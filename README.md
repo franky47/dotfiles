@@ -67,7 +67,7 @@ brew install stow       # macOS
 # or build stow 2.4+ from source on Linux (Debian ships 2.3.x which has --dotfiles bugs)
 
 git clone <repo-url> ~/dotfiles
-echo "<machine-name>" > ~/dotfiles/.machine-name
+echo "<machine>" > ~/dotfiles/.machine-name
 ~/dotfiles/install.sh
 ```
 
@@ -108,7 +108,7 @@ for f in ${DOTFILES}/local/${MACHINE_NAME}/zsh/*.zsh(N); do source "$f"; done
 Read from `.machine-name` in the repo root, falling back to `hostname -s`.
 
 ```sh
-echo "<machine-name>" > /path/to/dotfiles/.machine-name
+echo "<machine>" > /path/to/dotfiles/.machine-name
 ```
 
 This file is gitignored (per-clone). The hostname fallback usually works, but can change due to network adapter conflicts — the file provides a stable override.
