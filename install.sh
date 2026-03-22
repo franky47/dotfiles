@@ -16,7 +16,7 @@ if [[ "$(printf '%s\n' "2.4" "$stow_version" | sort -V | head -1)" != "2.4" ]]; 
 fi
 
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
-mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills
+mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/.config
 
 # Stow: symlinks .zshrc, .zshenv, and dot-claude/ contents into ~
 stow --dotfiles --restow -t ~ -d "${DOTFILES}" .

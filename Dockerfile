@@ -21,6 +21,9 @@ RUN echo "testbox" > /home/testuser/dotfiles/.machine-name
 RUN mkdir -p /home/testuser/dotfiles/local/testbox/claude/skills/testbox-only \
     && echo '---\nname: testbox-only\n---\nTest skill' > /home/testuser/dotfiles/local/testbox/claude/skills/testbox-only/SKILL.md
 
+# Ensure ~/.config exists so stow unfolds into it
+RUN mkdir -p ~/.config
+
 # Run install
 RUN /home/testuser/dotfiles/install.sh
 
@@ -54,6 +57,10 @@ RUN echo "=== Git ===" \
     && test -L ~/.gitconfig && readlink ~/.gitconfig | grep -q dotfiles && echo "OK: ~/.gitconfig symlinked" \
     && test -L ~/.gitignore_global && readlink ~/.gitignore_global | grep -q dotfiles && echo "OK: ~/.gitignore_global symlinked" \
     && grep -q 'excludesfile = ~/.gitignore_global' ~/.gitconfig && echo "OK: excludesfile uses portable path"
+
+# Assertions: ghostty
+RUN echo "=== Ghostty ===" \
+    && test -L ~/.config/ghostty && readlink ~/.config/ghostty | grep -q dotfiles && echo "OK: ~/.config/ghostty symlinked"
 
 # Assertions: zsh sources
 RUN echo "=== Zsh ===" \
