@@ -1,0 +1,20 @@
+[user]
+	name = François Best
+	email = github@francoisbest.com
+[core]
+	excludesfile = ~/.gitignore_global
+[color]
+	ui = auto
+[init]
+	defaultBranch = main
+[rerere]
+	enabled = true
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+[remote "origin"]
+	prune = true
+[push]
+	default = current

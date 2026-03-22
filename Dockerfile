@@ -49,6 +49,12 @@ RUN echo "=== Local skills ===" \
     && test -L ~/.claude/skills/testbox-only && echo "OK: testbox-only in ~/.claude/skills" \
     && test -L ~/.agents/skills/testbox-only && echo "OK: testbox-only in ~/.agents/skills"
 
+# Assertions: git config
+RUN echo "=== Git ===" \
+    && test -L ~/.gitconfig && readlink ~/.gitconfig | grep -q dotfiles && echo "OK: ~/.gitconfig symlinked" \
+    && test -L ~/.gitignore_global && readlink ~/.gitignore_global | grep -q dotfiles && echo "OK: ~/.gitignore_global symlinked" \
+    && grep -q 'excludesfile = ~/.gitignore_global' ~/.gitconfig && echo "OK: excludesfile uses portable path"
+
 # Assertions: zsh sources
 RUN echo "=== Zsh ===" \
     && zsh -c 'source ~/.zshrc' 2>&1 || true \
