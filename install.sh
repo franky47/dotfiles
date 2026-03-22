@@ -18,9 +18,16 @@ fi
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
 mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/.config
 
-# Stow: symlinks .zshrc, .zshenv, and dot-claude/ contents into ~
-stow --dotfiles --restow -t ~ -d "${DOTFILES}" .
-echo "Stow complete"
+# Stow: first run uses --adopt to pull existing files into the repo, then --restow for re-runs.
+# --adopt moves conflicting files into the package dir so stow can create symlinks.
+# After first install, review `git diff` to decide what to keep, move to local/, or revert.
+if stow --dotfiles --restow -t ~ -d "${DOTFILES}" . 2>/dev/null; then
+  echo "Stow complete"
+else
+  echo "Conflicts detected — adopting existing files into the repo"
+  stow --dotfiles --adopt -t ~ -d "${DOTFILES}" .
+  echo "Stow complete (adopted). Run 'git diff' to review adopted changes."
+fi
 
 # Mirror shared skills into ~/.agents/skills/ (stow only targets ~/.claude/)
 for d in "${DOTFILES}/dot-claude/skills/"*/; do

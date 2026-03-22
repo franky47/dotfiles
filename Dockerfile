@@ -58,6 +58,10 @@ RUN echo "=== Git ===" \
     && test -L ~/.gitignore_global && readlink ~/.gitignore_global | grep -q dotfiles && echo "OK: ~/.gitignore_global symlinked" \
     && grep -q 'excludesfile = ~/.gitignore_global' ~/.gitconfig && echo "OK: excludesfile uses portable path"
 
+# Assertions: skill lockfile
+RUN echo "=== Skill lockfile ===" \
+    && test -L ~/.agents/.skill-lock.json && readlink ~/.agents/.skill-lock.json | grep -q dotfiles && echo "OK: ~/.agents/.skill-lock.json symlinked"
+
 # Assertions: ghostty
 RUN echo "=== Ghostty ===" \
     && test -L ~/.config/ghostty && readlink ~/.config/ghostty | grep -q dotfiles && echo "OK: ~/.config/ghostty symlinked"
@@ -66,5 +70,15 @@ RUN echo "=== Ghostty ===" \
 RUN echo "=== Zsh ===" \
     && zsh -c 'source ~/.zshrc' 2>&1 || true \
     && echo "OK: .zshrc sourced"
+
+# === Test --adopt path: simulate pre-existing files ===
+# Unstow everything, create conflicting files, re-run install
+RUN stow --dotfiles -D -t ~ -d ~/dotfiles . 2>/dev/null || true \
+    && rm -f ~/.zshrc ~/.zshenv ~/.gitconfig \
+    && echo 'existing zshrc' > ~/.zshrc \
+    && echo 'existing gitconfig' > ~/.gitconfig \
+    && /home/testuser/dotfiles/install.sh 2>&1 | grep -q "adopted" && echo "OK: adopt path triggered" \
+    && test -L ~/.zshrc && echo "OK: ~/.zshrc is now a symlink after adopt" \
+    && test -L ~/.gitconfig && echo "OK: ~/.gitconfig is now a symlink after adopt"
 
 RUN echo "=== All assertions passed ==="
