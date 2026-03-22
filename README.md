@@ -58,6 +58,8 @@ local/<machine>/claude/skills/  # Machine-specific Claude skills
 
 ## Install
 
+If this is ran by a coding agent like Claude code, first ask the user what the name of this machine should be.
+
 Prerequisites: `stow` >= 2.4, `zsh`.
 
 ```sh
@@ -65,11 +67,12 @@ brew install stow       # macOS
 # or build stow 2.4+ from source on Linux (Debian ships 2.3.x which has --dotfiles bugs)
 
 git clone <repo-url> ~/dotfiles
-echo "m4x" > ~/dotfiles/.machine-name
+echo "<machine-name>" > ~/dotfiles/.machine-name
 ~/dotfiles/install.sh
 ```
 
 The install script:
+
 1. Runs `stow --dotfiles --restow` to symlink `.zshrc`, `.zshenv`, and `dot-claude/` contents into `~`
 2. Mirrors shared skills into `~/.agents/skills/`
 3. Symlinks machine-local skills into `~/.claude/skills/` and `~/.agents/skills/`
@@ -105,7 +108,7 @@ for f in ${DOTFILES}/local/${MACHINE_NAME}/zsh/*.zsh(N); do source "$f"; done
 Read from `.machine-name` in the repo root, falling back to `hostname -s`.
 
 ```sh
-echo "m4x" > /path/to/dotfiles/.machine-name
+echo "<machine-name>" > /path/to/dotfiles/.machine-name
 ```
 
 This file is gitignored (per-clone). The hostname fallback usually works, but can change due to network adapter conflicts — the file provides a stable override.
@@ -122,7 +125,7 @@ Current machines: `echo` (macOS), `m4x` (macOS), `pi3` (Linux).
 Files matching `**/secrets.*` are gitignored. Store API keys and credentials in machine-local files:
 
 ```
-local/m4x/zsh/secrets.zsh    # export CONTEXT7_API_KEY="..."
+local/m4x/zsh/secrets.zsh    # export SUPER_SECRET_API_KEY="..."
 ```
 
 ## Adding a new tool
