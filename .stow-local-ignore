@@ -1,0 +1,8 @@
+^zsh$
+^zshenv$
+^local$
+^README\.md$
+^install\.sh$
+^Dockerfile$
+^\.gitignore$
+^\.machine-name$
