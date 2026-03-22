@@ -5,6 +5,8 @@ DOTFILES="$(cd "$(dirname "$0")" && pwd)"
 MACHINE_NAME="$(cat "${DOTFILES}/.machine-name" 2>/dev/null || hostname -s)"
 LOCAL_CLAUDE="${DOTFILES}/local/${MACHINE_NAME}/claude"
 
+echo "${DOTFILES}" > ~/.dotfiles-path
+
 echo "Installing dotfiles from ${DOTFILES}"
 echo "Machine: ${MACHINE_NAME}"
 
