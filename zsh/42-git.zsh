@@ -1,0 +1,6 @@
+alias g='lazygit'
+alias gl='git log --graph --oneline -n 10'
+alias gll='git log --graph -n 5'
+alias gls='git log --oneline -n 20'
+alias grpo='git remote prune origin'
+alias gpfl='git push --force-with-lease'
