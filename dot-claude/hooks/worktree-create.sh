@@ -1,6 +1,10 @@
 #!/bin/bash
 INPUT=$(cat)
-NAME=$(echo "$INPUT" | jq -r '.name')
+RAW=$(echo "$INPUT" | jq -r '.name')
+
+# Decode -S- back to / for the branch name (encoded by cw/cwr shell functions)
+NAME=$(echo "$RAW" | sed 's/-S-/\//g')
+# Slugify for the directory
 SLUG=$(echo "$NAME" | sed 's/[^a-zA-Z0-9._-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
 WORKTREE_DIR="$CLAUDE_PROJECT_DIR/.worktrees/$SLUG"
 

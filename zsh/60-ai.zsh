@@ -10,10 +10,10 @@ cr() {
   claude --allow-dangerously-skip-permissions "/remote-control"
 }
 cw() {
-  claude --allow-dangerously-skip-permissions -w $1
+  claude --allow-dangerously-skip-permissions -w "${1//\//-S-}"
 }
 cwr() {
-  claude --allow-dangerously-skip-permissions -w $1 "/remote-control"
+  claude --allow-dangerously-skip-permissions -w "${1//\//-S-}" "/remote-control"
 }
 
 alias bt='beans tui'
