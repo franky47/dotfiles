@@ -15,6 +15,16 @@ cw() {
 cwr() {
   claude --allow-dangerously-skip-permissions -w "${1//\//-S-}" "/remote-control"
 }
+_claude_worktree_completions() {
+  local branches=()
+  local current=$(git branch --show-current 2>/dev/null)
+  while IFS= read -r line; do
+    [[ "$line" =~ ^branch\ refs/heads/(.+)$ ]] && [[ "${match[1]}" != "$current" ]] && \
+      branches+=("${match[1]}")
+  done < <(git worktree list --porcelain 2>/dev/null)
+  _describe 'worktree branch' branches
+}
+compdef _claude_worktree_completions cw cwr
 
 alias bt='beans tui'
 alias bl='beans list'
