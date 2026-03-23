@@ -7,6 +7,7 @@ CYAN='\033[36m'
 RED='\033[31m'
 YELLOW='\033[33m'
 GREEN='\033[32m'
+MAGENTA='\033[35m'
 RESET='\033[0m'
 
 eval "$(echo "$input" | jq -r '
@@ -46,6 +47,35 @@ fi
 
 separator=" ${DIM}|${RESET} "
 
+# Git dirty state (matches zsh prompt style)
+dirty=""
+if [ -n "$cwd" ]; then
+  dirty_str=$(git -C "$cwd" status --porcelain 2>/dev/null | awk \
+    -v yellow="$YELLOW" -v green="$GREEN" -v red="$RED" \
+    -v magenta="$MAGENTA" -v reset="$RESET" '
+    {
+      x = substr($0, 1, 1)
+      y = substr($0, 2, 1)
+      if (x == "M" || y == "M") m++
+      if (x == "A")             a++
+      if (x == "D" || y == "D") d++
+      if (x == "?" && y == "?") u++
+    }
+    END {
+      s = ""
+      if (m) s = s sprintf("%s%d~%s ", yellow, m, reset)
+      if (a) s = s sprintf("%s%d+%s ", green, a, reset)
+      if (d) s = s sprintf("%s%d-%s ", red, d, reset)
+      if (u) s = s sprintf("%s%d?%s ", magenta, u, reset)
+      sub(/ $/, "", s)
+      print s
+    }
+  ')
+  if [ -n "$dirty_str" ]; then
+    dirty="$separator$dirty_str"
+  fi
+fi
+
 diff=""
 if [ -n "$added" ] && [ -n "$removed" ]; then
   if [ "$added" -gt 0 ]; then
@@ -60,5 +90,5 @@ if [ -n "$added" ] && [ -n "$removed" ]; then
   fi
 fi
 
-echo -e "$model""$separator""$ctx_str""$separator""$location"
-echo -e "${DIM}${session_id}${RESET}""$diff"
+echo -e "$location""$separator""$ctx_str""$separator""$model"
+echo -e "${DIM}${session_id}${RESET}""$dirty""$diff"
