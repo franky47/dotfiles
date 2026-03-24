@@ -50,7 +50,5 @@ if [[ -d "${LOCAL_CLAUDE}/skills" ]]; then
   done
 fi
 
-source ~/.zshrc
-echo "Sourced ~/.zshrc"
-
-echo "Done"
+echo "Done — to reload your shell, run:"
+echo "source ~/.zshrc"
