@@ -1,5 +1,5 @@
 ---
-name: work-loop
+name: work
 description: Pick one open task and implement it end-to-end as a unit of work. Use when the user asks to pick a task.
 user-invocable: true
 ---
