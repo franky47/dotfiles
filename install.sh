@@ -10,12 +10,97 @@ echo "${DOTFILES}" > ~/.dotfiles-path
 echo "Installing dotfiles from ${DOTFILES}"
 echo "Machine: ${MACHINE_NAME}"
 
-# Check stow version >= 2.4 (--dotfiles bug in 2.3.x)
-stow_version="$(stow --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)"
-if [[ "$(printf '%s\n' "2.4" "$stow_version" | sort -V | head -1)" != "2.4" ]]; then
-  echo "ERROR: stow >= 2.4 required (found ${stow_version}). Install with: brew install stow" >&2
-  exit 1
-fi
+# ---------------------------------------------------------------------------
+# Prerequisites
+# ---------------------------------------------------------------------------
+
+check_prereqs() {
+  local missing=0
+
+  # Required — install fails without these
+  if ! command -v stow &>/dev/null; then
+    echo "ERROR: stow is required but not installed." >&2
+    echo "  brew install stow" >&2
+    missing=1
+  else
+    local stow_version
+    stow_version="$(stow --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)"
+    if [[ "$(printf '%s\n' "2.4" "$stow_version" | sort -V | head -1)" != "2.4" ]]; then
+      echo "ERROR: stow >= 2.4 required (found ${stow_version})." >&2
+      echo "  brew install stow" >&2
+      missing=1
+    fi
+  fi
+
+  if ! command -v git &>/dev/null; then
+    echo "ERROR: git is required but not installed." >&2
+    echo "  brew install git" >&2
+    missing=1
+  fi
+
+  [[ $missing -ne 0 ]] && exit 1
+
+  # Optional — dotfiles install fine but the configs won't be useful without these
+  local warn=0
+
+  if ! command -v difft &>/dev/null; then
+    echo "WARN: difftastic (difft) not found — git diff will fall back to built-in diff."
+    echo "  brew install difftastic"
+    warn=1
+  fi
+
+  if ! command -v delta &>/dev/null; then
+    echo "WARN: delta not found — lazygit pager will fall back to default."
+    echo "  brew install git-delta"
+    warn=1
+  fi
+
+  if ! command -v lazygit &>/dev/null; then
+    echo "WARN: lazygit not found."
+    echo "  brew install lazygit"
+    warn=1
+  fi
+
+  if ! command -v git-lfs &>/dev/null; then
+    echo "WARN: git-lfs not found — LFS filters in gitconfig won't work."
+    echo "  brew install git-lfs"
+    warn=1
+  fi
+
+  if ! command -v ghostty &>/dev/null; then
+    echo "WARN: ghostty not found."
+    echo "  https://ghostty.org/download"
+    warn=1
+  fi
+
+  if ! command -v bat &>/dev/null; then
+    echo "WARN: bat not found — 'cat' alias won't work."
+    echo "  brew install bat"
+    warn=1
+  fi
+
+  if ! command -v htop &>/dev/null; then
+    echo "WARN: htop not found — 'top' alias won't work."
+    echo "  brew install htop"
+    warn=1
+  fi
+
+  if ! command -v fnm &>/dev/null; then
+    echo "WARN: fnm not found — Node version management unavailable."
+    echo "  brew install fnm"
+    warn=1
+  fi
+
+  if ! command -v claude &>/dev/null; then
+    echo "WARN: claude not found — Claude Code config won't be used."
+    echo "  npm install -g @anthropic-ai/claude-code"
+    warn=1
+  fi
+
+  [[ $warn -ne 0 ]] && echo ""
+}
+
+check_prereqs
 
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
 mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/.config/jesseduffield/lazygit
