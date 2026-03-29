@@ -1,0 +1,9 @@
+gui:
+  nerdFontsVersion: "3"
+
+git:
+  pagers:
+    # Default pager for hunk staging & navigation
+    - pager: delta --dark --paging=never
+    # Difftastic via git's diff.external — toggle with |
+    - useExternalDiffGitConfig: true

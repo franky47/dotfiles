@@ -18,7 +18,7 @@ if [[ "$(printf '%s\n' "2.4" "$stow_version" | sort -V | head -1)" != "2.4" ]]; 
 fi
 
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
-mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/.config
+mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/.config/jesseduffield/lazygit
 
 # Stow: first run uses --adopt to pull existing files into the repo, then --restow for re-runs.
 # --adopt moves conflicting files into the package dir so stow can create symlinks.

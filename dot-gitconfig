@@ -14,7 +14,12 @@
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
+[diff]
+	external = difft --display=inline
 [remote "origin"]
 	prune = true
 [push]
 	default = current
+[alias]
+	dlog = -c diff.external=difft log -p --ext-diff
+	dshow = -c diff.external=difft show --ext-diff
