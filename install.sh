@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+YELLOW=$'\033[33m'
+RESET=$'\033[0m'
+
 DOTFILES="$(cd "$(dirname "$0")" && pwd)"
 MACHINE_NAME="$(cat "${DOTFILES}/.machine-name" 2>/dev/null || hostname -s)"
 LOCAL_CLAUDE="${DOTFILES}/local/${MACHINE_NAME}/claude"
@@ -44,49 +47,43 @@ check_prereqs() {
   local warn=0
 
   if ! command -v difft &>/dev/null; then
-    echo "WARN: difftastic (difft) not found — git diff will fall back to built-in diff."
+    echo "${YELLOW}WARN:${RESET} difftastic (difft) not found — git diff will fall back to built-in diff."
     echo "  brew install difftastic"
     warn=1
   fi
 
   if ! command -v lazygit &>/dev/null; then
-    echo "WARN: lazygit not found."
+    echo "${YELLOW}WARN:${RESET} lazygit not found."
     echo "  brew install lazygit"
     warn=1
   fi
 
-  if ! command -v git-lfs &>/dev/null; then
-    echo "WARN: git-lfs not found — LFS filters in gitconfig won't work."
-    echo "  brew install git-lfs"
-    warn=1
-  fi
-
   if ! command -v ghostty &>/dev/null; then
-    echo "WARN: ghostty not found."
+    echo "${YELLOW}WARN:${RESET} ghostty not found."
     echo "  https://ghostty.org/download"
     warn=1
   fi
 
   if ! command -v bat &>/dev/null; then
-    echo "WARN: bat not found — 'cat' alias won't work."
+    echo "${YELLOW}WARN:${RESET} bat not found — 'cat' alias won't work."
     echo "  brew install bat"
     warn=1
   fi
 
   if ! command -v htop &>/dev/null; then
-    echo "WARN: htop not found — 'top' alias won't work."
+    echo "${YELLOW}WARN:${RESET} htop not found — 'top' alias won't work."
     echo "  brew install htop"
     warn=1
   fi
 
   if ! command -v fnm &>/dev/null; then
-    echo "WARN: fnm not found — Node version management unavailable."
+    echo "${YELLOW}WARN:${RESET} fnm not found — Node version management unavailable."
     echo "  brew install fnm"
     warn=1
   fi
 
   if ! command -v claude &>/dev/null; then
-    echo "WARN: claude not found — Claude Code config won't be used."
+    echo "${YELLOW}WARN:${RESET} claude not found — Claude Code config won't be used."
     echo "  npm install -g @anthropic-ai/claude-code"
     warn=1
   fi
