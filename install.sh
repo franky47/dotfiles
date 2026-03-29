@@ -88,13 +88,13 @@ check_prereqs() {
     warn=1
   fi
 
-  [[ $warn -ne 0 ]] && echo ""
+  [[ $warn -ne 0 ]] && echo "" || true
 }
 
 check_prereqs
 
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
-mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/.config/jesseduffield/lazygit
+mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/Library/Application\ Support/lazygit
 
 # Stow: first run uses --adopt to pull existing files into the repo, then --restow for re-runs.
 # --adopt moves conflicting files into the package dir so stow can create symlinks.
@@ -106,6 +106,10 @@ else
   stow --dotfiles --adopt -t ~ -d "${DOTFILES}" .
   echo "Stow complete (adopted). Run 'git diff' to review adopted changes."
 fi
+
+# Lazygit config (macOS path with spaces — can't use stow)
+ln -sfn "${DOTFILES}/lazygit/config.yml" ~/Library/Application\ Support/lazygit/config.yml
+echo "Linked lazygit config"
 
 # Mirror shared skills into ~/.agents/skills/ (stow only targets ~/.claude/)
 for d in "${DOTFILES}/dot-claude/skills/"*/; do
