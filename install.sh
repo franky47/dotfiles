@@ -49,12 +49,6 @@ check_prereqs() {
     warn=1
   fi
 
-  if ! command -v delta &>/dev/null; then
-    echo "WARN: delta not found — lazygit pager will fall back to default."
-    echo "  brew install git-delta"
-    warn=1
-  fi
-
   if ! command -v lazygit &>/dev/null; then
     echo "WARN: lazygit not found."
     echo "  brew install lazygit"

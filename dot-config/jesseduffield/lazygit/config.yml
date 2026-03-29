@@ -3,7 +3,5 @@ gui:
 
 git:
   pagers:
-    # Default pager for hunk staging & navigation
-    - pager: delta --dark --paging=never
-    # Difftastic via git's diff.external — toggle with |
+    # Difftastic via git's diff.external — toggle with | to fall back to built-in diff
     - useExternalDiffGitConfig: true
