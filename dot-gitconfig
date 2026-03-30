@@ -9,8 +9,6 @@
 	defaultBranch = main
 [rerere]
 	enabled = true
-[diff]
-	external = difft --display=inline
 [remote "origin"]
 	prune = true
 [push]

@@ -3,5 +3,6 @@ gui:
 
 git:
   pagers:
-    # Difftastic via git's diff.external — toggle with | to fall back to built-in diff
-    - useExternalDiffGitConfig: true
+    - externalDiffCommand: "difft --color=always --display=inline --syntax-highlight=off"
+    - externalDiffCommand: "difft --color=always --display=inline"
+    - {}
