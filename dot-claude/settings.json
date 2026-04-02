@@ -71,6 +71,8 @@
       "Bash(xargs cat*)",
       "Bash(node --version*)",
       "Bash(npm --version*)",
+      "Bash(npm info *)",
+      "Bash(npm view *)",
       "Bash(pnpm --version*)",
       "Bash(bun --version*)",
       "Bash(pnpm list *)",
@@ -120,7 +122,6 @@
       "Edit(.env*)"
     ],
     "ask": [
-      "Bash(rm *)",
       "Bash(pnpm add *)",
       "Bash(bun add *)",
       "Bash(gh pr create *)"
@@ -135,6 +136,16 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/block-dangerous-git.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "if": "Bash(rm *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/check-rm-git-tracked.sh"
           }
         ]
       }
