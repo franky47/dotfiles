@@ -77,7 +77,20 @@ RED:   Write next test → RUN IT → observe it fail
 GREEN: Minimal code to pass → RUN IT → observe it pass
 ```
 
-**You MUST run the test after writing it and confirm it fails before writing any implementation.** The red step is not optional — it validates that your test actually detects the missing behavior. If you skip it, you don't know whether the test is testing anything. Likewise, when modifying existing behavior, update the test expectations first, run to confirm failure, then change the source.
+**You MUST run the test after writing it and confirm it fails before writing any implementation.** The red step is not optional — it validates that your test actually detects the missing behavior. If you skip it, you don't know whether the test is testing anything.
+
+### Editing Existing Code
+
+When changing behavior in existing code, **edit the test first**:
+
+```
+RED:   Update test to expect new behavior → RUN IT → observe it fail
+GREEN: Edit implementation to match → RUN IT → observe it pass
+```
+
+**A test that passes before you touch the implementation is a red flag** — it means the test doesn't actually cover the behavioral change you're making. Either the test is too loose, or the behavior already existed. Investigate before moving on.
+
+This applies to bug fixes too: write a test that reproduces the bug (RED), then fix it (GREEN). If you can't write a failing test for a bug, you don't understand the bug yet.
 
 Rules:
 
