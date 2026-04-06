@@ -27,7 +27,7 @@ Comprehensive guidance for mastering TypeScript's advanced type system including
 **Basic Generic Function:**
 
 function identity<T>(value: T): T {
-  return value;
+return value;
 }
 
 const num = identity<number>(42);
@@ -39,18 +39,18 @@ const auto = identity(true); // Type inferred: boolean
 **Generic Constraints:**
 
 type HasLength = {
-  length: number;
+length: number;
 }
 
 function logLength<T extends HasLength>(item: T): T {
-  console.log(item.length);
-  return item;
+console.log(item.length);
+return item;
 }
 
 **Multiple Type Parameters:**
 
 function merge<T, U>(obj1: T, obj2: U): T & U {
-  return { ...obj1, ...obj2 };
+return { ...obj1, ...obj2 };
 }
 
 ### 2. Conditional Types
@@ -90,6 +90,18 @@ Partial<T>, Required<T>, Readonly<T>, Pick<T, K>, Omit<T, K>, Exclude<T, U>, Ext
 - Type guards with `value is Type`
 - Assertion functions with `asserts value is Type`
 
+## Strict mode
+
+In tsconfig.json, strict mode should always be enabled.
+The following flags should also be on:
+
+- "noFallthroughCasesInSwitch": true
+- "noUncheckedIndexedAccess": true
+- "noPropertyAccessFromIndexSignature": true
+
+Don't type-cast `catch (err: unknown) {}`, err is already `unknown`
+in strict mode: `catch (err) {}`.
+
 ## Best Practices
 
 1. Use `unknown` over `any`
@@ -99,6 +111,7 @@ Partial<T>, Required<T>, Readonly<T>, Pick<T, K>, Omit<T, K>, Exclude<T, U>, Ext
 5. Create helper types for reuse
 6. Use const assertions
 7. Avoid type assertions — use type guards
-8. Document complex types
-9. Use strict mode
-10. Test your types
+8. Use tsconfig strict settings eagerly
+9. Document complex types
+10. Use strict mode
+11. Test your types
