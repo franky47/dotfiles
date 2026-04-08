@@ -31,7 +31,7 @@ The core principle: **replace, don't layer.**
 - Tests assert on observable outcomes through the public interface, not internal state
 - Tests should survive internal refactors — they describe behavior, not implementation
 
-## Issue Template
+## Bean Body Template
 
 <issue-template>
 
