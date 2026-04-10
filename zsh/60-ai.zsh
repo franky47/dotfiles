@@ -4,16 +4,16 @@ o() {
 alias ocup="opencode upgrade"
 
 c() {
-  claude --allow-dangerously-skip-permissions
+  claude --dangerously-skip-permissions
 }
 cr() {
-  claude --allow-dangerously-skip-permissions "/remote-control"
+  claude --dangerously-skip-permissions "/remote-control"
 }
 cw() {
-  claude --allow-dangerously-skip-permissions -w "${1//\//-S-}"
+  claude --dangerously-skip-permissions -w "${1//\//-S-}"
 }
 cwr() {
-  claude --allow-dangerously-skip-permissions -w "${1//\//-S-}" "/remote-control"
+  claude --dangerously-skip-permissions -w "${1//\//-S-}" "/remote-control"
 }
 _claude_worktree_completions() {
   local branches=()
