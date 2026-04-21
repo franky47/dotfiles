@@ -121,12 +121,8 @@
       "Read(.env*)",
       "Edit(.env*)"
     ],
-    "ask": [
-      "Bash(pnpm add *)",
-      "Bash(bun add *)",
-      "Bash(gh pr create *)"
-    ],
-    "defaultMode": "default"
+    "ask": ["Bash(pnpm add *)", "Bash(bun add *)", "Bash(gh pr create *)"],
+    "defaultMode": "bypassPermissions"
   },
   "hooks": {
     "PreToolUse": [
@@ -173,14 +169,22 @@
     "pr-review-toolkit@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+    "caveman@caveman": true
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
   },
   "spinnerVerbs": {
     "mode": "replace",
-    "verbs": [
-      "Processing"
-    ]
+    "verbs": ["Processing"]
   },
   "effortLevel": "high",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true
 }
