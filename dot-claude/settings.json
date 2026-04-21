@@ -141,10 +141,10 @@
       },
       {
         "matcher": "Bash",
-        "if": "Bash(rm *)",
         "hooks": [
           {
             "type": "command",
+            "if": "Bash(rm *)",
             "command": "~/.claude/hooks/check-rm-git-tracked.sh"
           }
         ]
