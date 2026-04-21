@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.47ng.llama-swap</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+	<key>ProgramArguments</key>
+	<array>
+		<string>__LLAMA_SWAP_BIN__</string>
+		<string>-config</string>
+		<string>__LLAMA_SWAP_CONFIG__</string>
+		<string>-listen</string>
+		<string>0.0.0.0:10001</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>__LLAMA_SWAP_LOG_OUT__</string>
+	<key>StandardErrorPath</key>
+	<string>__LLAMA_SWAP_LOG_ERR__</string>
+</dict>
+</plist>

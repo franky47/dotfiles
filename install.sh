@@ -88,6 +88,18 @@ check_prereqs() {
     warn=1
   fi
 
+  if ! command -v llama-swap &>/dev/null; then
+    echo "${YELLOW}WARN:${RESET} llama-swap not found — model swap daemon unavailable."
+    echo "  brew install llama-swap"
+    warn=1
+  fi
+
+  if ! command -v llama-server &>/dev/null; then
+    echo "${YELLOW}WARN:${RESET} llama-server not found — llama.cpp unavailable."
+    echo "  brew install llama.cpp"
+    warn=1
+  fi
+
   [[ $warn -ne 0 ]] && echo "" || true
 }
 
@@ -128,6 +140,23 @@ if [[ -d "${LOCAL_CLAUDE}/skills" ]]; then
     ln -sfn "$d" ~/.agents/skills/"$name"
     echo "Linked local skill: $name"
   done
+fi
+
+# llama-swap LaunchAgent
+LLAMA_SWAP="$(which llama-swap 2>/dev/null || echo /opt/homebrew/bin/llama-swap)"
+HOME_DIR="$HOME"
+sed -e "s|__LLAMA_SWAP_BIN__|${LLAMA_SWAP}|g" \
+    -e "s|__LLAMA_SWAP_CONFIG__|${HOME_DIR}/.config/llama-swap/config.yml|g" \
+    -e "s|__LLAMA_SWAP_LOG_OUT__|${HOME_DIR}/.config/llama-swap/logs/stdout.txt|g" \
+    -e "s|__LLAMA_SWAP_LOG_ERR__|${HOME_DIR}/.config/llama-swap/logs/stderr.txt|g" \
+    "${DOTFILES}/templates/com.47ng.llama-swap.plist" \
+  > ~/Library/LaunchAgents/com.47ng.llama-swap.plist
+if launchctl list gui/"$(id -u)" 2>/dev/null | grep -q com.47ng.llama-swap; then
+  launchctl bootout gui/"$(id -u)"/com.47ng.llama-swap 2>/dev/null || true
+  launchctl bootstrap gui/"$(id -u)" ~/Library/LaunchAgents/com.47ng.llama-swap.plist 2>/dev/null || true
+  echo "Restarted llama-swap LaunchAgent"
+else
+  echo "llama-swap LaunchAgent already loaded"
 fi
 
 echo "Done — to reload your shell, run:"

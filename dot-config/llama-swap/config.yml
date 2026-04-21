@@ -1,0 +1,32 @@
+healthCheckTimeout: 300
+startPort: 10002
+
+models:
+
+  qwen-code:
+    # 262144: 256k shared KV (64k per agent)
+    cmd: |
+      llama-server
+        -hf unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_M
+        --port ${PORT}
+        --parallel 4
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --ctx-size 262144
+        --gpu-layers all
+    ttl: 0
+    concurrencyLimit: 4
+
+  gemma:
+    name: "gemma-4-31B"
+    cmd: |
+      llama-server
+        -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --ctx-size 65536
+        --gpu-layers all
+    ttl: 0
+    concurrencyLimit: 1
