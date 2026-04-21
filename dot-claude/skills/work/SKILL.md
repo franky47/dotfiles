@@ -4,7 +4,13 @@ description: Pick one open task and implement it end-to-end as a unit of work. U
 user-invocable: true
 ---
 
-Task management is done with beans. Familiarise yourself with the beans CLI if you haven't already (calling `beans prime`).
+Task management is done with `beans`:
+
+!`beans prime`
+
+---
+
+## Workflow
 
 Do the following, in this specific order:
 
