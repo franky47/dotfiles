@@ -15,7 +15,7 @@
 		<string>-config</string>
 		<string>__LLAMA_SWAP_CONFIG__</string>
 		<string>-listen</string>
-		<string>0.0.0.0:10001</string>
+		<string>127.0.0.1:10001</string>
 		<string>-watch-config</string>
 	</array>
 	<key>RunAtLoad</key>
