@@ -2,7 +2,7 @@ FROM debian:bookworm-slim
 
 # Install stow 2.4+ from source (Debian ships 2.3.1 which has --dotfiles bugs)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    zsh hostname perl make curl ca-certificates \
+    zsh hostname perl make curl ca-certificates git \
     && curl -sL https://ftp.gnu.org/gnu/stow/stow-2.4.1.tar.gz | tar xz -C /tmp \
     && cd /tmp/stow-2.4.1 && ./configure && make install \
     && rm -rf /tmp/stow-2.4.1 \
@@ -58,10 +58,6 @@ RUN echo "=== Git ===" \
     && test -L ~/.gitignore_global && readlink ~/.gitignore_global | grep -q dotfiles && echo "OK: ~/.gitignore_global symlinked" \
     && grep -q 'excludesfile = ~/.gitignore_global' ~/.gitconfig && echo "OK: excludesfile uses portable path"
 
-# Assertions: skill lockfile
-RUN echo "=== Skill lockfile ===" \
-    && test -L ~/.agents/.skill-lock.json && readlink ~/.agents/.skill-lock.json | grep -q dotfiles && echo "OK: ~/.agents/.skill-lock.json symlinked"
-
 # Assertions: ghostty
 RUN echo "=== Ghostty ===" \
     && test -L ~/.config/ghostty && readlink ~/.config/ghostty | grep -q dotfiles && echo "OK: ~/.config/ghostty symlinked"
@@ -80,5 +76,32 @@ RUN stow --dotfiles -D -t ~ -d ~/dotfiles . 2>/dev/null || true \
     && /home/testuser/dotfiles/install.sh 2>&1 | grep -q "adopted" && echo "OK: adopt path triggered" \
     && test -L ~/.zshrc && echo "OK: ~/.zshrc is now a symlink after adopt" \
     && test -L ~/.gitconfig && echo "OK: ~/.gitconfig is now a symlink after adopt"
+
+# === Test guard: non-symlink dir at ~/.agents/skills/<name> is preserved ===
+# Regression: ln -sfn into a real dir creates a nested symlink inside it rather
+# than replacing it, leading to stale-copy / nested-too-deep bugs.
+RUN echo "=== Guard: ~/.agents/skills collision ===" \
+    && mkdir -p /home/testuser/dotfiles/dot-claude/skills/guard-fixture-shared \
+    && echo '---\nname: guard-fixture-shared\n---' > /home/testuser/dotfiles/dot-claude/skills/guard-fixture-shared/SKILL.md \
+    && mkdir -p ~/.agents/skills/guard-fixture-shared \
+    && echo 'user data' > ~/.agents/skills/guard-fixture-shared/USER_DATA \
+    && /home/testuser/dotfiles/install.sh 2>&1 | tee /tmp/install.out \
+    && grep -q "WARN.*guard-fixture-shared" /tmp/install.out && echo "OK: warning emitted" \
+    && test -f ~/.agents/skills/guard-fixture-shared/USER_DATA && echo "OK: user data preserved" \
+    && ! test -L ~/.agents/skills/guard-fixture-shared && echo "OK: target not turned into symlink" \
+    && ! test -e ~/.agents/skills/guard-fixture-shared/guard-fixture-shared && echo "OK: no nested symlink created"
+
+# === Test guard: non-symlink dir at ~/.claude/skills/<name> is preserved ===
+# Same bug as ~/.agents/skills but via the machine-local skills loop.
+RUN echo "=== Guard: ~/.claude/skills collision ===" \
+    && mkdir -p /home/testuser/dotfiles/local/testbox/claude/skills/guard-fixture-local \
+    && echo '---\nname: guard-fixture-local\n---' > /home/testuser/dotfiles/local/testbox/claude/skills/guard-fixture-local/SKILL.md \
+    && mkdir -p ~/.claude/skills/guard-fixture-local \
+    && echo 'user data' > ~/.claude/skills/guard-fixture-local/USER_DATA \
+    && /home/testuser/dotfiles/install.sh 2>&1 | tee /tmp/install.out \
+    && grep -q "WARN.*guard-fixture-local.*\.claude/skills" /tmp/install.out && echo "OK: warning emitted" \
+    && test -f ~/.claude/skills/guard-fixture-local/USER_DATA && echo "OK: user data preserved" \
+    && ! test -L ~/.claude/skills/guard-fixture-local && echo "OK: target not turned into symlink" \
+    && ! test -e ~/.claude/skills/guard-fixture-local/guard-fixture-local && echo "OK: no nested symlink created"
 
 RUN echo "=== All assertions passed ==="

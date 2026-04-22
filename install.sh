@@ -125,11 +125,22 @@ fi
 ln -sfn "${DOTFILES}/lazygit/config.yml" ~/Library/Application\ Support/lazygit/config.yml
 echo "Linked lazygit config"
 
+# ln -sfn replaces existing symlinks but creates a link *inside* a real dir,
+# which nests-too-deep and masks stale copies. Skip and warn instead.
+link_skill() {
+  local src="$1" target="$2"
+  if [[ -d "$target" && ! -L "$target" ]]; then
+    echo "${YELLOW}WARN:${RESET} skipping symlink ${src} → ${target} (target is a non-symlink dir — move its contents into dotfiles or local/<machine>/claude/skills/ if intended as managed)" >&2
+    return
+  fi
+  ln -sfn "$src" "$target"
+}
+
 # Mirror shared skills into ~/.agents/skills/ (stow only targets ~/.claude/)
 for d in "${DOTFILES}/dot-claude/skills/"*/; do
   [[ -d "$d" ]] || continue
   name="$(basename "$d")"
-  ln -sfn "$d" ~/.agents/skills/"$name"
+  link_skill "$d" ~/.agents/skills/"$name"
 done
 echo "Mirrored shared skills to ~/.agents/skills/"
 
@@ -138,8 +149,8 @@ if [[ -d "${LOCAL_CLAUDE}/skills" ]]; then
   for d in "${LOCAL_CLAUDE}/skills/"*/; do
     [[ -d "$d" ]] || continue
     name="$(basename "$d")"
-    ln -sfn "$d" ~/.claude/skills/"$name"
-    ln -sfn "$d" ~/.agents/skills/"$name"
+    link_skill "$d" ~/.claude/skills/"$name"
+    link_skill "$d" ~/.agents/skills/"$name"
     echo "Linked local skill: $name"
   done
 fi
