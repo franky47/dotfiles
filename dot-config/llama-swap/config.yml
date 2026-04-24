@@ -3,7 +3,7 @@ startPort: 10002
 
 models:
 
-  qwen-code:
+  qwen3.6-35b-a3b-q4_k_m:
     # 262144: 256k shared KV (64k per agent)
     cmd: |
       llama-server
@@ -15,11 +15,43 @@ models:
         --flash-attn on
         --ctx-size 262144
         --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
     ttl: 0
     concurrencyLimit: 4
 
-  gemma:
-    name: "gemma-4-31B"
+  qwen3.6-27b-q4_k_xl:
+    cmd: |
+      llama-server
+        -hf unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --ctx-size 65536
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+    ttl: 0
+    concurrencyLimit: 1
+
+  qwopus-glm-18b-q4_k_m:
+    cmd: |
+      llama-server
+        -hf KyleHessling1/Qwopus-GLM-18B-Merged-GGUF:Q4_K_M
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --ctx-size 65536
+        --flash-attn on
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+    ttl: 0
+    concurrencyLimit: 1
+
+  gemma4-31b-q4_k_m:
     cmd: |
       llama-server
         -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
@@ -28,5 +60,64 @@ models:
         --cont-batching
         --ctx-size 65536
         --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
     ttl: 0
     concurrencyLimit: 1
+
+  council-qwen3.6-35b-a3b-q4_k_m:
+    cmd: |
+      llama-server
+        -hf unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_M
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --ctx-size 32768
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+    ttl: 0
+    concurrencyLimit: 1
+
+  council-qwen3.6-27b-q4_k_xl:
+    cmd: |
+      llama-server
+        -hf unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --ctx-size 32768
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+    ttl: 0
+    concurrencyLimit: 1
+
+  council-gemma4-31b-q4_k_m:
+    cmd: |
+      llama-server
+        -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --ctx-size 32768
+        --flash-attn on
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+    ttl: 0
+    concurrencyLimit: 1
+
+groups:
+  council:
+    swap: false
+    exclusive: false
+    persistent: false
+    members:
+      - council-qwen3.6-35b-a3b-q4_k_m
+      - council-qwen3.6-27b-q4_k_xl
+      - council-gemma4-31b-q4_k_m
