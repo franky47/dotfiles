@@ -51,7 +51,13 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the beans issues
 
-For each approved slice, create a beans issue using `beans create`. Use the issue body template below. Set the type with `--type` (task, feature, bug, etc.), priority with `--priority`, and use `--blocked-by <id>` to express dependencies. Use `--parent <prd-id>` to link each slice back to the parent PRD bean.
+For each approved slice, create a beans issue using `beans create`. Set the type with `--type` (task, feature, bug, etc.), priority with `--priority`, use `--blocked-by <id>` for dependencies, and `--parent <prd-id>` to link each slice back to the parent PRD bean.
+
+**How to create the bean:** do NOT pass the issue body to `beans create` via `-d`/`--body` or stdin — multi-line content breaks. Instead:
+
+1. Run `beans create "<title>" --type <type> --parent <prd-id> [--blocked-by <id>] [--priority <p>]` — metadata only, no body.
+2. `beans create` prints the new bean ID. Locate the file with `ls .beans/<id>*` (e.g. `.beans/abc1--<slug>.md`).
+3. Use the Edit tool on that file to fill in the body below the frontmatter using the template below.
 
 Create issues in dependency order (blockers first) so you can reference real bean IDs in the `--blocked-by` flag.
 

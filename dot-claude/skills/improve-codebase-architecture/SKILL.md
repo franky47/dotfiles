@@ -75,4 +75,10 @@ After comparing, give your own recommendation: which design you think is stronge
 
 ### 7. Create beans issue
 
-Create a refactor RFC as a beans issue using `beans create --type task`. Use the template in [REFERENCE.md](REFERENCE.md) for the body. Do NOT ask the user to review before creating — just create it and share the ID.
+Create a refactor RFC as a beans issue. Do NOT ask the user to review before creating — just create it and share the ID.
+
+**How to create the bean:** do NOT pass the RFC body to `beans create` via `-d`/`--body` or stdin — multi-line content breaks. Instead:
+
+1. Run `beans create "<title>" --type task` — metadata only, no body.
+2. `beans create` prints the new bean ID. Locate the file with `ls .beans/<id>*` (e.g. `.beans/abc1--<slug>.md`).
+3. Use the Edit tool on that file to fill in the body below the frontmatter using the template in [REFERENCE.md](REFERENCE.md).

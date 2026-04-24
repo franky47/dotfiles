@@ -17,7 +17,17 @@ A deep module (as opposed to a shallow module) is one which encapsulates a lot o
 
 Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
 
-5. Once you have a complete understanding of the problem and solution, use the template below to write the PRD. The PRD should be submitted as a beans issue using `beans create --type feature --body <prd-content>`.
+5. Once you have a complete understanding of the problem and solution, use the template below to write the PRD. The PRD should be submitted as a beans issue of type `epic` — PRDs group the vertical-slice issues produced by `prd-to-issues` under a single parent.
+
+**How to create the bean:** do NOT pass the PRD body to `beans create` via `-d`/`--body` or stdin — multi-line content breaks. Instead, create with metadata only, then edit the bean file:
+
+```sh
+beans create "<title>" --type epic
+# → prints the new bean ID, e.g. `abc1`
+ls .beans/abc1* # locate the file, e.g. .beans/abc1--<slug>.md
+```
+
+Then use the Edit tool on `.beans/<id>--<slug>.md` to write the PRD body below the frontmatter.
 
 <prd-template>
 
