@@ -140,8 +140,8 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(rm *)",
-            "command": "~/.claude/hooks/check-rm-git-tracked.sh"
+            "command": "~/.claude/hooks/check-rm-git-tracked.sh",
+            "if": "Bash(rm *)"
           }
         ]
       }
@@ -186,5 +186,5 @@
   },
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true
+  "agentPushNotifEnabled": true
 }
