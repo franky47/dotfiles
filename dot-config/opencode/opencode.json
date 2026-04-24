@@ -1,0 +1,69 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "plan",
+  "provider": {
+    "llamacpp": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "llama.cpp (local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:10001/v1"
+      },
+      "models": {
+        "qwen3.6-35b-a3b-q4_k_m": {
+          "name": "Qwen 3.6 35B A3B (Q4_K_M)",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "input": 65536,
+            "output": 65536
+          }
+        },
+        "qwen3.6-27b-q4_k_xl": {
+          "name": "Qwen 3.6 27B (Q4_K_XL)",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "input": 65536,
+            "output": 65536
+          }
+        },
+        "qwopus-glm-18b-q4_k_m": {
+          "name": "Qwopus GLM 18B (Q4_K_M)",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "input": 65536,
+            "output": 65536
+          }
+        },
+        "gemma4-31b-q4_k_m": {
+          "name": "Gemma 4 31B (Q4_K_M)",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "input": 65536,
+            "output": 65536
+          }
+        }
+      }
+    }
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      }
+    }
+  },
+  "share": "disabled",
+  "experimental": {
+    "continue_loop_on_deny": true,
+    "disable_paste_summary": true
+  }
+}
