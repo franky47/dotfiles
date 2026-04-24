@@ -121,7 +121,11 @@
       "Read(.env*)",
       "Edit(.env*)"
     ],
-    "ask": ["Bash(pnpm add *)", "Bash(bun add *)", "Bash(gh pr create *)"],
+    "ask": [
+      "Bash(pnpm add *)",
+      "Bash(bun add *)",
+      "Bash(gh pr create *)"
+    ],
     "defaultMode": "bypassPermissions"
   },
   "hooks": {
@@ -182,7 +186,9 @@
   },
   "spinnerVerbs": {
     "mode": "replace",
-    "verbs": ["Processing"]
+    "verbs": [
+      "Processing"
+    ]
   },
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
