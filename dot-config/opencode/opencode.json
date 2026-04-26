@@ -1,6 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "default_agent": "plan",
+  "default_agent": "brainstorm",
+  "agent": {
+    "plan": {
+      "disable": true
+    }
+  },
   "provider": {
     "llamacpp": {
       "npm": "@ai-sdk/openai-compatible",
