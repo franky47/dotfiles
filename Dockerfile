@@ -21,11 +21,13 @@ RUN echo "testbox" > /home/testuser/dotfiles/.machine-name
 RUN mkdir -p /home/testuser/dotfiles/local/testbox/claude/skills/testbox-only \
     && echo '---\nname: testbox-only\n---\nTest skill' > /home/testuser/dotfiles/local/testbox/claude/skills/testbox-only/SKILL.md
 
-# Ensure ~/.config exists so stow unfolds into it
-RUN mkdir -p ~/.config
+# Ensure ~/.config exists so stow unfolds into it.
+# Pre-create ~/.config/opencode to simulate opencode having been installed first
+# (matches real-world layout: opencode owns the dir, stow contributes per-file symlinks).
+RUN mkdir -p ~/.config/opencode
 
 # Run install
-RUN /home/testuser/dotfiles/install.sh
+RUN bash -o pipefail -c '/home/testuser/dotfiles/install.sh 2>&1 | tee /tmp/install.out'
 
 # Assertions: shell loaders
 RUN echo "=== Shell loaders ===" \
@@ -61,6 +63,26 @@ RUN echo "=== Git ===" \
 # Assertions: ghostty
 RUN echo "=== Ghostty ===" \
     && test -L ~/.config/ghostty && readlink ~/.config/ghostty | grep -q dotfiles && echo "OK: ~/.config/ghostty symlinked"
+
+# Assertions: opencode config stowed under ~/.config/opencode.
+# Dir is pre-created above, so stow unfolds (per-file symlinks) — mirrors real-world layout.
+RUN echo "=== Opencode ===" \
+    && ! test -L ~/.config/opencode && test -d ~/.config/opencode && echo "OK: ~/.config/opencode is a real dir (unfolded)" \
+    && test -L ~/.config/opencode/opencode.json && echo "OK: opencode.json symlinked" \
+    && test -L ~/.config/opencode/AGENTS.md && echo "OK: AGENTS.md symlinked" \
+    && test -L ~/.config/opencode/agents && readlink ~/.config/opencode/agents | grep -q dotfiles && echo "OK: agents/ symlinked" \
+    && test -L ~/.config/opencode/commands && echo "OK: commands/ symlinked" \
+    && test -L ~/.config/opencode/skills && echo "OK: skills/ symlinked" \
+    && test -L ~/.config/opencode/themes && echo "OK: themes/ symlinked" \
+    && test -e ~/.config/opencode/skills/pnpm/SKILL.md && echo "OK: nested skill reachable through symlinked dir"
+
+# Assertions: llama-swap config stowed on non-m4x hosts (config travels everywhere; daemon doesn't)
+RUN echo "=== llama-swap (non-m4x) ===" \
+    && test -L ~/.config/llama-swap && readlink ~/.config/llama-swap | grep -q dotfiles && echo "OK: ~/.config/llama-swap symlinked" \
+    && test -e ~/.config/llama-swap/config.yml && echo "OK: llama-swap config.yml reachable" \
+    && ! test -e ~/Library/LaunchAgents/com.47ng.llama-swap.plist && echo "OK: no LaunchAgent on non-m4x" \
+    && ! grep -q "llama-swap not found" /tmp/install.out && echo "OK: no llama-swap prereq warn on non-m4x" \
+    && ! grep -q "llama-server not found" /tmp/install.out && echo "OK: no llama-server prereq warn on non-m4x"
 
 # Assertions: zsh sources
 RUN echo "=== Zsh ===" \
