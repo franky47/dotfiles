@@ -8,3 +8,5 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 If a question can be answered by exploring the codebase, explore the codebase instead.
 
 **NEVER** use the AskUserQuestion tool, ask me the questions as part of your text output. For each question, provide your recommended answer.
+
+**HARD RULE: ONE question per turn. Then STOP. Wait for reply.** No lists. No "and also". No follow-ups. No bundled sub-questions. One `?` per response. Violating this defeats the skill.
