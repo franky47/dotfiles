@@ -1,0 +1,5 @@
+# m4x-only: local LLM stack (referenced by install.sh and the llama-swap LaunchAgent).
+# Install: `brew bundle --file=local/m4x/Brewfile`
+
+brew "llama-swap"
+brew "llama.cpp"

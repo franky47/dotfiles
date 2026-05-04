@@ -84,7 +84,7 @@ check_prereqs() {
 
   if ! command -v claude &>/dev/null; then
     echo "${YELLOW}WARN:${RESET} claude not found — Claude Code config won't be used."
-    echo "  npm install -g @anthropic-ai/claude-code"
+    echo "  curl -fsSL https://claude.ai/install.sh | bash"
     warn=1
   fi
 
