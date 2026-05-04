@@ -1,2 +1,3 @@
 .machine-name
 **/secrets.*
+/dot-config/htop/htoprc
