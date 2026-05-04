@@ -17,10 +17,15 @@ brew "htop"                         # top replacement (zsh alias top=htop)
 brew "tmux"
 brew "jq"
 brew "ripgrep"
+brew "tree"
+brew "nano"                         # macOS ships ancient pico-as-nano with no syntax highlighting
 
 # Git
 brew "difftastic"                   # difft — used by lazygit pager and git diff
 brew "lazygit"
+
+# GitHub Actions
+brew "pinact"                       # pin actions to commit SHAs
 
 # Languages and runtimes
 brew "elixir"
