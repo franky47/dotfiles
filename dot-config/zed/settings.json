@@ -7,6 +7,22 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "agent_servers": {
+    "opencode": {
+      "type": "registry"
+    },
+    "claude-acp": {
+      "type": "registry"
+    }
+  },
+  "collaboration_panel": {
+    "dock": "right"
+  },
+  "agent": {
+    "dock": "left",
+    "favorite_models": [],
+    "model_parameters": []
+  },
   "git_panel": {
     "dock": "right"
   },
@@ -27,6 +43,7 @@
     "git_status": false
   },
   "outline_panel": {
+    "dock": "right",
     "git_status": false
   },
   "tabs": {
