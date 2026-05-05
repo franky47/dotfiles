@@ -1,0 +1,60 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "git_panel": {
+    "dock": "right"
+  },
+  "terminal": {
+    "font_size": 12.0,
+    "font_family": "Menlo",
+    "blinking": "on",
+    "max_scroll_history_lines": 1000000
+  },
+  "telemetry": {
+    "diagnostics": true,
+    "metrics": false
+  },
+  "project_panel": {
+    "indent_size": 20.0,
+    "entry_spacing": "standard",
+    "dock": "right",
+    "git_status": false
+  },
+  "outline_panel": {
+    "git_status": false
+  },
+  "tabs": {
+    "git_status": false
+  },
+  "sticky_scroll": {
+    "enabled": true
+  },
+  "minimap": {
+    "show": "never",
+    "max_width_columns": 80
+  },
+  "cursor_shape": "bar",
+  "autosave": "on_focus_change",
+  "buffer_font_family": "Menlo",
+  "show_whitespaces": "all",
+  "remove_trailing_whitespace_on_save": true,
+  "wrap_guides": [
+    80
+  ],
+  "hard_tabs": false,
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)"
+  },
+  "base_keymap": "VSCode",
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": "47ng"
+}
