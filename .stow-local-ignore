@@ -8,3 +8,4 @@
 ^\.machine-name$
 ^\.git$
 ^lazygit$
+\.DS_Store
