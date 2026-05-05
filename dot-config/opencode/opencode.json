@@ -19,9 +19,9 @@
           "reasoning": true,
           "tool_call": true,
           "limit": {
-            "context": 65536,
-            "input": 65536,
-            "output": 65536
+            "context": 262144,
+            "input": 262144,
+            "output": 262144
           }
         },
         "qwen3.6-27b-q4_k_xl": {

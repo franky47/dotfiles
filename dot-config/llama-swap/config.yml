@@ -4,21 +4,23 @@ startPort: 10002
 models:
 
   qwen3.6-35b-a3b-q4_k_m:
-    # 262144: 256k shared KV (64k per agent)
+    # 524288: 512k shared KV (256k per agent, 2 agents)
     cmd: |
       llama-server
         -hf unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_M
         --port ${PORT}
-        --parallel 4
+        --parallel 2
         --cont-batching
         --cache-reuse 256
         --flash-attn on
-        --ctx-size 262144
+        --cache-type-k q4_0
+        --cache-type-v q4_0
+        --ctx-size 524288
         --gpu-layers all
         --reasoning-format deepseek
         --chat-template-kwargs '{"preserve_thinking":true}'
     ttl: 0
-    concurrencyLimit: 4
+    concurrencyLimit: 2
 
   qwen3.6-27b-q4_k_xl:
     cmd: |
