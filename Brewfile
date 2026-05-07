@@ -1,6 +1,8 @@
 # Shared formulae for all machines.
 # Install: `brew bundle` (from this repo root)
 # On m4x also run: `brew bundle --file=local/m4x/Brewfile`
+# Note: HOMEBREW_BUNDLE_NO_UPGRADE=1 is set in zshenv/03-homebrew.zsh —
+# pass `--upgrade` explicitly to refresh existing formulae.
 
 tap "anomalyco/tap"
 
