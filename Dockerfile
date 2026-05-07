@@ -89,6 +89,13 @@ RUN echo "=== Zsh ===" \
     && zsh -c 'source ~/.zshrc' 2>&1 || true \
     && echo "OK: .zshrc sourced"
 
+# Assertions: zshenv exports (must hold in non-interactive shells too)
+RUN echo "=== Zshenv exports ===" \
+    && zsh -c 'source ~/.zshenv && [[ "$LANG" == en_GB.UTF-8 ]]' && echo "OK: LANG=en_GB.UTF-8" \
+    && zsh -c 'source ~/.zshenv && [[ "$HOMEBREW_BUNDLE_NO_UPGRADE" == 1 ]]' && echo "OK: HOMEBREW_BUNDLE_NO_UPGRADE=1" \
+    && zsh -c 'source ~/.zshenv && [[ ":$PATH:" == *:/opt/homebrew/bin:* ]]' && echo "OK: PATH contains /opt/homebrew/bin" \
+    && zsh -c 'source ~/.zshenv && [[ ":$PATH:" == *:/usr/local/bin:* ]]' && echo "OK: PATH contains /usr/local/bin"
+
 # === Test --adopt path: simulate pre-existing files ===
 # Unstow everything, create conflicting files, re-run install
 RUN stow --dotfiles -D -t ~ -d ~/dotfiles . 2>/dev/null || true \
