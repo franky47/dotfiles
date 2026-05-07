@@ -16,6 +16,7 @@ brew "bat"                          # cat replacement (zsh alias cat=bat)
 brew "htop"                         # top replacement (zsh alias top=htop)
 brew "tmux"
 brew "reattach-to-user-namespace"  # share host Keychain (Claude Code auth) + pbcopy/pbpaste into tmux
+brew "mosh"                         # roaming SSH replacement — survives sleep/network changes
 brew "jq"
 brew "ripgrep"
 brew "tree"
