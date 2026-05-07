@@ -9,3 +9,6 @@
 ^\.git$
 ^lazygit$
 \.DS_Store
+^templates
+^.github
+
