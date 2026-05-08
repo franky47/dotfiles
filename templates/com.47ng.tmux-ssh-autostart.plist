@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Keeps a tmux server alive in the GUI (Aqua) login context so panes
+  forked by tmux inherit the user's Mach audit session — required for
+  Keychain access from SSH-attached tmux panes (e.g. Claude Code
+  credentials), which otherwise fail with errSecInteractionNotAllowed.
+
+  The watchdog logic is inlined here rather than referenced as a script
+  in the dotfiles repo because the repo lives on /Volumes/Storage, and
+  TCC blocks launchd from executing scripts on non-system volumes
+  (`Operation not permitted`, exit 126). Embedding keeps the plist
+  self-contained on the system volume after install.sh writes it.
+
+  Watchdog flow:
+    1. Create the long-lived `ssh` session if missing (using
+       `has-session` first because `new-session -A` would attempt to
+       attach, which fails without a TTY under launchd).
+    2. Block while the tmux server is alive. When `tmux kill-server`
+       runs, `has-session` returns nonzero, the loop exits, the script
+       exits, and launchd's KeepAlive respawns us — yielding a fresh
+       Aqua-context server.
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.47ng.tmux-ssh-autostart</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/sh</string>
+		<string>-c</string>
+		<string>set -eu
+tmux has-session -t ssh 2&gt;/dev/null || tmux new-session -d -s ssh
+while tmux has-session 2&gt;/dev/null; do sleep 5; done</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+	<key>StandardOutPath</key>
+	<string>__TMUX_SSH_AUTOSTART_LOG_OUT__</string>
+	<key>StandardErrorPath</key>
+	<string>__TMUX_SSH_AUTOSTART_LOG_ERR__</string>
+</dict>
+</plist>

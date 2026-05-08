@@ -185,5 +185,25 @@ if [[ "${MACHINE_NAME}" == "m4x" ]]; then
   fi
 fi
 
+# tmux-ssh-autostart LaunchAgent (echo only — keeps one tmux server
+# alive in the GUI login (Aqua) context so panes forked by tmux inherit
+# the user's Mach audit session. Required for Keychain access from
+# SSH-attached tmux panes (e.g. Claude Code credentials), which
+# otherwise fail with errSecInteractionNotAllowed.)
+if [[ "${MACHINE_NAME}" == "echo" ]]; then
+  # ~/Library/Logs is the Apple-blessed location for user-scope log
+  # files. ~/.config/.../logs trips TCC under launchd (EX_CONFIG, no
+  # log files written) so we use Library/Logs instead.
+  TMUX_SSH_AUTOSTART_LOG_DIR="${HOME}/Library/Logs/tmux-ssh-autostart"
+  mkdir -p "${TMUX_SSH_AUTOSTART_LOG_DIR}"
+  sed -e "s|__TMUX_SSH_AUTOSTART_LOG_OUT__|${TMUX_SSH_AUTOSTART_LOG_DIR}/stdout.log|g" \
+      -e "s|__TMUX_SSH_AUTOSTART_LOG_ERR__|${TMUX_SSH_AUTOSTART_LOG_DIR}/stderr.log|g" \
+      "${DOTFILES}/templates/com.47ng.tmux-ssh-autostart.plist" \
+    > ~/Library/LaunchAgents/com.47ng.tmux-ssh-autostart.plist
+  launchctl bootout gui/"$(id -u)"/com.47ng.tmux-ssh-autostart 2>/dev/null || true
+  launchctl bootstrap gui/"$(id -u)" ~/Library/LaunchAgents/com.47ng.tmux-ssh-autostart.plist
+  echo "Loaded com.47ng.tmux-ssh-autostart LaunchAgent"
+fi
+
 echo "Done — to reload your shell, run:"
 echo "source ~/.zshrc"
