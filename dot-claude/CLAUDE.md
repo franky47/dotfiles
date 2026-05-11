@@ -24,3 +24,8 @@
 ## Python
 
 - Always use `uv` for everything Python-related (e.g. `uv run`, `uv pip install`). Never use raw `python3` or `pip` directly.
+
+## TypeScript
+
+- Use the `typescript-advanced-types` skill for any TypeScript task.
+- Never make your own type definitions for external libraries, install `@types` packages instead. If they don't exist, look for alternatives. Always prefer type-safe libraries.
