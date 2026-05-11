@@ -103,9 +103,7 @@
       "mcp__context7__resolve-library-id",
       "mcp__shadcn__view_items_in_registries",
       "mcp__shadcn__get_add_command_for_items",
-      "mcp__shadcn__get_item_examples_from_registries",
-      "Read(.env.example)",
-      "Edit(.env.example)"
+      "mcp__shadcn__get_item_examples_from_registries"
     ],
     "deny": [
       "Bash(sudo *)",
@@ -119,9 +117,7 @@
       "Bash(wget * | zsh *)",
       "Bash(git push *)",
       "Bash(npm *)",
-      "Bash(yarn *)",
-      "Read(.env*)",
-      "Edit(.env*)"
+      "Bash(yarn *)"
     ],
     "ask": [
       "Bash(pnpm add *)",
@@ -148,6 +144,15 @@
             "type": "command",
             "command": "~/.claude/hooks/check-rm-git-tracked.sh",
             "if": "Bash(rm *)"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-env-files.sh"
           }
         ]
       }
