@@ -148,6 +148,16 @@
         ]
       },
       {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/allow-readonly-npm.sh",
+            "if": "Bash(npm *)"
+          }
+        ]
+      },
+      {
         "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit",
         "hooks": [
           {
