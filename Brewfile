@@ -38,3 +38,4 @@ brew "uv"                           # Python tooling
 
 # AI / agents
 brew "anomalyco/tap/opencode"
+brew "rtk"                          # Token savings (setup in OpenCode)
