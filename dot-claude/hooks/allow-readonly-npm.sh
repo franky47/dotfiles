@@ -1,88 +1,82 @@
 #!/bin/bash
-# PreToolUse hook for Bash. Pre-approves read-only `npm` subcommands so they
-# bypass the broad `Bash(npm *)` deny rule. Anything not matched here falls
-# through to static permission rules (where the deny still blocks).
+# PreToolUse hook for Bash. Pre-approves a *very* small allow-list of
+# read-only invocations that LLMs reach for often. Anything that doesn't
+# match emits a structured `deny` decision whose reason text tells the agent
+# exactly which shapes ARE allowed, so it can self-correct on the next turn
+# without bothering the user.
 #
-# Pre-approved (read-only, network-or-local lookups, no install/publish):
-#   npm view | info | show | v       -> registry metadata
-#   npm ls | list                     -> installed tree
-#   npm search | s | se | find        -> registry search
-#   npm docs | home | repo            -> open URL (gated by browser anyway)
-#   npm explain | why                 -> dependency reasoning
-#   npm outdated                      -> compare local vs registry
-#   npm ping                          -> registry reachability
-#   npm config get ...                -> read config (not set/delete)
-#   npm --version | -v | version      -> version print
-#   npm help | -h                     -> help text
+# To allow a new command verbatim, add a line to ALLOWED below. Each entry
+# is a human-readable template. Placeholders in <angle-brackets> are
+# substituted with the regex fragments defined above (currently only <pkg>);
+# the rest is matched literally as part of an anchored regex.
+#
+# Rules for any line you add to ALLOWED:
+#   1. Use only safe characters and placeholders. NEVER bake in & ; | < > ( )
+#      $ ` \ * ? or quote chars, since the shell would re-interpret them
+#      AFTER this hook approves the command.
+#   2. A bare ` ` matches exactly one ASCII space.
+#   3. The entry must describe the ENTIRE command (^…$ is added for you).
+#
+# To add a new placeholder, define it as a bash variable above ALLOWED and
+# extend `substitute` below to swap it in.
 
 set -uo pipefail
 
-emit_allow() {
-  jq -nc --arg r "$1" \
-    '{ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "allow", permissionDecisionReason: $r } }'
-  exit 0
+# Package spec: optional @scope/, name, optional @version. SemVer chars only
+# — no <, >, =, *, or whitespace, all of which need shell quoting and would
+# create an injection surface.
+PKG='(@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*(@[a-zA-Z0-9._^~-]+)?'
+
+ALLOWED=(
+  'npm view <pkg>'
+  'npm info <pkg>'
+  'npm show <pkg>'
+)
+
+substitute() {
+  local s=$1
+  s=${s//<pkg>/${PKG}}
+  printf '%s' "$s"
+}
+
+emit() {
+  local decision=$1 reason=$2
+  jq -nc --arg d "$decision" --arg r "$reason" \
+    '{ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: $d, permissionDecisionReason: $r } }'
 }
 
 INPUT=$(cat) || exit 0
-TOOL=$(echo "$INPUT" | jq -r '.tool_name' 2>/dev/null) || exit 0
+TOOL=$(jq -r '.tool_name // empty' <<<"$INPUT" 2>/dev/null) || exit 0
 [ "$TOOL" = "Bash" ] || exit 0
 
-CMD=$(echo "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null) || exit 0
+CMD=$(jq -r '.tool_input.command // empty' <<<"$INPUT" 2>/dev/null) || exit 0
 [ -z "$CMD" ] && exit 0
 
-# Only consider commands that start with `npm ` (after optional leading whitespace).
-# Reject pipelines/chains by requiring the first token to be `npm` and bailing
-# on shell metacharacters that could smuggle a second command.
+# Only act on commands whose first token is literally `npm`. Anything else
+# (pnpm, yarn, bun, npx, anything containing $0/$@/$!, …) gets no decision so
+# static rules in settings.json decide. Empirically (tested 2026-05-12) the
+# `if: "Bash(npm *)"` clause on this hook is unreliable — it fires the hook
+# for many commands that contain no `npm` substring at all (e.g. `echo $0`,
+# `echo $@`, multi-line backgrounded commands with `$!`). This in-script
+# guard is the real gate; do not remove it.
 TRIMMED="${CMD#"${CMD%%[![:space:]]*}"}"
 case "$TRIMMED" in
-  npm\ *|npm) ;;
+  npm|npm\ *) ;;
   *) exit 0 ;;
 esac
 
-# Disallow chaining (&&, ||, ;, |, backticks, $()) — keep this hook strictly
-# scoped to a single npm invocation.
-case "$CMD" in
-  *'&&'*|*'||'*|*';'*|*'|'*|*'`'*|*'$('*) exit 0 ;;
-esac
-
-# Extract subcommand (first token after `npm`, skipping flags like -s/--silent).
-SUB=""
-read -ra TOKENS <<<"$TRIMMED"
-for tok in "${TOKENS[@]:1}"; do
-  case "$tok" in
-    -*) continue ;;
-    *) SUB="$tok"; break ;;
-  esac
+for human in "${ALLOWED[@]}"; do
+  pattern="^$(substitute "$human")\$"
+  if [[ "$CMD" =~ $pattern ]]; then
+    emit allow "allowlisted: $CMD"
+    exit 0
+  fi
 done
 
-# Flag-only invocations: `npm --version`, `npm -v`, `npm -h`.
-if [ -z "$SUB" ]; then
-  case "$TRIMMED" in
-    *' --version'*|*' -v'*|*' --help'*|*' -h'*) emit_allow "npm version/help — read-only" ;;
-  esac
-  exit 0
-fi
+LIST=$(printf '  • %s\n' "${ALLOWED[@]}")
+emit deny "This npm invocation is not in the allow-list. Allowed shapes (must match the entire command):
+${LIST}
+where <pkg> is a lowercase package name with an optional @scope/ prefix and optional @version, containing only [a-z0-9._-] in the name and [a-zA-Z0-9._^~-] in the version. No flags, no extra args, no shell metacharacters.
 
-case "$SUB" in
-  view|info|show|v)             emit_allow "npm $SUB — registry metadata, read-only" ;;
-  ls|list|ll|la)                emit_allow "npm $SUB — installed tree, read-only" ;;
-  search|s|se|find)             emit_allow "npm $SUB — registry search, read-only" ;;
-  docs|home|repo|bugs)          emit_allow "npm $SUB — opens URL, no mutation" ;;
-  explain|why)                  emit_allow "npm $SUB — dependency reasoning, read-only" ;;
-  outdated)                     emit_allow "npm outdated — compare versions, read-only" ;;
-  ping)                         emit_allow "npm ping — registry reachability" ;;
-  version)                      emit_allow "npm version — print versions" ;;
-  help)                         emit_allow "npm help — help text" ;;
-  config)
-    # Allow `npm config get ...` and `npm config list/ls`; everything else falls through.
-    for tok in "${TOKENS[@]:2}"; do
-      case "$tok" in
-        -*) continue ;;
-        get|list|ls) emit_allow "npm config $tok — read-only" ;;
-        *) exit 0 ;;
-      esac
-    done
-    ;;
-esac
-
+If you genuinely need a different invocation, ask the user to add it to ~/.claude/hooks/allow-readonly-npm.sh — do not try to work around this hook."
 exit 0
