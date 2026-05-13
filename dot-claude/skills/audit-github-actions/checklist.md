@@ -7,9 +7,11 @@ Quick-reference table of the patterns to check. Use as a *prompt for what to loo
 | Pattern | Detection hint | Anchored to |
 |---|---|---|
 | `pull_request_target` + checkout of PR head ref | `on.pull_request_target` co-occurring with `actions/checkout` and `with.ref: github.event.pull_request.head.*` (or default checkout in a privileged trigger) | Nx s1ngularity (2025-08) |
-| Expression injection of attacker-controlled fields into `run:` | Any `${{ github.event.* }}` from PR/issue/comment/discussion/head_commit inside a `run:` line | Nx s1ngularity |
+| `workflow_run` + checkout of triggering branch | `on.workflow_run` co-occurring with `actions/checkout` and `with.ref: ${{ github.event.workflow_run.head_branch \| head_sha \| head_commit.* }}` | Structural twin of `pull_request_target` checkout |
+| Expression injection of attacker-controlled fields into `run:` or `actions/github-script` `script:` | Any `${{ github.event.* }}` from PR/issue/comment/discussion/head_commit inside a `run:` line, **or** inside `with.script:` of `actions/github-script` (GHA expands `${{ }}` before JS executes) | Nx s1ngularity |
 | Long-lived `NPM_TOKEN` / `NODE_AUTH_TOKEN` for publishing | `npm publish` with `NODE_AUTH_TOKEN` or `NPM_TOKEN` from `secrets.*` | Shai-Hulud, qix |
 | Unpinned third-party action | `uses: owner/repo@<not-a-40-char-sha>` (tag, branch, `latest`) | tj-actions / reviewdog (2025-03) |
+| Repojackable action owner (unpinned consumer) | `uses: owner/repo@<tag-or-branch>` where `HEAD https://github.com/<owner>` returns `404` (namespace unclaimed) or `3xx` (owner renamed) | Generic namespace-reuse hijack |
 | Self-hosted runner on public repo | `runs-on:` outside `ubuntu-*` / `windows-*` / `macos-*` families | Shai-Hulud 2.0 self-hosted runner registration |
 | Script self-mutates `.github/workflows/*` or `.git/config` | Scripts that write into those paths | Shai-Hulud worm persistence |
 | Composite-action input interpolated into `run:` | Action publisher: `${{ inputs.* }}` in a `runs.steps[*].run:` | tj-actions chain |
@@ -30,6 +32,7 @@ Quick-reference table of the patterns to check. Use as a *prompt for what to loo
 | No npm `--provenance` and no OIDC trusted publishing | `npm publish` without provenance or `id-token: write` | Forgery defence absent |
 | Action `dist/` distributed without build-verification gate | Committed `dist/` for a JS action with no CI step ensuring it matches source | Generic JS-action risk |
 | Docker action with mutable image tag | `runs.image:` not pinned to `@sha256:` digest | Container registry tag mutability |
+| Repojackable action owner (SHA-pinned consumer) | `uses: owner/repo@<sha>` where the owner namespace is 404 or redirects — current SHA still resolves but future bumps roll onto attacker code | Generic namespace-reuse hijack |
 
 ## MEDIUM
 

@@ -41,6 +41,7 @@ Run these steps in order. Steps 2a/2b/2c run in parallel.
    - If `gh` is unavailable, try `git ls-remote https://github.com/<owner>/<repo> refs/tags/<v>`.
    - If both fail, try `curl -fsSL https://api.github.com/repos/<owner>/<repo>/git/refs/tags/<v>`.
    - SHA mismatch, force-pushed tag, or no matching release = High finding. Never ask the user to run these — you run them.
+   - **Also probe owner liveness once per unique `owner`:** `curl -sI -o /dev/null -w "%{http_code} %{redirect_url}\n" https://github.com/<owner>`. A `404` (namespace unclaimed) or a `3xx` redirect (owner renamed) means the action is **repojackable** — see [workflows.md](workflows.md) §13. Flag even when the pinned SHA still resolves, because future ref bumps are exposed.
 
 4. **Reason holistically.** Load the relevant context (the workflow graph, the sub-docs) and synthesize attack paths. Pattern-matching alone misses xz-utils-style multi-stage payloads. Use [checklist.md](checklist.md) as a prompt for what to look for, [incidents.md](incidents.md) when an unfamiliar shape looks like a variant of a known attack.
 

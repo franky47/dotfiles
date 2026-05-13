@@ -28,6 +28,8 @@ Look for `on: pull_request_target` co-occurring with any of:
 
 Also flag the "fixed on main but vulnerable on a stale branch" variant — the historical sub-agent handles that sweep.
 
+**Same shape, `workflow_run` variant (CRITICAL).** `on: workflow_run` co-occurring with `actions/checkout` whose `with.ref` references `github.event.workflow_run.head_branch` / `head_sha` / `head_commit.*` is the structurally identical kill chain — the triggering workflow ran on a PR fork, the `workflow_run` job now executes in base-repo context with full secrets and write token, and checking out the same head pulls in attacker code. The indirection through a second workflow often masks this from reviewers. Flag with the same severity and the same fix shape (don't check out untrusted refs in privileged jobs; if you must, drop privileges first via the artifact hand-off pattern in [remediation.md](remediation.md) §8).
+
 ### 2. Expression injection into `run:` blocks (CRITICAL)
 
 Any `${{ github.event.* }}` interpolation directly inside a `run:` line where the value is attacker-controlled. Untrusted fields include but are not limited to:
@@ -43,6 +45,8 @@ Any `${{ github.event.* }}` interpolation directly inside a `run:` line where th
 The attacker controls the literal text → it becomes shell. Same applies to `${{ github.head_ref }}` in `pull_request` triggers. Branch names accept characters that turn into shell metacharacters.
 
 Reason from intent: if the value comes from outside the org and ends up in a shell, that is a finding even if the field is not on the list above.
+
+**`actions/github-script` `script:` field is the JS twin.** The `script:` input is a JS string, but GitHub Actions expands `${{ }}` *before* the JS runs — so an untrusted field interpolated into `script:` is arbitrary code execution in the action's Node context (which holds `github.token`, `octokit`, runner env). Treat any `${{ github.event.* }}` (or other untrusted source) inside `with.script:` exactly like the same expression inside a `run:` line. Same severity, same fix: bind the value into an env var or pass it through `with:` as a typed input and read it from `process.env` / `core.getInput()`.
 
 ### 3. Missing or over-broad `permissions:` (HIGH)
 
@@ -121,6 +125,21 @@ A top-level `env:` block with `${{ secrets.* }}` exposes that secret to every st
 `run:` blocks fetching code from the network and executing it (`curl -fsSL ... | bash`, `wget -qO- ... | sh`, `eval "$(curl ...)"`, downloading a binary and `chmod +x`). Even from a "trusted" domain — the domain can be compromised, the URL can be hijacked, the binary is opaque.
 
 If the URL is a `raw.githubusercontent.com` URL pinned to a specific commit SHA, it is somewhat better but still flag — out-of-band code paths defeat the rest of the audit.
+
+### 13. Repojackable third-party action owner (HIGH)
+
+A `uses: owner/repo@<ref>` reference where the GitHub owner has been **renamed, transferred, or deleted**. GitHub frees the abandoned namespace; an attacker who registers the same name (or a similar one if GitHub redirects) can publish a malicious repo of the same name. Anyone who has pinned by tag or branch silently rolls onto attacker code on the next CI run that re-resolves the ref. SHA-pinned consumers are safe for the *current* SHA but every future bumper of that dependency is exposed.
+
+Detection (run alongside the SHA-verification in [SKILL.md](SKILL.md) step 3, once per unique `owner/repo` in the repo):
+
+- HEAD `https://github.com/<owner>` →
+  - `404` = owner namespace is unclaimed. Repojackable. **HIGH** finding, raise to **CRITICAL** if the consumer is unpinned (`@vN` / `@main`).
+  - `301`/`302` redirect = owner was renamed and GitHub still redirects, but the redirect is best-effort and breaks the moment someone else claims the old name. Flag as **HIGH**.
+- HEAD `https://github.com/<owner>/<repo>` returning a redirect to a different `owner/repo` = repo was transferred. Investigate whether the new owner is the legitimate maintainer.
+
+Use `curl -sI -o /dev/null -w "%{http_code} %{redirect_url}\n" https://github.com/<owner>` (no auth needed, public endpoint). Cache results per-owner to avoid redundant requests.
+
+**Fix:** drop the dependency, fork to your own org and pin to the fork's SHA, or replace with a maintained equivalent. Renaming/repojacking is invisible until exploited — make it a recurring audit item, not a one-shot check.
 
 ## After the walk
 
