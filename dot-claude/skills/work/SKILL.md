@@ -29,6 +29,7 @@ Do the following, in this specific order:
 - Only pick one task at a time. This is the "work loop" pattern: pick one task, do it, then say you are done.
 - Always commit the bean along with the code. The bean is the source of truth for task management, so it must be updated to reflect the work done.
 - Load best practices from memory, and remember
+- Update bean files by editing the markdown directly (Edit/Write on the file under `.beans/`). Do not use `beans query` GraphQL mutations for updates — direct edits are simpler, easier to review in the diff, and avoid quoting issues. The CLI's `beans update` flags are fine for status-only changes; longer body edits go through Edit on the bean file.
 
 ## Commit message format
 
