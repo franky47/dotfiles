@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "default_agent": "brainstorm",
+  "default_agent": "build",
   "agent": {
     "plan": {
       "disable": true
