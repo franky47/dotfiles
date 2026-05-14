@@ -54,16 +54,20 @@ models:
     concurrencyLimit: 1
 
   gemma4-31b-q4_k_m:
+    # Gemma 4 on Metal: flash-attn must be OFF (mixed SWA layout breaks Metal FA);
+    # KV-cache quant requires FA so it cannot be used here. Sampling per Google docs.
+    # enable_thinking:false — 31B has optional thinking mode; disable for direct answers.
     cmd: |
       llama-server
         -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
         --port ${PORT}
         --parallel 1
         --cont-batching
-        --ctx-size 65536
-        --gpu-layers all
-        --reasoning-format deepseek
-        --chat-template-kwargs '{"preserve_thinking":true}'
+        --ctx-size 131072
+        --gpu-layers 99
+        --jinja
+        --chat-template-kwargs '{"enable_thinking":false}'
+        --temp 1.0 --top-p 0.95 --top-k 64
     ttl: 0
     concurrencyLimit: 1
 
@@ -100,6 +104,8 @@ models:
     concurrencyLimit: 1
 
   council-gemma4-31b-q4_k_m:
+    # Gemma 4 on Metal requires flash-attn OFF; smaller ctx variant for council pool.
+    # enable_thinking:false — 31B has optional thinking mode; disable for direct answers.
     cmd: |
       llama-server
         -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
@@ -107,10 +113,10 @@ models:
         --parallel 1
         --cont-batching
         --ctx-size 32768
-        --flash-attn on
-        --gpu-layers all
-        --reasoning-format deepseek
-        --chat-template-kwargs '{"preserve_thinking":true}'
+        --gpu-layers 99
+        --jinja
+        --chat-template-kwargs '{"enable_thinking":false}'
+        --temp 1.0 --top-p 0.95 --top-k 64
     ttl: 0
     concurrencyLimit: 1
 
