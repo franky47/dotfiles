@@ -31,7 +31,7 @@ models:
         --cont-batching
         --cache-reuse 256
         --flash-attn on
-        --ctx-size 65536
+        --ctx-size 262144
         --gpu-layers all
         --reasoning-format deepseek
         --chat-template-kwargs '{"preserve_thinking":true}'
@@ -45,7 +45,7 @@ models:
         --port ${PORT}
         --parallel 1
         --cont-batching
-        --ctx-size 65536
+        --ctx-size 262144
         --flash-attn on
         --gpu-layers all
         --reasoning-format deepseek
