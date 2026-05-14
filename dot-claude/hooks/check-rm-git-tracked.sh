@@ -22,16 +22,24 @@ if [ -z "$ARGS" ] || echo "$ARGS" | grep -qE '[*?]'; then
   decide ask
 fi
 
-# Not in a git repo → ask
-if ! git rev-parse --is-inside-work-tree &>/dev/null; then
-  decide ask
-fi
+IN_GIT_REPO=true
+git rev-parse --is-inside-work-tree &>/dev/null || IN_GIT_REPO=false
 
 # Check each path
 for path in $ARGS; do
   # Strip surrounding quotes
   path=$(echo "$path" | sed "s/^['\"]//;s/['\"]$//")
   path="${path%/}"
+
+  # Paths under /tmp (or /private/tmp on macOS) are always safe to delete
+  case "$path" in
+    /tmp/*|/private/tmp/*) continue ;;
+  esac
+
+  # Outside a git repo we can't verify tracking → ask
+  if [ "$IN_GIT_REPO" = false ]; then
+    decide ask
+  fi
 
   if [ -d "$path" ]; then
     # Directory: check if git tracks any files inside
