@@ -14,6 +14,18 @@ decide() {
   exit 0
 }
 
+# Compound or expansion-bearing commands can't be safely scoped by an
+# rm-only allowlist — the hook decides for the entire Bash invocation, so
+# allowing the rm would also allow whatever follows or whatever the shell
+# substitutes in. Bail to ask if we see any of:
+#   ; && || |    — command chaining
+#   \n           — multi-line scripts
+#   $            — $(...) or $VAR (could expand outside our allowlisted dirs)
+#   `            — legacy backtick command substitution
+if [[ "$COMMAND" == *[$';&|$`\n']* ]]; then
+  decide ask
+fi
+
 # Strip "rm" and any flags (-r, -rf, -f, etc.) to get just the paths
 ARGS=$(echo "$COMMAND" | sed -E 's/^rm[[:space:]]+//' | sed -E 's/(^|[[:space:]])-[a-zA-Z]+//g' | xargs)
 
@@ -31,9 +43,16 @@ for path in $ARGS; do
   path=$(echo "$path" | sed "s/^['\"]//;s/['\"]$//")
   path="${path%/}"
 
-  # Paths under /tmp (or /private/tmp on macOS) are always safe to delete
+  # Per-user temp dirs are always safe to delete:
+  #   /tmp/*                              — classic Unix tmp (Linux + macOS shortcut)
+  #   /private/tmp/*                      — macOS canonical form of /tmp
+  #   /var/folders/<x>/<hash>/T/*         — macOS $TMPDIR (mktemp -d default)
+  #   /private/var/folders/<x>/<hash>/T/* — same path, symlink-resolved form
+  # The sibling subtrees C/ (Darwin user cache) and 0/ (legacy user-temp) hold
+  # app state worth preserving — leave those to fall through to ask.
   case "$path" in
     /tmp/*|/private/tmp/*) continue ;;
+    /var/folders/*/*/T/*|/private/var/folders/*/*/T/*) continue ;;
   esac
 
   # Outside a git repo we can't verify tracking → ask
