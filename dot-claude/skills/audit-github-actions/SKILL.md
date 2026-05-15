@@ -41,7 +41,7 @@ Run these steps in order. Steps 2a/2b/2c run in parallel.
    - If `gh` is unavailable, try `git ls-remote https://github.com/<owner>/<repo> refs/tags/<v>`.
    - If both fail, try `curl -fsSL https://api.github.com/repos/<owner>/<repo>/git/refs/tags/<v>`.
    - SHA mismatch, force-pushed tag, or no matching release = High finding. Never ask the user to run these — you run them.
-   - **Also probe owner liveness once per unique `owner`:** `curl -sI -o /dev/null -w "%{http_code} %{redirect_url}\n" https://github.com/<owner>`. A `404` (namespace unclaimed) or a `3xx` redirect (owner renamed) means the action is **repojackable** — see [workflows.md](workflows.md) §13. Flag even when the pinned SHA still resolves, because future ref bumps are exposed.
+   - **Also probe owner liveness once per unique `owner`:** `curl -sI -o /dev/null -w "%{http_code} %{redirect_url}\n" https://github.com/<owner>`. A `404` (namespace unclaimed) or a `3xx` redirect (owner renamed) means the action is **repojackable** — see [workflows.md](workflows.md) §14. Flag even when the pinned SHA still resolves, because future ref bumps are exposed.
 
 4. **Reason holistically.** Load the relevant context (the workflow graph, the sub-docs) and synthesize attack paths. Pattern-matching alone misses xz-utils-style multi-stage payloads. Use [checklist.md](checklist.md) as a prompt for what to look for, [incidents.md](incidents.md) when an unfamiliar shape looks like a variant of a known attack.
 
@@ -76,3 +76,14 @@ Run these steps in order. Steps 2a/2b/2c run in parallel.
 ## Scope arg
 
 If invoked without args, audit every surface in the repo. If invoked with a file path, audit only that file and its transitive references — but still spawn the historical sub-agent (the IOC sweep is repo-wide and cheap).
+
+If invoked with a GitHub URL (e.g. `https://github.com/<owner>/<repo>` or `git@github.com:<owner>/<repo>.git`), audit a fresh clone instead of the current working tree:
+
+1. Make a temp dir: `CLONE_DIR=$(mktemp -d -t gha-audit.XXXXXX)`.
+2. **Partial clone, all refs**: `git clone --filter=blob:none <url> "$CLONE_DIR/repo"`. **Do not use `--depth 1` / `--single-branch`** — the IOC sub-agent (step 2a) needs every branch and tag for stale-workflow and `git log --all` sweeps, and `--depth 1` would silently break them. `--filter=blob:none` keeps the size down by lazy-loading blobs on demand; `git for-each-ref`, `git log --all`, and `git grep` all still work (grep fetches the blobs it needs transparently).
+3. If the URL points at a specific branch/ref (`/tree/<ref>`), strip the `/tree/<ref>` suffix from the clone URL and after cloning `git -C "$CLONE_DIR/repo" checkout <ref>` so HEAD reflects what the user asked about. Still keep all the other refs — the IOC sweep is repo-wide.
+4. Run the full audit flow against `$CLONE_DIR/repo`. Render displayed `file:line` paths as repo-relative (strip the `$CLONE_DIR/repo/` prefix) so the user can map findings back to the upstream repo.
+5. Note the resolved commit SHA (`git -C "$CLONE_DIR/repo" rev-parse HEAD`) in the report header so the audit is reproducible.
+6. After the report prints, remove the clone: `rm -rf "$CLONE_DIR"`. Do this even on early exit.
+
+Do not push, fetch additional refs beyond the initial clone, or write into the clone.

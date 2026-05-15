@@ -33,6 +33,7 @@ Quick-reference table of the patterns to check. Use as a *prompt for what to loo
 | Action `dist/` distributed without build-verification gate | Committed `dist/` for a JS action with no CI step ensuring it matches source | Generic JS-action risk |
 | Docker action with mutable image tag | `runs.image:` not pinned to `@sha256:` digest | Container registry tag mutability |
 | Repojackable action owner (SHA-pinned consumer) | `uses: owner/repo@<sha>` where the owner namespace is 404 or redirects — current SHA still resolves but future bumps roll onto attacker code | Generic namespace-reuse hijack |
+| `id-token: write` granted at workflow level instead of job level | Top-level `permissions:` block sets `id-token: write`, exposing OIDC minting to every job in the file (lint, test, matrix builds) | TanStack-class blast-radius amplifier |
 
 ## MEDIUM
 

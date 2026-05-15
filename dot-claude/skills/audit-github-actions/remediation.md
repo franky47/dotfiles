@@ -235,3 +235,45 @@ In `.github/CODEOWNERS`:
 ```
 
 Combine with a branch protection rule on the default branch that requires CODEOWNERS review. Stops a worm with a stolen contributor token from silently adding `.github/workflows/shai-hulud-workflow.yml`.
+
+## 12. Scope `id-token: write` to the publishing job only
+
+Granting OIDC at the workflow level lets every job in the file mint a trusted-publisher token. A compromised test step can swap to the publish role. Keep top-level permissions read-only and escalate only on the publish job.
+
+```yaml
+# before — workflow-wide OIDC, every job can mint
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps: # ... runs PR-derived code, third-party actions, etc.
+  publish:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - run: npm publish
+```
+
+```yaml
+# after — OIDC only inside the publish job
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps: # ...
+  publish:
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+      id-token: write   # scoped: only minted inside this job's runner
+    steps:
+      - run: npm publish
+```
+
+Apply the same shape to AWS (`aws-actions/configure-aws-credentials`), GCP (`google-github-actions/auth`), sigstore/cosign signing, and PyPI trusted publishing — anywhere `id-token: write` enables a privileged exchange.

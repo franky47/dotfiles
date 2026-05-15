@@ -126,7 +126,22 @@ A top-level `env:` block with `${{ secrets.* }}` exposes that secret to every st
 
 If the URL is a `raw.githubusercontent.com` URL pinned to a specific commit SHA, it is somewhat better but still flag — out-of-band code paths defeat the rest of the audit.
 
-### 13. Repojackable third-party action owner (HIGH)
+### 13. `id-token: write` scoped at workflow level (HIGH)
+
+`id-token: write` mints OIDC tokens that authenticate to npm trusted publishers, PyPI, AWS via `aws-actions/configure-aws-credentials`, GCP via `google-github-actions/auth`, sigstore/cosign, etc. Granted at the **workflow** level (top-level `permissions:` block), every job in the file — including lint, test, matrix builds, and any step that runs PR-derived code or untrusted dependencies — can request that token and exchange it for cloud credentials or a publish capability.
+
+Scoping it to the single publishing job confines the blast radius: a compromised test step in the same workflow can no longer mint a trusted-publisher OIDC token.
+
+Detect both shapes:
+
+- Top-level `permissions:` block sets `id-token: write` (workflow-wide grant). Flag whenever the workflow has more than one job, or any job that runs untrusted code (PR builds, matrix tests, third-party actions that execute user code).
+- No top-level `permissions:` block at all *and* a job sets `id-token: write` while another job in the same workflow does not — fine, that is the desired shape. The finding is specifically the **workflow-level** grant.
+
+Anchor: this is the same blast-radius logic that made the TanStack cache-poisoning chain (§8) catastrophic — the publish workflow held `id-token: write` while restoring a cache poisoned by an earlier untrusted job. Job-level scoping would have meant the OIDC token only existed inside the publish job's runner memory, not the cache-restoring job's.
+
+Fix: keep top-level `permissions: contents: read` (or stricter) and grant `id-token: write` only on the specific publishing job. See [remediation.md](remediation.md) §4 and §12.
+
+### 14. Repojackable third-party action owner (HIGH)
 
 A `uses: owner/repo@<ref>` reference where the GitHub owner has been **renamed, transferred, or deleted**. GitHub frees the abandoned namespace; an attacker who registers the same name (or a similar one if GitHub redirects) can publish a malicious repo of the same name. Anyone who has pinned by tag or branch silently rolls onto attacker code on the next CI run that re-resolves the ref. SHA-pinned consumers are safe for the *current* SHA but every future bumper of that dependency is exposed.
 
