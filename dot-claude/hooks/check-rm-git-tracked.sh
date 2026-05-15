@@ -14,10 +14,33 @@ decide() {
   exit 0
 }
 
-# Compound or expansion-bearing commands can't be safely scoped by an
-# rm-only allowlist — the hook decides for the entire Bash invocation, so
-# allowing the rm would also allow whatever follows or whatever the shell
-# substitutes in. Bail to ask if we see any of:
+# Self-gate: bail out fast if no `rm` invocation appears as a command word.
+#
+# The `if: "Bash(rm *)"` clause on this hook in settings.json is empirically
+# unreliable — Claude Code fail-opens it for commands containing shell
+# metacharacters ($, ;, &, |, backtick, newline, command-substitution),
+# firing the hook on plenty of bash that has no `rm` in it at all. Without
+# this gate the compound-command check below then `decide ask`s, prompting
+# the user even under bypassPermissions and defeating AFK runs of any skill
+# that uses compound shell (for-loops, $(...), pipelines). Same defensive
+# pattern as allow-readonly-npm.sh — `if:` stays in settings for perf but
+# is not trusted as the real gate.
+#
+# `rm` is a command word when it sits at the start of a pipeline: at the
+# beginning of the command, or after a separator (; && || | & ` newline) or
+# a command-substitution opener `(`. This excludes `git rm`, `npm rm`, flag
+# values like `--remove`, and identifiers that happen to contain "rm".
+if ! printf '%s\n' "$COMMAND" | awk '
+  /(^|[;&|`(]|&&|\|\|)[[:space:]]*rm([[:space:]]|$)/ { hit=1; exit }
+  END { exit !hit }
+'; then
+  decide allow
+fi
+
+# An `rm` is present. Compound or expansion-bearing commands can't be safely
+# scoped by an rm-only allowlist — the hook decides for the entire Bash
+# invocation, so allowing the rm would also allow whatever surrounds it or
+# whatever the shell substitutes in. Bail to ask if we see any of:
 #   ; && || |    — command chaining
 #   \n           — multi-line scripts
 #   $            — $(...) or $VAR (could expand outside our allowlisted dirs)

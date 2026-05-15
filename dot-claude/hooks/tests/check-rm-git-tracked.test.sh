@@ -91,5 +91,39 @@ assert_asks 'rm /tmp/`whoami`.log'
 assert_asks "rm /tmp/foo.txt; rm $TRACKED"
 assert_asks "rm /tmp/a && rm /tmp/b"
 
+# --- no rm anywhere -> allow regardless of shape ---------------------------
+# The `if: "Bash(rm *)"` matcher in settings.json fail-opens on commands
+# containing shell metacharacters, so this hook fires on plenty of non-rm
+# bash. The self-gate at the top of the hook is what actually prevents
+# prompts. These shapes (compound, expansion, for-loops, pipelines,
+# multi-line, command-substitution) used to return `ask` and defeat AFK.
+assert_allows 'which actionlint zizmor 2>&1; echo "---"'
+assert_allows 'for f in foo/*.yml; do echo "=== $f ==="; wc -l "$f"; done'
+assert_allows 'gh api repos/x/y/git/refs/tags/v3 2>/dev/null | jq -r .object.sha'
+assert_allows 'git -C /some/path grep -lE pattern $(git -C /some/path for-each-ref --format=%(refname) refs/heads)'
+assert_allows 'CLONE=/some/path; git -C "$CLONE" log --oneline -5'
+assert_allows 'cd /tmp && VAR=foo; ls "$VAR"'
+assert_allows $'line1\nline2\nls -la'
+assert_allows 'echo `whoami` && id'
+assert_allows 'for owner in a b c; do printf "%s: " "$owner"; curl -sI "https://github.com/$owner"; done'
+assert_allows 'HEAD_BLOB=$(git ls-tree HEAD -- file); echo "$HEAD_BLOB"'
+
+# --- subcommands containing the literal "rm" are NOT standalone rm ---------
+# `git rm`, `npm rm`, etc. are subcommands of other tools with their own
+# semantics — not this hook's concern. They must allow without triggering
+# path validation.
+assert_allows "git rm $TRACKED"
+assert_allows "git -C . rm $TRACKED"
+assert_allows 'npm rm some-package'
+assert_allows 'echo "--remove-tag"'
+assert_allows 'echo "the form is broken"'
+
+# --- rm inside $(...) is still rm and must still be validated -------------
+# Command substitution executes its contents; we cannot let an rm hide in
+# `$(...)` or `` `...` ``. The fast-path must NOT short-circuit these.
+assert_asks 'echo $(rm /tmp/foo)'
+assert_asks 'X=$(rm /tmp/foo)'
+assert_asks 'echo `rm /tmp/foo`'
+
 printf 'check-rm-git-tracked tests passed (%d cases)\n' \
   "$(grep -cE '^assert_(allows|asks) ' "$0")"
