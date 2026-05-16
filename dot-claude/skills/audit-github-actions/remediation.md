@@ -31,7 +31,14 @@ Refs: https://docs.npmjs.com/trusted-publishers/, https://github.blog/changelog/
 
 ## 2. Pin a third-party action to a 40-char SHA
 
-Find the SHA from the action's release page or:
+The fastest path is [`pinact`](https://github.com/suzuki-shunsuke/pinact) — it rewrites every `uses:` line in the workflow to a SHA with the original tag preserved as a comment, and `pinact run --check --verify` later validates the SHA still matches the annotation (catches force-pushed tags):
+
+```sh
+pinact run                  # rewrite all uses: to pinned SHA + # vX.Y.Z comment
+pinact run --check --verify # CI gate: fail on unpinned or SHA/annotation mismatch
+```
+
+To pin a single action by hand, resolve the SHA first:
 
 ```sh
 git ls-remote https://github.com/<owner>/<repo> refs/tags/v<X.Y.Z>
@@ -49,7 +56,7 @@ Then:
 - uses: foo/bar@8a4e9f06c1ed62b6ab27a09f0d75cf90a8b3c46b  # v1.2.3
 ```
 
-GitHub now supports org-level policy to require SHA pinning (announced 2025-08-15). Recommend enabling it in the report's next-steps line.
+GitHub now supports org-level policy to require SHA pinning (announced 2025-08-15). Recommend enabling it in the report's next-steps line, alongside `pinact run --check --verify` as a workflow gate.
 
 ## 3. Pass attacker-controlled fields safely
 
