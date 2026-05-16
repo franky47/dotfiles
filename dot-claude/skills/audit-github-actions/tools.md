@@ -1,6 +1,6 @@
 # Deterministic tooling integration
 
-Static analysers for GitHub Actions are mature. They catch the obvious cases deterministically, freeing the agent for novel-variant reasoning. Three tools are **required** for this skill — if any is missing, install it before continuing; if installation is impossible, abort the audit and tell the user which tool is missing and how to install it.
+Static analysers for GitHub Actions are mature. They catch the obvious cases deterministically, freeing the agent for novel-variant reasoning. Three tools are **required** for this skill — if any is missing, abort the audit immediately, print the missing tool(s) and the exact install command from the table below, and stop. Do **not** attempt to install anything yourself; do not produce a partial report.
 
 ## Required tools
 
@@ -13,7 +13,7 @@ Static analysers for GitHub Actions are mature. They catch the obvious cases det
 ## Operating mode
 
 1. Probe for every required tool in one shot: `command -v zizmor actionlint pinact`.
-2. For each missing tool, attempt installation yourself using the command in the table above. Do not ask the user. If installation fails (no `brew`/`uv`/`go`/`aqua`, network blocked, etc.), abort the audit with a one-line message naming the missing tool and the install command — do not produce a partial report.
+2. If any tool is missing, **stop immediately**. Print a message naming each missing tool and the install command from the table above, then exit the conversation without running any further audit steps. Never install tools yourself, never ask the user mid-audit to install and continue — the user installs and re-invokes the skill.
 3. Once all three are present, run them against the workflow surface in parallel with the agent walk. Capture SARIF / JSON / exit codes.
 4. `pinact` is authoritative for the pin-legitimacy step (SKILL.md §3). Treat its `--verify` mismatches as High findings. Agent still owns:
    - **Owner-liveness / repojacking** probe (`curl -sI https://github.com/<owner>` — a 404 or 3xx redirect means the namespace is unclaimed or renamed, exposing future ref bumps even when the current SHA still resolves).
