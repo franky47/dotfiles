@@ -38,21 +38,6 @@ models:
     ttl: 0
     concurrencyLimit: 1
 
-  qwopus-glm-18b-q4_k_m:
-    cmd: |
-      llama-server
-        -hf KyleHessling1/Qwopus-GLM-18B-Merged-GGUF:Q4_K_M
-        --port ${PORT}
-        --parallel 1
-        --cont-batching
-        --ctx-size 262144
-        --flash-attn on
-        --gpu-layers all
-        --reasoning-format deepseek
-        --chat-template-kwargs '{"preserve_thinking":true}'
-    ttl: 0
-    concurrencyLimit: 1
-
   gemma4-31b-q4_k_m:
     # Gemma 4 on Metal: flash-attn must be OFF (mixed SWA layout breaks Metal FA);
     # KV-cache quant requires FA so it cannot be used here. Sampling per Google docs.

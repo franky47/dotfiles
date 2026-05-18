@@ -15,12 +15,6 @@ const MODELS = [
     maxTokens: 65536,
   },
   {
-    id: 'qwopus-glm-18b-q4_k_m',
-    name: 'Qwopus GLM 18B (Q4_K_M)',
-    contextWindow: 65536,
-    maxTokens: 65536,
-  },
-  {
     id: 'gemma4-31b-q4_k_m',
     name: 'Gemma 4 31B (Q4_K_M)',
     contextWindow: 65536,

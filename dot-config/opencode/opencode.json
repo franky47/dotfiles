@@ -34,16 +34,6 @@
             "output": 65536
           }
         },
-        "qwopus-glm-18b-q4_k_m": {
-          "name": "Qwopus GLM 18B (Q4_K_M)",
-          "reasoning": true,
-          "tool_call": true,
-          "limit": {
-            "context": 65536,
-            "input": 65536,
-            "output": 65536
-          }
-        },
         "gemma4-31b-q4_k_m": {
           "name": "Gemma 4 31B (Q4_K_M)",
           "reasoning": true,
