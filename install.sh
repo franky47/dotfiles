@@ -108,7 +108,7 @@ check_prereqs() {
 check_prereqs
 
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
-mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/Library/Application\ Support/lazygit
+mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/Library/Application\ Support/lazygit ~/.pi/agent/extensions
 
 # Stow: first run uses --adopt to pull existing files into the repo, then --restow for re-runs.
 # --adopt moves conflicting files into the package dir so stow can create symlinks.
@@ -152,6 +152,17 @@ if [[ -d "${LOCAL_CLAUDE}/skills" ]]; then
     link_skill "$d" ~/.claude/skills/"$name"
     link_skill "$d" ~/.agents/skills/"$name"
     echo "Linked local skill: $name"
+  done
+fi
+
+# Symlink machine-local pi extensions
+LOCAL_PI="${DOTFILES}/local/${MACHINE_NAME}/pi"
+if [[ -d "${LOCAL_PI}/extensions" ]]; then
+  for f in "${LOCAL_PI}/extensions/"*.ts; do
+    [[ -f "$f" ]] || continue
+    name="$(basename "$f")"
+    link_skill "$f" ~/.pi/agent/extensions/"$name"
+    echo "Linked local pi extension: $name"
   done
 fi
 
