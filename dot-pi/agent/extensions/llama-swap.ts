@@ -59,15 +59,15 @@ export default async function (pi: ExtensionAPI) {
     },
   });
 
-  console.log(`llama-swap: registered provider with ${models.length} model(s)`);
-
   pi.on("session_start", async (_event, ctx) => {
     try {
-      if (ctx.hasUI)
+      if (ctx.hasUI) {
+        console.log(`llama-swap: registered provider with ${models.length} model(s)`);
         ctx.ui.notify(
           `llama-swap provider registered (${models.length} model(s))`,
           "info"
         );
+      }
     } catch {
       // ignore
     }
