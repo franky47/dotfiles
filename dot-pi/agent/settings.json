@@ -1,7 +1,13 @@
 {
-  "lastChangelogVersion": "0.75.1",
+  "lastChangelogVersion": "0.75.3",
   "defaultProvider": "llama-swap",
-  "defaultModel": "qwen3.6-35b-a3b-q4_k_m",
-  "defaultThinkingLevel": "medium",
-  "hideThinkingBlock": false
+  "defaultModel": "qwen3.6-27b-q4_k_xl",
+  "defaultThinkingLevel": "low",
+  "hideThinkingBlock": false,
+  "enabledModels": [
+    "llama-swap/qwen3.6-35b-a3b-q4_k_m",
+    "llama-swap/qwen3.6-27b-q4_k_xl",
+    "github-copilot/gpt-5.4-mini",
+    "github-copilot/gpt-5.5"
+  ]
 }
