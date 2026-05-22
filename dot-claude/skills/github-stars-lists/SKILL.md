@@ -119,7 +119,8 @@ matching "auth":
 ```bash
 curl -sL "https://github.com/franky47?tab=stars&q=auth" \
   | grep -oE 'href="/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"' \
-  | sed -E 's@href="/(.*)"@\1@' | grep -vE '^(sponsors|stars)/' | sort -u
+  | sed -E 's@href="/(.*)"@\1@' \
+  | grep -vE '^(sponsors|orgs|users|topics|collections|stars|settings)/' | sort -u
 ```
 
 This searches *only* the user's own starred set — narrower and faster than
