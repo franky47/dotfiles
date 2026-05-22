@@ -20,3 +20,7 @@ cursor-color = #f32882
 cursor-text = #fafafa
 selection-background = #005be7
 selection-foreground = #fafafa
+
+# Quick word deletion with alt+backspace
+# From https://pi.dev/docs/latest/terminal-setup
+keybind = alt+backspace=text:\x1b\x7f
