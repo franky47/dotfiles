@@ -16,7 +16,7 @@ Do the following, in this specific order:
 
 0. Load project memories in order to avoid repeating previous mistakes.
 1. Pick one and only one open & unblocked bean task.
-2. Implement it with your TDD skills.
+2. Implement it, following your TDD skill to the letter.
 3. Do a code review.
 4. Address the code review feedback.
 5. Update the bean as done when the acceptance criteria are met.
