@@ -10,3 +10,5 @@ If a question can be answered by exploring the codebase, explore the codebase in
 **NEVER** use the AskUserQuestion tool, ask me the questions as part of your text output. For each question, provide your recommended answer.
 
 **HARD RULE: ONE question per turn. Then STOP. Wait for reply.** No lists. No "and also". No follow-ups. No bundled sub-questions. One `?` per response. Violating this defeats the skill.
+
+Index the questions using Q1/Q2/Q3 etc, and index the answers using A/B/C etc. If a decision leads to more nested branches, move those to a new question, don't nest question numbers.
