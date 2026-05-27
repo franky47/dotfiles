@@ -7,13 +7,27 @@ description: Schedule a prompt to fire back at yourself at a future time or on a
 
 The `schedule` tool lets you enqueue a prompt that fires back as a user message when a cron pattern matches. The fired prompt triggers a fresh agent turn, so write the prompt as a complete, standalone instruction — past you won't be in context.
 
+## ⚠ ALWAYS check the current time first
+
+You have **no built-in clock**. Your training data is months or years stale. If you guess the year, you will pick the wrong one.
+
+**Before computing any cron expression involving a relative offset** ("in N minutes", "tomorrow", "next Friday", "in 2 hours", "at 3pm" — anything that depends on "now"), run:
+
+```bash
+date "+%Y-%m-%d %H:%M %A"
+```
+
+Use the output as the basis for every date/time field in the cron. After the tool returns, read the `next fire` and `current time` lines back — if they don't match the user's intent, delete and reschedule.
+
+Exception: if the user gives a fully absolute time with year ("on 2026-12-25 at 09:00"), you can construct the cron directly without consulting `date`.
+
 ## When to use it
 
 Trigger the tool, don't try to remember manually:
 
-- "remind me in 10 minutes" → one-shot, ~10 min from now
-- "remind me at 3pm" → one-shot, today at 15:00 (or tomorrow if past)
-- "every Monday at 9am send me my open PRs" → recurring weekday cron
+- "remind me in 10 minutes" → one-shot, ~10 min from now (check `date` first!)
+- "remind me at 3pm" → one-shot, today at 15:00 (or tomorrow if past — check `date`!)
+- "every Monday at 9am send me my open PRs" → recurring weekday cron (no `date` needed)
 - "check the build status every 30 minutes" → recurring `*/30 * * * *`
 - "wake me up daily with the news" → recurring `0 8 * * *`
 
@@ -42,17 +56,16 @@ When both day-of-month and day-of-week are restricted, the task fires when **eit
 
 You generate the cron expression. The tool validates it and rejects anything bogus.
 
-| Request | Cron | Recurring |
-|---|---|---|
-| in 10 minutes (from 14:32) | `42 14 27 5 *` | false |
-| every 5 minutes | `*/5 * * * *` | true |
-| daily at 9am | `0 9 * * *` | true |
-| weekdays at 9am | `0 9 * * MON-FRI` | true |
-| first of every month at midnight | `0 0 1 * *` | true |
-| every Friday at 5pm | `0 17 * * FRI` | true |
-| tomorrow at 8am (one-shot) | `0 8 <DD> <MM> *` | false |
+| Request             | Steps                                       | Cron              | Recurring |
+| ------------------- | ------------------------------------------- | ----------------- | --------- |
+| in 10 minutes       | `date` → compute now+10min → pin all fields | `42 14 27 5 *`    | false     |
+| every 5 minutes     | (no `date` needed)                          | `*/5 * * * *`     | true      |
+| tomorrow at 8am     | `date` → tomorrow's date → pin              | `0 8 <DD> <MM> *` | false     |
+| daily at 9am        | (no `date` needed)                          | `0 9 * * *`       | true      |
+| weekdays at 9am     | (no `date` needed)                          | `0 9 * * MON-FRI` | true      |
+| every Friday at 5pm | (no `date` needed)                          | `0 17 * * FRI`    | true      |
 
-For one-shot reminders that are not naturally a recurring pattern, pin minute + hour + day + month exactly and set `recurring: false`. The task auto-deletes after firing.
+For one-shot reminders, pin minute + hour + day + month exactly and set `recurring: false`. The task auto-deletes after firing.
 
 ## The prompt argument
 
@@ -63,11 +76,9 @@ The `prompt` is what gets sent back when the task fires. Make it self-contained 
 - `/schedule` — lists active tasks (id, schedule, next fire, prompt preview)
 - `/schedule delete <id>` — removes a task
 
-You can also call the schedule tool to create new tasks; deletion goes through the slash command (no `unschedule` tool — keeps the tool surface small).
-
 ## Firing model
 
-- Tasks fire on `turn_end` (when you become idle). Sub-minute lag while you're mid-turn is expected.
+- Tasks fire via a single in-process timer for the soonest due task. They also drain on `turn_end` as a fallback. Sub-second jitter on the wall clock is expected.
 - One message per fired task. If 3 tasks fire at once, you get 3 sequential turns.
-- Tasks persist across reloads (stored in session JSONL). On session start, overdue tasks are flagged and fire on the next turn.
-- Tasks are scoped to the session. They do not carry across `/new` or `/resume`.
+- Tasks persist across reloads (stored in session JSONL). On session start, overdue tasks fire immediately.
+- Tasks are scoped to the session JSONL. Resuming the same session restores them; `/new` (a fresh session) starts with no tasks.

@@ -28,8 +28,9 @@ export default function (pi: ExtensionAPI) {
 
   function armFireTimer() {
     clearFireTimer()
-    const upcoming = manager.list()
-      .map(t => t.nextFireAt)
+    const upcoming = manager
+      .list()
+      .map((t) => t.nextFireAt)
       .filter((n): n is number => n !== null)
     if (upcoming.length === 0) return
     const next = Math.min(...upcoming)
@@ -47,9 +48,10 @@ export default function (pi: ExtensionAPI) {
     manager.rebuild(ctx)
     const overdue = manager.due(Date.now())
     if (overdue.length > 0 && ctx.hasUI) {
-      const summary = overdue.length === 1
-        ? `1 scheduled task is overdue — firing now.`
-        : `${overdue.length} scheduled tasks are overdue — firing now.`
+      const summary =
+        overdue.length === 1
+          ? `1 scheduled task is overdue — firing now.`
+          : `${overdue.length} scheduled tasks are overdue — firing now.`
       ctx.ui.notify(summary, 'info')
     }
     armFireTimer()
@@ -68,12 +70,13 @@ export default function (pi: ExtensionAPI) {
     name: 'schedule',
     label: 'Schedule',
     description:
-      'Schedule a prompt to be re-sent to yourself at a future time using a 5-field cron expression. Use for reminders, recurring checks, or any time-based prompt. The prompt fires as a follow-up user message when the cron pattern next matches.',
+      'Schedule a prompt to be re-sent to yourself at a future time using a 5-field cron expression. Use for reminders, recurring checks, or any time-based prompt. The prompt fires as a follow-up user message when the cron pattern next matches.\n\nCRITICAL: you have no built-in clock. Before computing any cron expression involving a relative offset ("in 5 minutes", "tomorrow", "next Friday", "in 2 hours"), you MUST first run `date "+%Y-%m-%d %H:%M %A"` via bash to get the current local time. The tool\'s response includes the current time so you can sanity-check the next-fire output before reporting back to the user.',
     promptSnippet: 'Schedule a future prompt with a cron expression',
     promptGuidelines: [
       'When the user says "remind me", "every N minutes/hours/days", "at HH:MM", or otherwise asks for a time-based action, use the schedule tool instead of trying to remember manually.',
-      'Convert the user\'s natural-language time into a 5-field cron expression (minute hour day-of-month month day-of-week). For one-shot reminders, pin the cron to the exact minute (e.g. "30 14 27 5 *") and set recurring=false.',
-      'The prompt argument is what gets sent back to you when the task fires — write it as a complete instruction, not a summary.',
+      'You DO NOT know the current time. Before scheduling anything with a relative offset ("in N min", "tomorrow", "next week"), run `date "+%Y-%m-%d %H:%M %A"` first.',
+      'Convert the user\'s natural-language time into a 5-field cron expression (minute hour day-of-month month day-of-week). For one-shot reminders, pin the cron to the exact minute (e.g. "30 14 27 5 *") and set recurring=false. Always sanity-check the tool\'s reported "next fire" against the current time.',
+      'The prompt argument is what gets sent back to you when the task fires — write it as a complete instruction, not a summary. The agent reading it on fire has no memory of this conversation.',
       'Use the /schedule command (or tell the user to) to list and delete tasks.',
     ],
     parameters: Type.Object({
@@ -97,13 +100,25 @@ export default function (pi: ExtensionAPI) {
       try {
         const task = manager.create(params.cron, params.prompt, recurring)
         const desc = describeCron(task.parsed)
-        const next = task.nextFireAt ? new Date(task.nextFireAt).toLocaleString() : 'never'
+        const now = new Date()
+        const next = task.nextFireAt ? new Date(task.nextFireAt) : null
+        const nextStr = next ? next.toLocaleString() : 'never'
+        const deltaMs = next ? next.getTime() - now.getTime() : 0
+        const deltaStr = next ? formatDuration(deltaMs) : 'n/a'
+        // Loud warning when a one-shot lands suspiciously far out — usually
+        // means the agent guessed the wrong year without checking the clock.
+        const sanity =
+          !recurring && deltaMs > 7 * 24 * 60 * 60 * 1000
+            ? `\n  ⚠ WARNING: this one-shot fires in ${deltaStr}. Did you mean to schedule that far in the future? If not, run \`date\` to check the current year and reschedule.`
+            : ''
         const text =
           `Scheduled task ${task.id}\n` +
+          `  current time: ${now.toLocaleString()}\n` +
           `  schedule: ${desc} (${task.cron})\n` +
           `  recurring: ${recurring}\n` +
-          `  next fire: ${next}\n` +
-          `  prompt: ${params.prompt}`
+          `  next fire: ${nextStr} (in ${deltaStr})\n` +
+          `  prompt: ${params.prompt}` +
+          sanity
         // turn_end will re-arm, but arm now too so an isolated tool invocation
         // outside the normal turn lifecycle still gets a timer.
         armFireTimer()
@@ -114,10 +129,12 @@ export default function (pi: ExtensionAPI) {
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error)
         return {
-          content: [{
-            type: 'text' as const,
-            text: `Failed to schedule: ${msg}\n\nCron format: "minute hour day-of-month month day-of-week". Valid ranges: minute 0-59, hour 0-23, day 1-31, month 1-12 (or JAN-DEC), day-of-week 0-7 (or SUN-SAT, both 0 and 7 mean Sunday).`,
-          }],
+          content: [
+            {
+              type: 'text' as const,
+              text: `Failed to schedule: ${msg}\n\nCron format: "minute hour day-of-month month day-of-week". Valid ranges: minute 0-59, hour 0-23, day 1-31, month 1-12 (or JAN-DEC), day-of-week 0-7 (or SUN-SAT, both 0 and 7 mean Sunday).`,
+            },
+          ],
           details: { taskId: '', nextFireAt: null },
           isError: true,
         }
@@ -126,7 +143,8 @@ export default function (pi: ExtensionAPI) {
   })
 
   pi.registerCommand('schedule', {
-    description: 'List or delete scheduled tasks. Usage: /schedule [delete <id>]',
+    description:
+      'List or delete scheduled tasks. Usage: /schedule [delete <id>]',
     async handler(args, ctx) {
       const trimmed = args.trim()
       if (trimmed.startsWith('delete ') || trimmed.startsWith('rm ')) {
@@ -136,7 +154,10 @@ export default function (pi: ExtensionAPI) {
           return
         }
         const ok = manager.delete(id)
-        ctx.ui.notify(ok ? `Deleted task ${id}` : `No such task: ${id}`, ok ? 'info' : 'warning')
+        ctx.ui.notify(
+          ok ? `Deleted task ${id}` : `No such task: ${id}`,
+          ok ? 'info' : 'warning',
+        )
         // Command path doesn't trigger turn_end, so re-arm here.
         armFireTimer()
         return
@@ -148,7 +169,10 @@ export default function (pi: ExtensionAPI) {
         return
       }
       const body = tasks.map(formatTask).join('\n\n')
-      ctx.ui.notify(`${tasks.length} scheduled task${tasks.length === 1 ? '' : 's'}:\n\n${body}`, 'info')
+      ctx.ui.notify(
+        `${tasks.length} scheduled task${tasks.length === 1 ? '' : 's'}:\n\n${body}`,
+        'info',
+      )
     },
   })
 
@@ -169,4 +193,19 @@ export default function (pi: ExtensionAPI) {
       ctx.ui.notify(examples, 'info')
     },
   })
+}
+
+function formatDuration(ms: number): string {
+  const abs = Math.abs(ms)
+  const sec = Math.round(abs / 1000)
+  if (sec < 60) return `${sec}s`
+  const min = Math.round(sec / 60)
+  if (min < 60) return `${min}m`
+  const hr = Math.round(min / 60)
+  if (hr < 48) return `${hr}h`
+  const day = Math.round(hr / 24)
+  if (day < 60) return `${day}d`
+  const mo = Math.round(day / 30)
+  if (mo < 24) return `${mo}mo`
+  return `${(day / 365).toFixed(1)}y`
 }
