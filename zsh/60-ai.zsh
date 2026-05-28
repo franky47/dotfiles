@@ -36,7 +36,7 @@ alias ocmute='touch ~/.config/opencode/plugins/soundboard/mute'
 alias ocunmute='rm -f ~/.config/opencode/plugins/soundboard/mute'
 
 # Pi coding agent — invoked via π
-local PI_BIN="${PI_BIN:-$(npm prefix -g)/bin/pi}"
 π() {
+  : ${PI_BIN:=$(command npm prefix -g)/bin/pi}
   "$PI_BIN" "$@"
 }
