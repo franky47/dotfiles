@@ -1,0 +1,26 @@
+# echo (MacBookPro11,4 — Haswell i7-4980HQ, 16GB, Intel Iris Pro).
+# llama.cpp is built locally from franky47/llama.cpp@macos12-build because
+# upstream binaries link ILP64 BLAS symbols absent from macOS 12 Accelerate
+# and the upstream source needs a one-line `<unordered_map>` include patch
+# to compile on the Monterey toolchain.
+
+healthCheckTimeout: 300
+startPort: 10002
+
+models:
+
+  lfm2.5-8b-a1b-q4_k_m:
+    # MoE 8B total / 1B active. ~1.5GB host RAM, ~17 tok/s decode CPU-only.
+    # gpu-layers 0: Iris Pro Metal Family 1 not worth offload overhead.
+    cmd: |
+      /Volumes/Storage/dev/franky47/llama.cpp/build/bin/llama-server
+        -hf LiquidAI/LFM2.5-8B-A1B-GGUF:Q4_K_M
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --ctx-size 16384
+        --gpu-layers 0
+        --threads 4
+        --jinja
+    ttl: 300
+    concurrencyLimit: 1

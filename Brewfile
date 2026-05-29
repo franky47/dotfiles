@@ -5,6 +5,7 @@
 # pass `--upgrade` explicitly to refresh existing formulae.
 
 tap "anomalyco/tap"
+tap "mostlygeek/llama-swap"
 
 # Core
 brew "git"
@@ -39,3 +40,4 @@ brew "uv"                           # Python tooling
 # AI / agents
 brew "anomalyco/tap/opencode"
 brew "rtk"                          # Token savings (setup in OpenCode)
+brew "llama-swap"                   # Local LLM router with auto-load/unload (LaunchAgent: m4x, echo)

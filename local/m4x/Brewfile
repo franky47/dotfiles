@@ -1,5 +1,8 @@
-# m4x-only: local LLM stack (referenced by install.sh and the llama-swap LaunchAgent).
+# m4x-only: llama.cpp inference engine for the local LLM stack.
+# llama-swap moved to the shared Brewfile — needed on echo too.
+# echo cannot brew-install llama.cpp (macOS 12 = Tier 3, source build trips a
+# missing-include bug); it builds from franky47/llama.cpp@macos12-build via
+# local/echo/setup-llama-cpp.sh instead.
 # Install: `brew bundle --file=local/m4x/Brewfile`
 
-brew "llama-swap"
 brew "llama.cpp"

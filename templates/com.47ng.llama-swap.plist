@@ -7,7 +7,7 @@
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
-		<string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<string>__LAUNCH_PATH__</string>
 	</dict>
 	<key>ProgramArguments</key>
 	<array>

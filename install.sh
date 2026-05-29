@@ -88,16 +88,26 @@ check_prereqs() {
     warn=1
   fi
 
-  if [[ "${MACHINE_NAME}" == "m4x" ]]; then
+  if [[ "${MACHINE_NAME}" == "m4x" || "${MACHINE_NAME}" == "echo" ]]; then
     if ! command -v llama-swap &>/dev/null; then
       echo "${YELLOW}WARN:${RESET} llama-swap not found — model swap daemon unavailable."
       echo "  brew install llama-swap"
       warn=1
     fi
+  fi
 
+  if [[ "${MACHINE_NAME}" == "m4x" ]]; then
     if ! command -v llama-server &>/dev/null; then
       echo "${YELLOW}WARN:${RESET} llama-server not found — llama.cpp unavailable."
       echo "  brew install llama.cpp"
+      warn=1
+    fi
+  fi
+
+  if [[ "${MACHINE_NAME}" == "echo" ]]; then
+    if [[ ! -x /Volumes/Storage/dev/franky47/llama.cpp/build/bin/llama-server ]]; then
+      echo "${YELLOW}WARN:${RESET} echo llama.cpp build missing — llama-server unavailable."
+      echo "  ${DOTFILES}/local/echo/setup-llama-cpp.sh"
       warn=1
     fi
   fi
@@ -166,23 +176,53 @@ if [[ -d "${LOCAL_PI}/extensions" ]]; then
   done
 fi
 
-# llama-swap LaunchAgent (m4x only — other hosts still get the config via stow)
-if [[ "${MACHINE_NAME}" == "m4x" ]]; then
-  LLAMA_SWAP="$(which llama-swap 2>/dev/null || echo /opt/homebrew/bin/llama-swap)"
+# llama-swap active config: pick the per-host variant. The symlink is created
+# inside the stow-managed dir (~/.config is folded), so the link literally lives
+# next to its target in the repo — gitignored to keep host selection local.
+if [[ -e "${DOTFILES}/dot-config/llama-swap/config.${MACHINE_NAME}.yml" ]]; then
+  ln -snf "config.${MACHINE_NAME}.yml" ~/.config/llama-swap/config.yml
+  echo "Selected llama-swap config: config.${MACHINE_NAME}.yml"
+fi
+
+# llama-swap LaunchAgent (m4x + echo). PATH differs by host because the brew
+# prefix differs (Apple Silicon vs Intel). The child llama-server is resolved
+# via absolute path in config.echo.yml — m4x leaves it on PATH.
+if [[ "${MACHINE_NAME}" == "m4x" || "${MACHINE_NAME}" == "echo" ]]; then
+  case "${MACHINE_NAME}" in
+    m4x)
+      LAUNCH_PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      LLAMA_SWAP_LOG_DIR="${HOME}/.config/llama-swap/logs"
+      ;;
+    echo)
+      LAUNCH_PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      # ~/Library/Logs is the Apple-blessed location for user-scope log files;
+      # ~/.config/.../logs trips TCC under launchd on macOS 12 (EX_CONFIG).
+      LLAMA_SWAP_LOG_DIR="${HOME}/Library/Logs/llama-swap"
+      ;;
+  esac
+  mkdir -p "${LLAMA_SWAP_LOG_DIR}"
+  LLAMA_SWAP="$(which llama-swap 2>/dev/null || true)"
+  if [[ -z "${LLAMA_SWAP}" ]]; then
+    case "${MACHINE_NAME}" in
+      m4x)  LLAMA_SWAP="/opt/homebrew/bin/llama-swap" ;;
+      echo) LLAMA_SWAP="/usr/local/bin/llama-swap" ;;
+    esac
+  fi
   HOME_DIR="$HOME"
   sed -e "s|__LLAMA_SWAP_BIN__|${LLAMA_SWAP}|g" \
       -e "s|__LLAMA_SWAP_CONFIG__|${HOME_DIR}/.config/llama-swap/config.yml|g" \
-      -e "s|__LLAMA_SWAP_LOG_OUT__|${HOME_DIR}/.config/llama-swap/logs/stdout.txt|g" \
-      -e "s|__LLAMA_SWAP_LOG_ERR__|${HOME_DIR}/.config/llama-swap/logs/stderr.txt|g" \
+      -e "s|__LLAMA_SWAP_LOG_OUT__|${LLAMA_SWAP_LOG_DIR}/stdout.txt|g" \
+      -e "s|__LLAMA_SWAP_LOG_ERR__|${LLAMA_SWAP_LOG_DIR}/stderr.txt|g" \
+      -e "s|__LAUNCH_PATH__|${LAUNCH_PATH}|g" \
       "${DOTFILES}/templates/com.47ng.llama-swap.plist" \
     > ~/Library/LaunchAgents/com.47ng.llama-swap.plist
-  if launchctl list gui/"$(id -u)" 2>/dev/null | grep -q com.47ng.llama-swap; then
-    launchctl bootout gui/"$(id -u)"/com.47ng.llama-swap 2>/dev/null || true
-    launchctl bootstrap gui/"$(id -u)" ~/Library/LaunchAgents/com.47ng.llama-swap.plist 2>/dev/null || true
-    echo "Restarted llama-swap LaunchAgent"
-  else
-    echo "llama-swap LaunchAgent already loaded"
-  fi
+  # bootout (idempotent) + bootstrap + kickstart -k. Bootstrap alone leaves the
+  # job in `spawn scheduled` on a cold load; kickstart -k forces immediate spawn
+  # and replaces any stuck spawn slot.
+  launchctl bootout gui/"$(id -u)"/com.47ng.llama-swap 2>/dev/null || true
+  launchctl bootstrap gui/"$(id -u)" ~/Library/LaunchAgents/com.47ng.llama-swap.plist 2>/dev/null || true
+  launchctl kickstart -k gui/"$(id -u)"/com.47ng.llama-swap >/dev/null 2>&1 || true
+  echo "Started llama-swap LaunchAgent"
 fi
 
 # tmux-ssh-autostart LaunchAgent (echo only — keeps one tmux server
