@@ -56,7 +56,7 @@ models:
     ttl: 0
     concurrencyLimit: 1
 
-lfm2.5-8b-a1b:
+  lfm2.5-8b-a1b:
     # --chat-template-file: works around a llama.cpp tool-parser bug (as of b9200).
     # llama.cpp selects its LFM2.5 tool-call parser by scanning the template source
     # for the literal "List of tools: [", but the stock GGUF template builds that string
