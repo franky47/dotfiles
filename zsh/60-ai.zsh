@@ -40,3 +40,13 @@ alias ocunmute='rm -f ~/.config/opencode/plugins/soundboard/mute'
   : ${PI_BIN:=$(command npm prefix -g)/bin/pi}
   "$PI_BIN" "$@"
 }
+
+# ds4 local inference server (DeepSeek V4 Flash on Metal)
+ds4() {
+  (cd "$HOME/dev/playground/ai/ds4" && exec ./ds4-server \
+    --port 9999 \
+    --ctx 131072 \
+    --kv-disk-dir ./kv-cache \
+    --kv-disk-space-mb 20000 \
+    "$@")
+}

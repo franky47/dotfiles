@@ -7,6 +7,25 @@
     }
   },
   "provider": {
+    "ds4": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "ds4.c (local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:9999/v1"
+      },
+      "models": {
+        "deepseek-v4-flash": {
+          "name": "DeepSeek V4 Flash (q2-imatrix)",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": {
+            "context": 131072,
+            "input": 131072,
+            "output": 131072
+          }
+        }
+      }
+    },
     "llamacpp": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "llama.cpp (local)",

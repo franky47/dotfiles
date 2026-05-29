@@ -5,6 +5,7 @@
   "defaultThinkingLevel": "low",
   "hideThinkingBlock": true,
   "enabledModels": [
+    "ds4/deepseek-v4-flash",
     "llama-swap/qwen3.6-35b-a3b-q4_k_m",
     "llama-swap/qwen3.6-27b-q4_k_xl",
     "llama-swap/lfm2.5-8b-a1b",
