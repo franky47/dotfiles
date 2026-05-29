@@ -12,3 +12,44 @@ alias brewup='brew update && brew upgrade'
 alias pw='playwright'
 alias pwt='playwright test'
 alias pwtu='playwright test --ui'
+
+
+# Security - Socket firewall
+export SFW_SILENT=true
+
+sfw() {
+  local ts="$(date +%Y-%m-%d_%H-%M-%S)-$$-$RANDOM"
+  local tmp_dir="${TMPDIR%/}/sfw"
+  local keep_dir="$HOME/.cache/sfw"
+  local report="$tmp_dir/${ts}.json"
+  mkdir -p "$tmp_dir"
+  local code
+  if [[ -t 1 ]]; then
+    SFW_JSON_REPORT_PATH="$report" command sfw "$@"
+    code=$?
+  else
+    SFW_JSON_REPORT_PATH="$report" command sfw "$@" \
+      > >(grep --line-buffered -v "^sfw report written to: ")
+    code=$?
+  fi
+  if [[ $code -ne 0 && -f "$report" ]]; then
+    mkdir -p "$keep_dir"
+    mv "$report" "$keep_dir/"
+    echo "[Socket Firewall] report saved at $keep_dir/${ts}.json" >&2
+  fi
+  return $code
+}
+
+alias bun='sfw bun'
+alias bunx='sfw bunx'
+alias npm='sfw npm'
+alias npx='sfw npx'
+alias pnpm='sfw pnpm'
+alias pnpx='sfw pnpx'
+alias pn='sfw pn'
+alias pnx='sfw pnx'
+alias yarn='sfw yarn'
+alias cargo='sfw cargo'
+alias pip='sfw pip'
+alias pipx='sfw pipx'
+alias uv='sfw uv'

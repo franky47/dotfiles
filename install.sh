@@ -117,6 +117,23 @@ check_prereqs() {
 
 check_prereqs
 
+# Bootstrap sfw — zsh aliases route npm/pnpm/cargo/pip/etc. through it.
+# Runs in bash, so aliases aren't active here; `npm` is unaliased.
+ensure_sfw() {
+  if command -v sfw &>/dev/null; then
+    return
+  fi
+  if ! command -v npm &>/dev/null; then
+    echo "${YELLOW}WARN:${RESET} sfw not installed and npm unavailable." >&2
+    echo "  Install Node first (brew install fnm && fnm install --lts), then re-run." >&2
+    return
+  fi
+  echo "Installing sfw (Socket Firewall) globally via npm..."
+  npm install -g sfw
+}
+
+ensure_sfw
+
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
 mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/Library/Application\ Support/lazygit ~/.pi/agent/extensions
 
