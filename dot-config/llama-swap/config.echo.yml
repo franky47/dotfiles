@@ -12,6 +12,11 @@ models:
   lfm2.5-8b-a1b-q4_k_m:
     # MoE 8B total / 1B active. ~1.5GB host RAM, ~17 tok/s decode CPU-only.
     # gpu-layers 0: Iris Pro Metal Family 1 not worth offload overhead.
+    # --chat-template-file: same llama.cpp tool-parser bug as on m4x — the
+    # detector scans the template source for a literal "List of tools: ["
+    # which the stock GGUF template only builds at render time, so tool
+    # calls return HTTP 500. The override carries that literal in a Jinja
+    # comment so detection trips. See config.m4x.yml for the longer note.
     cmd: |
       /Volumes/Storage/dev/franky47/llama.cpp/build/bin/llama-server
         -hf LiquidAI/LFM2.5-8B-A1B-GGUF:Q4_K_M
@@ -21,6 +26,6 @@ models:
         --ctx-size 16384
         --gpu-layers 0
         --threads 4
-        --jinja
+        --chat-template-file ${env.HOME}/.config/llama-swap/lfm2.5-tool-fix.jinja
     ttl: 300
     concurrencyLimit: 1
