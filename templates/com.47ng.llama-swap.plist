@@ -8,6 +8,8 @@
 	<dict>
 		<key>PATH</key>
 		<string>__LAUNCH_PATH__</string>
+		<key>HOME</key>
+		<string>__HOME__</string>
 	</dict>
 	<key>ProgramArguments</key>
 	<array>

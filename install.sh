@@ -231,6 +231,7 @@ if [[ "${MACHINE_NAME}" == "m4x" || "${MACHINE_NAME}" == "echo" ]]; then
       -e "s|__LLAMA_SWAP_LOG_OUT__|${LLAMA_SWAP_LOG_DIR}/stdout.txt|g" \
       -e "s|__LLAMA_SWAP_LOG_ERR__|${LLAMA_SWAP_LOG_DIR}/stderr.txt|g" \
       -e "s|__LAUNCH_PATH__|${LAUNCH_PATH}|g" \
+      -e "s|__HOME__|${HOME_DIR}|g" \
       "${DOTFILES}/templates/com.47ng.llama-swap.plist" \
     > ~/Library/LaunchAgents/com.47ng.llama-swap.plist
   # bootout (idempotent) + bootstrap + kickstart -k. Bootstrap alone leaves the
