@@ -56,6 +56,28 @@ models:
     ttl: 0
     concurrencyLimit: 1
 
+lfm2.5-8b-a1b:
+    # --chat-template-file: works around a llama.cpp tool-parser bug (as of b9200).
+    # llama.cpp selects its LFM2.5 tool-call parser by scanning the template source
+    # for the literal "List of tools: [", but the stock GGUF template builds that string
+    # at render time ("List of tools: " + tools|tojson), so detection misses and tool
+    # calls fail to parse (HTTP 500). The override is the stock template plus a one-line
+    # Jinja comment carrying that literal — zero render change, just trips the detector.
+    cmd: |
+      llama-server
+        -hf LiquidAI/LFM2.5-8B-A1B-GGUF
+        --port ${PORT}
+        --parallel 8
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --ctx-size 524288
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-file ${env.HOME}/.config/llama-swap/lfm2.5-tool-fix.jinja
+        --chat-template-kwargs '{"preserve_thinking":true}'
+    ttl: 0
+    concurrencyLimit: 8
 
 #   council-qwen3.6-35b-a3b-q4_k_m:
 #     cmd: |

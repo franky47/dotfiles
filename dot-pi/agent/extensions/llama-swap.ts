@@ -20,6 +20,12 @@ const MODELS = [
     contextWindow: 65536,
     maxTokens: 65536,
   },
+  {
+    id: 'lfm2.5-8b-a1b',
+    name: 'LFM2.5 8B A1B',
+    contextWindow: 65536,
+    maxTokens: 65536,
+  },
 ]
 
 function toProviderModel(m: {

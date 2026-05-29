@@ -43,6 +43,16 @@
             "input": 65536,
             "output": 65536
           }
+        },
+        "lfm2.5-8b-a1b": {
+          "name": "LFM2.5 8B A1B",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "input": 65536,
+            "output": 65536
+          }
         }
       }
     }
