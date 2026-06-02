@@ -21,6 +21,10 @@ RUN echo "testbox" > /home/testuser/dotfiles/.machine-name
 RUN mkdir -p /home/testuser/dotfiles/local/testbox/claude/skills/testbox-only \
     && echo '---\nname: testbox-only\n---\nTest skill' > /home/testuser/dotfiles/local/testbox/claude/skills/testbox-only/SKILL.md
 
+# Create a per-host llama-swap config so install.sh's host selection has a match
+# (config.yml itself is gitignored — generated per host from config.<host>.yml).
+RUN echo 'models: {}' > /home/testuser/dotfiles/dot-config/llama-swap/config.testbox.yml
+
 # Ensure ~/.config exists so stow unfolds into it.
 # Pre-create ~/.config/opencode to simulate opencode having been installed first
 # (matches real-world layout: opencode owns the dir, stow contributes per-file symlinks).
@@ -76,10 +80,14 @@ RUN echo "=== Opencode ===" \
     && test -L ~/.config/opencode/themes && echo "OK: themes/ symlinked" \
     && test -e ~/.config/opencode/skills/pnpm/SKILL.md && echo "OK: nested skill reachable through symlinked dir"
 
-# Assertions: llama-swap config stowed on non-m4x hosts (config travels everywhere; daemon doesn't)
+# Assertions: llama-swap config stowed + host-selected on non-m4x hosts
+# (config travels everywhere; the daemon doesn't). config.yml is generated per
+# host from config.<host>.yml — testbox has a fixture created above.
 RUN echo "=== llama-swap (non-m4x) ===" \
     && test -L ~/.config/llama-swap && readlink ~/.config/llama-swap | grep -q dotfiles && echo "OK: ~/.config/llama-swap symlinked" \
-    && test -e ~/.config/llama-swap/config.yml && echo "OK: llama-swap config.yml reachable" \
+    && test -L ~/.config/llama-swap/config.yml && echo "OK: config.yml symlink created" \
+    && readlink ~/.config/llama-swap/config.yml | grep -q config.testbox.yml && echo "OK: config.yml → config.testbox.yml (host-selected)" \
+    && grep -q "Selected llama-swap config: config.testbox.yml" /tmp/install.out && echo "OK: host selection logged" \
     && ! test -e ~/Library/LaunchAgents/com.47ng.llama-swap.plist && echo "OK: no LaunchAgent on non-m4x" \
     && ! grep -q "llama-swap not found" /tmp/install.out && echo "OK: no llama-swap prereq warn on non-m4x" \
     && ! grep -q "llama-server not found" /tmp/install.out && echo "OK: no llama-server prereq warn on non-m4x"
