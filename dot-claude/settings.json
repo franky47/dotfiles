@@ -178,6 +178,8 @@
       }
     ]
   },
+  "enableWorkflows": false,
+  "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
