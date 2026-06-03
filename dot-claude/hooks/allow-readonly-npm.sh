@@ -7,7 +7,7 @@
 #
 # To allow a new command verbatim, add a line to ALLOWED below. Each entry
 # is a human-readable template. Placeholders in <angle-brackets> are
-# substituted with the regex fragments defined above (currently only <pkg>);
+# substituted with the regex fragments defined above (<pkg>, <field>);
 # the rest is matched literally as part of an anchored regex.
 #
 # Rules for any line you add to ALLOWED:
@@ -27,15 +27,27 @@ set -uo pipefail
 # create an injection surface.
 PKG='(@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*(@[a-zA-Z0-9._^~-]+)?'
 
+# Read-only field selector for `npm view <pkg> <field>` (e.g. version,
+# versions, dist-tags.latest, dependencies). Must start with an alphanumeric
+# (so it can never be read as a `-flag`/`--option` to npm), then word chars,
+# dots and hyphens — deliberately NO brackets, so the shell can't glob-expand
+# an approved command (e.g. `versions[0]`). Agents can fetch the whole field
+# instead.
+FIELD='[a-zA-Z0-9][a-zA-Z0-9._-]*'
+
 ALLOWED=(
   'npm view <pkg>'
+  'npm view <pkg> <field>'
   'npm info <pkg>'
+  'npm info <pkg> <field>'
   'npm show <pkg>'
+  'npm show <pkg> <field>'
 )
 
 substitute() {
   local s=$1
   s=${s//<pkg>/${PKG}}
+  s=${s//<field>/${FIELD}}
   printf '%s' "$s"
 }
 
