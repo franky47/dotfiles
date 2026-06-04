@@ -2,6 +2,33 @@
 
 Cross-machine dotfile management with shared configs and per-machine overrides.
 
+## Skills
+
+Agent skills live in `dot-claude/skills/` (shared) and `local/<machine>/claude/skills/` (per-machine), and are symlinked to .agents for cross-agent use.
+
+Original sources attributed, but skills have been adapted for my usage.
+
+| Skill | What it does | Original Source |
+| --- | --- | --- |
+| [`audit-github-actions`](dot-claude/skills/audit-github-actions/) | Audit GitHub Actions for supply-chain / CI-CD vulns (Shai-Hulud-class worms, expression injection, token exfil) | ✏️ |
+| [`prose`](dot-claude/skills/prose/SKILL.md) | Write human-readable prose: PRs, docs, emails, memos | ✏️ |
+| [`github-stars-lists`](dot-claude/skills/github-stars-lists/SKILL.md) | Scrape repos from your GitHub Stars lists (no API for them) | ✏️ |
+| [`research`](dot-claude/skills/research/SKILL.md) | Run a deep-research session and save it to Obsidian | ✏️ |
+| [`taildrop`](dot-claude/skills/taildrop/SKILL.md) | Send files to Tailscale devices via Taildrop | ✏️ |
+| [`work`](dot-claude/skills/work/SKILL.md) | Pick one open beans task and implement it end-to-end | ✏️ |
+| [`premortem`](dot-claude/skills/premortem/SKILL.md) | Assume the plan already failed, work backward to find why (Gary Klein) | Ohle Lehmann |
+| [`brainstorm`](dot-claude/skills/brainstorm/SKILL.md) | Interview you relentlessly to stress-test a plan or design | Matt Pocock |
+| [`frontend-design`](dot-claude/skills/frontend-design/) | Build distinctive, production-grade UIs that dodge generic AI aesthetics | Anthropic |
+| [`handoff`](dot-claude/skills/handoff/SKILL.md) | Compact the conversation into a handoff doc for a fresh agent | Matt Pocock |
+| [`improve-codebase-architecture`](dot-claude/skills/improve-codebase-architecture/) | Surface deep-module refactors (Ousterhout) for testability | Matt Pocock |
+| [`prd-to-issues`](dot-claude/skills/prd-to-issues/SKILL.md) | Split a PRD into independently-grabbable beans issues (tracer bullets) | Matt Pocock |
+| [`repro`](dot-claude/skills/repro/SKILL.md) | Build a minimal, self-contained bug reproduction | Matt Pocock |
+| [`tdd`](dot-claude/skills/tdd/) | Red-green-refactor with behavior-focused integration tests | Matt Pocock |
+| [`typescript-advanced-types`](dot-claude/skills/typescript-advanced-types/SKILL.md) | Generics, conditional/mapped/template-literal types, utility types | Matt Pocock |
+| [`ubiquitous-language`](dot-claude/skills/ubiquitous-language/SKILL.md) | Extract a DDD glossary from the conversation | Matt Pocock |
+| [`write-a-prd`](dot-claude/skills/write-a-prd/SKILL.md) | Create a PRD via interview, codebase exploration, module design | Matt Pocock |
+| [`write-a-skill`](dot-claude/skills/write-a-skill/SKILL.md) | Author new skills with progressive disclosure and bundled resources | Matt Pocock |
+
 ## Conventions
 
 1. **Shared vs local**: Top-level directories hold configs shared across all machines. `local/<machine>/` mirrors the same structure for machine-specific overrides.
@@ -82,6 +109,8 @@ Re-run `install.sh` after any changes. Stow's `--restow` handles re-runs cleanly
 ## Claude Code settings
 
 Claude Code has a built-in scope system (user → project → local). Stow symlinks `dot-claude/` into `~/.claude/` as the **user** scope. Per-project overrides use Claude's native `.claude/settings.json` (shared) and `.claude/settings.local.json` (personal, gitignored) — no custom merge needed.
+
+
 
 ## How the zsh loader works
 
