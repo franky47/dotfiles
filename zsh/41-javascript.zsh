@@ -1,6 +1,11 @@
 # FNM - https://github.com/Schniz/fnm
 eval "$(fnm env --shell zsh)"
 
+# fnm (above) prepends the active Node version's bin, which ships a bundled npm.
+# Keep our globally-installed npm/npx (~/.npm-packages) ahead of it so the npm
+# CLI is pinned independent of the Node version. node still resolves to fnm.
+export PATH="$HOME/.npm-packages/bin:${PATH//$HOME\/.npm-packages\/bin:/}"
+
 # Bun
 export BUN_INSTALL=~/.bun
 export PATH=$BUN_INSTALL/bin:$PATH
