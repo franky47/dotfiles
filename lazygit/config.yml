@@ -2,9 +2,16 @@ gui:
   nerdFontsVersion: "3"
   theme:
     # active border: leave default (green + bold)
-    # inactive panels recede into a muted family gray (hunk `muted` / zed dim_foreground)
+    # inactive panels recede into hunk's inert line-number color
     inactiveBorderColor:
-      - "#7f848e"
+      - "#485163"
+    # selected item bg: hue + saturation of the inactive border (#485163), at a
+    # darker lightness so text stays legible — HSL(220, 16%, 26%)
+    # (terminals have no real alpha, so this is a pre-blended opaque color)
+    selectedLineBgColor:
+      - "#383F4D"
+    selectedRangeBgColor:
+      - "#383F4D"
 
 git:
   pagers:
