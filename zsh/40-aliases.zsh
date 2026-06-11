@@ -18,6 +18,11 @@ alias pwtu='playwright test --ui'
 export SFW_SILENT=true
 
 sfw() {
+  # sfw's proxy only speaks CONNECT and 405s plain-HTTP/WS loopback traffic,
+  # breaking test suites that spin up local servers (SocketDev/sfw-free#49).
+  # Exempting loopback loses nothing: registry traffic is never loopback.
+  local -x NO_PROXY="localhost,127.0.0.1,::1${NO_PROXY:+,$NO_PROXY}"
+  local -x no_proxy="$NO_PROXY"
   local ts="$(date +%Y-%m-%d_%H-%M-%S)-$$-$RANDOM"
   local tmp_dir="${TMPDIR%/}/sfw"
   local keep_dir="$HOME/.cache/sfw"
