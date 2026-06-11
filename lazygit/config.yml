@@ -1,5 +1,10 @@
 gui:
   nerdFontsVersion: "3"
+  theme:
+    # active border: leave default (green + bold)
+    # inactive panels recede into a muted family gray (hunk `muted` / zed dim_foreground)
+    inactiveBorderColor:
+      - "#7f848e"
 
 git:
   pagers:
