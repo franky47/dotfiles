@@ -28,5 +28,5 @@ git:
   branchLogCmd: git-pretty-log {{branchName}} --
   pagers:
     - colorArg: always
-      pager: hunk pager
+      pager: hunk pager --no-hunk-headers --no-line-numbers
     - {}
