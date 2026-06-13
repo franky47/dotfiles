@@ -171,6 +171,23 @@ for d in "${DOTFILES}/dot-claude/skills/"*/; do
 done
 echo "Mirrored shared skills to ~/.agents/skills/"
 
+# Wire hunk's bundled review skill into both skill dirs. `hunk skill path`
+# returns a versioned Cellar path (stale on upgrade), so rebase it onto
+# `brew --prefix hunk` — a stable symlink brew re-points to the current version
+# on every `brew upgrade`. The link then never goes stale and tracks whatever
+# hunk version is installed. brew-only; skipped where hunk isn't installed.
+if command -v hunk &>/dev/null && hunk_prefix="$(brew --prefix hunk 2>/dev/null)"; then
+  hunk_skill_dir="$(dirname "$(hunk skill path)")"
+  hunk_rel="${hunk_skill_dir#"$(cd "$hunk_prefix" && pwd -P)"/}"
+  hunk_skill="${hunk_prefix}/${hunk_rel}"
+  hunk_name="$(basename "$hunk_skill_dir")"
+  if [[ -d "$hunk_skill" ]]; then
+    link_skill "$hunk_skill" ~/.claude/skills/"$hunk_name"
+    link_skill "$hunk_skill" ~/.agents/skills/"$hunk_name"
+    echo "Linked hunk skill: $hunk_name (via ${hunk_prefix})"
+  fi
+fi
+
 # Symlink machine-local skills
 if [[ -d "${LOCAL_CLAUDE}/skills" ]]; then
   for d in "${LOCAL_CLAUDE}/skills/"*/; do
@@ -234,12 +251,14 @@ if [[ "${MACHINE_NAME}" == "m4x" || "${MACHINE_NAME}" == "echo" ]]; then
       -e "s|__HOME__|${HOME_DIR}|g" \
       "${DOTFILES}/templates/com.47ng.llama-swap.plist" \
     > ~/Library/LaunchAgents/com.47ng.llama-swap.plist
-  # bootout (idempotent) + bootstrap + kickstart -k. Bootstrap alone leaves the
-  # job in `spawn scheduled` on a cold load; kickstart -k forces immediate spawn
-  # and replaces any stuck spawn slot.
+  # bootout (idempotent) + bootstrap. With RunAtLoad=true the bootstrap already
+  # spawns the daemon; a plain kickstart force-spawns it if a cold load left the
+  # job in `spawn scheduled`. Avoid kickstart -k: it kills the just-spawned
+  # instance, which is then under launchd's 10s respawn throttle and blocks
+  # bootstrap for ~10s.
   launchctl bootout gui/"$(id -u)"/com.47ng.llama-swap 2>/dev/null || true
   launchctl bootstrap gui/"$(id -u)" ~/Library/LaunchAgents/com.47ng.llama-swap.plist 2>/dev/null || true
-  launchctl kickstart -k gui/"$(id -u)"/com.47ng.llama-swap >/dev/null 2>&1 || true
+  launchctl kickstart gui/"$(id -u)"/com.47ng.llama-swap >/dev/null 2>&1 || true
   echo "Started llama-swap LaunchAgent"
 fi
 
