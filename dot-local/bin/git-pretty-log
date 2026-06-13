@@ -26,7 +26,7 @@
 #   decoration: HEAD -> main  ->  HEAD ⟶ main   (U+27F6, only when ANSI-wrapped,
 #                 so a literal `->` in a commit message is left alone)
 #   metadata:   dimmed to #485163 (theme color, truecolor 38;2;72;81;99) —
-#                 `Author:` label + `<email>` dimmed, author NAME kept normal;
+#                 `Author:` label + `<email>` dimmed, author NAME bold;
 #                 `Date:` / `Merge:` whole line dimmed. Matched only inside the
 #                 header block (commit line .. blank line), so a message body
 #                 starting with "Author:"/"Date:" is never touched.
@@ -41,7 +41,7 @@ $c =~ s/^[ \x{2502}\x{25CF}\x{2571}\x{2572}|*\/\\_]+//;
 if ($c =~ /^commit [0-9a-f]{4,}/) { $H = 1; s/(\x1b\[[0-9;]*m)?commit (?=[0-9a-f]{4,})/$1/ }
 elsif ($H) {
     if ($c =~ /^\s*$/) { $H = 0 }
-    elsif ($c =~ /^Author:/) { s/^($gut)Author:\s+(.+?)\s+(<[^>]*>)/$1\x1b[38;2;72;81;99mAuthor: \x1b[m$2 \x1b[38;2;72;81;99m$3\x1b[m/ }
+    elsif ($c =~ /^Author:/) { s/^($gut)Author:\s+(.+?)\s+(<[^>]*>)/$1\x1b[38;2;72;81;99mAuthor: \x1b[m\x1b[1m$2\x1b[22m \x1b[38;2;72;81;99m$3\x1b[m/ }
     elsif ($c =~ /^(?:Date|Merge|Commit|AuthorDate|CommitDate|Reflog):/) { s/^($gut)(\S.*\S|\S)/$1\x1b[38;2;72;81;99m$2\x1b[m/ }
 }
 '
