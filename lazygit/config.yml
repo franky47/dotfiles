@@ -14,14 +14,18 @@ gui:
       - "#383F4D"
 
 git:
-  # lazygit renders the log views (all-branches `<` and per-branch log) in a PTY
-  # with GIT_PAGER set to the active diff pager (hunk). hunk only colorizes diffs
-  # and strips ANSI from plain `git log`, so these views lost their color.
-  # `git --no-pager` makes git ignore GIT_PAGER and emit color directly; diffs are
-  # unaffected (they don't use these commands). See lazygit pkg/gui/pty.go.
+  # Both log views (all-branches `<` and per-branch log) call git-pretty-log
+  # (~/.local/bin, stowed from dot-local/), which runs `git log --graph` and pipes
+  # it through perl to swap the ASCII graph glyphs for box-drawing chars
+  # (| * / \ -> │ ● ╱ ╲). The pipe MUST live in a script, not here: lazygit runs
+  # these via str.ToArgv (argv exec, no shell), so a `| perl` written inline would
+  # become a literal git arg. The script also handles `--no-pager` (lazygit sets
+  # GIT_PAGER=hunk, which strips ANSI from `git log` and kills the color).
+  # The trailing `--` is git's ref/pathspec separator (lazygit's own default), not
+  # option-forwarding — it disambiguates {{branchName}} from a same-named file.
   allBranchesLogCmds:
-    - git --no-pager log --graph --all --color=always --abbrev-commit --decorate --date=relative --pretty=medium
-  branchLogCmd: git --no-pager log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --
+    - git-pretty-log --all
+  branchLogCmd: git-pretty-log {{branchName}} --
   pagers:
     - colorArg: always
       pager: hunk pager

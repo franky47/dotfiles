@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Render `git log --graph` with box-drawing glyphs and dimmed metadata.
+#
+# Lazygit drives this from branchLogCmd / allBranchesLogCmds. Those run via
+# str.ToArgv (direct argv exec, NO shell — see lazygit branch.go), so a
+# `git log ... | perl` pipe can't live in the config: the `|` would become a
+# literal git arg. This wrapper owns the pipe instead; the config just calls it
+# and forwards args ("$@" = `<branch> --` for one branch, `--all` for the rest).
+#
+# `git --no-pager` because lazygit sets GIT_PAGER to the diff pager (hunk),
+# which strips ANSI from plain `git log` and kills the color.
+#
+# Why post-process in perl rather than a custom --pretty format with %C(...):
+#   1. --graph redraws the gutter (and resets color) at the start of every line,
+#      so a single %C(#485163) span dies after the first line — each line must be
+#      re-colored, which perl does and a format span can't.
+#   2. git-log formats have no conditional, so they can't emit `Merge:` only for
+#      merge commits. --pretty=medium gives Merge:/Author:/Date: natively.
+#
+# The perl filter rewrites:
+#   gutter:     | * / \       ->  │ ● ╱ ╲   (U+2502 U+25CF U+2571 U+2572)
+#                 (only the leading gutter, so / and \ in messages/refs survive)
+#   decoration: HEAD -> main  ->  HEAD ⟶ main   (U+27F6, only when ANSI-wrapped,
+#                 so a literal `->` in a commit message is left alone)
+#   metadata:   dimmed to #485163 (theme color, truecolor 38;2;72;81;99) —
+#                 `Author:` label + `<email>` dimmed, author NAME kept normal;
+#                 `Date:` / `Merge:` whole line dimmed. Matched only inside the
+#                 header block (commit line .. blank line), so a message body
+#                 starting with "Author:"/"Date:" is never touched.
+git --no-pager log --graph --color=always --abbrev-commit --decorate \
+    --date=relative --pretty=medium "$@" \
+  | perl -CSDA -pe '
+s{^((?:\x1b\[[0-9;]*m|[ |*/\\_])+)}{ my $g=$1; $g=~s/\|/\x{2502}/g; $g=~s/\*/\x{25CF}/g; $g=~s{/}{\x{2571}}g; $g=~s/\\/\x{2572}/g; $g }ge;
+s/(\x1b\[[0-9;]*m) -> (\x1b\[m)/$1 \x{27F6} $2/g;
+my $gut = qr/(?:\x1b\[[0-9;]*m|[ \x{2502}\x{25CF}\x{2571}\x{2572}|*\/\\_])*/;
+(my $c = $_) =~ s/\x1b\[[0-9;]*m//g;
+$c =~ s/^[ \x{2502}\x{25CF}\x{2571}\x{2572}|*\/\\_]+//;
+if ($c =~ /^commit [0-9a-f]{4,}/) { $H = 1 }
+elsif ($H) {
+    if ($c =~ /^\s*$/) { $H = 0 }
+    elsif ($c =~ /^Author:/) { s/^($gut)Author:\s+(.+?)\s+(<[^>]*>)/$1\x1b[38;2;72;81;99mAuthor: \x1b[m$2 \x1b[38;2;72;81;99m$3\x1b[m/ }
+    elsif ($c =~ /^(?:Date|Merge|Commit|AuthorDate|CommitDate|Reflog):/) { s/^($gut)(\S.*\S|\S)/$1\x1b[38;2;72;81;99m$2\x1b[m/ }
+}
+'
