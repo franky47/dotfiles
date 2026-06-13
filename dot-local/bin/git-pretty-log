@@ -18,6 +18,9 @@
 #      merge commits. --pretty=medium gives Merge:/Author:/Date: natively.
 #
 # The perl filter rewrites:
+#   header:     drops the `commit ` keyword — the line only ever holds
+#                 `commit <sha> [decoration]`, so the short SHA (still yellow)
+#                 sits right after the node
 #   gutter:     | * / \       ->  │ ● ╱ ╲   (U+2502 U+25CF U+2571 U+2572)
 #                 (only the leading gutter, so / and \ in messages/refs survive)
 #   decoration: HEAD -> main  ->  HEAD ⟶ main   (U+27F6, only when ANSI-wrapped,
@@ -35,7 +38,7 @@ s/(\x1b\[[0-9;]*m) -> (\x1b\[m)/$1 \x{27F6} $2/g;
 my $gut = qr/(?:\x1b\[[0-9;]*m|[ \x{2502}\x{25CF}\x{2571}\x{2572}|*\/\\_])*/;
 (my $c = $_) =~ s/\x1b\[[0-9;]*m//g;
 $c =~ s/^[ \x{2502}\x{25CF}\x{2571}\x{2572}|*\/\\_]+//;
-if ($c =~ /^commit [0-9a-f]{4,}/) { $H = 1 }
+if ($c =~ /^commit [0-9a-f]{4,}/) { $H = 1; s/(\x1b\[[0-9;]*m)?commit (?=[0-9a-f]{4,})/$1/ }
 elsif ($H) {
     if ($c =~ /^\s*$/) { $H = 0 }
     elsif ($c =~ /^Author:/) { s/^($gut)Author:\s+(.+?)\s+(<[^>]*>)/$1\x1b[38;2;72;81;99mAuthor: \x1b[m$2 \x1b[38;2;72;81;99m$3\x1b[m/ }
