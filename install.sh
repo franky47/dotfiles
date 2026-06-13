@@ -46,9 +46,9 @@ check_prereqs() {
   # Optional — dotfiles install fine but the configs won't be useful without these
   local warn=0
 
-  if ! command -v difft &>/dev/null; then
-    echo "${YELLOW}WARN:${RESET} difftastic (difft) not found — git diff will fall back to built-in diff."
-    echo "  brew install difftastic"
+  if ! command -v hunk &>/dev/null; then
+    echo "${YELLOW}WARN:${RESET} hunk not found — git diff will fall back to built-in diff."
+    echo "  brew install modem-dev/tap/hunk"
     warn=1
   fi
 

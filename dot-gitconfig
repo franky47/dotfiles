@@ -14,5 +14,5 @@
 [push]
 	default = current
 [alias]
-	dlog = -c diff.external=difft log -p --ext-diff
-	dshow = -c diff.external=difft show --ext-diff
+	dlog = "!f() { git log -p \"$@\" | hunk pager; }; f"
+	dshow = "!hunk show"

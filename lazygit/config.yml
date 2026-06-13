@@ -14,7 +14,15 @@ gui:
       - "#383F4D"
 
 git:
+  # lazygit renders the log views (all-branches `<` and per-branch log) in a PTY
+  # with GIT_PAGER set to the active diff pager (hunk). hunk only colorizes diffs
+  # and strips ANSI from plain `git log`, so these views lost their color.
+  # `git --no-pager` makes git ignore GIT_PAGER and emit color directly; diffs are
+  # unaffected (they don't use these commands). See lazygit pkg/gui/pty.go.
+  allBranchesLogCmds:
+    - git --no-pager log --graph --all --color=always --abbrev-commit --decorate --date=relative --pretty=medium
+  branchLogCmd: git --no-pager log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --
   pagers:
-    - externalDiffCommand: "difft --color=always --display=inline --syntax-highlight=off"
-    - externalDiffCommand: "difft --color=always --display=inline"
+    - colorArg: always
+      pager: hunk pager
     - {}

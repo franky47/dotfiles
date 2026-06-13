@@ -5,6 +5,7 @@
 # pass `--upgrade` explicitly to refresh existing formulae.
 
 tap "anomalyco/tap"
+tap "modem-dev/tap"
 tap "mostlygeek/llama-swap"
 
 # Core
@@ -18,16 +19,17 @@ brew "wget"
 brew "bat"                          # cat replacement (zsh alias cat=bat)
 brew "htop"                         # top replacement (zsh alias top=htop)
 brew "tmux"
-brew "reattach-to-user-namespace"  # share host Keychain (Claude Code auth) + pbcopy/pbpaste into tmux
+brew "reattach-to-user-namespace"   # share host Keychain (Claude Code auth) + pbcopy/pbpaste into tmux
 brew "mosh"                         # roaming SSH replacement — survives sleep/network changes
 brew "jq"
 brew "ripgrep"
 brew "tree"
 brew "nano"                         # macOS ships ancient pico-as-nano with no syntax highlighting
+brew "fresh-editor"                 # text editor & IDE - https://getfresh.dev/
 
 # Git
-brew "difftastic"                   # difft — used by lazygit pager and git diff
 brew "lazygit"
+brew "modem-dev/tap/hunk"           # terminal diff viewer — lazygit pager, git dlog/dshow, zsh alias d="hunk diff"
 
 # GitHub Actions
 brew "pinact"                       # pin actions to commit SHAs
