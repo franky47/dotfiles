@@ -1,0 +1,3 @@
+# OBS rewrites these on every save — generated, not source.
+*.bak
+*.tmp*

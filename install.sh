@@ -152,6 +152,19 @@ fi
 ln -sfn "${DOTFILES}/lazygit/config.yml" ~/Library/Application\ Support/lazygit/config.yml
 echo "Linked lazygit config"
 
+# OBS scene collections live under ~/.config/obs (stow-folded with the rest of
+# dot-config). OBS demands its scenes at basic/scenes, so re-point that dir at the
+# managed one. A whole-dir symlink (not per-file) survives OBS's atomic save —
+# OBS writes a temp file and renames it *inside* the dir, which would clobber a
+# per-file link but leaves the dir link intact. macOS-only; the guard skips hosts
+# without OBS. profiles/ (stream keys) is deliberately left unmanaged.
+OBS_BASIC="${HOME}/Library/Application Support/obs-studio/basic"
+if [[ -d "$OBS_BASIC" && ! -L "$OBS_BASIC/scenes" ]]; then
+  [[ -e "$OBS_BASIC/scenes" ]] && mv "$OBS_BASIC/scenes" "$OBS_BASIC/scenes.pre-dotfiles.$(date +%s).bak"
+  ln -sfn "${HOME}/.config/obs/scenes" "$OBS_BASIC/scenes"
+  echo "Linked OBS scenes → ~/.config/obs/scenes"
+fi
+
 # ln -sfn replaces existing symlinks but creates a link *inside* a real dir,
 # which nests-too-deep and masks stale copies. Skip and warn instead.
 link_skill() {
