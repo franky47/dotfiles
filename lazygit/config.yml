@@ -1,3 +1,18 @@
+# Skip the "Press ENTER to return to lazygit" pause after a subprocess (e.g.
+# quitting fresh) — fresh owns the screen, so there's no output to read.
+promptToReturnFromSubprocess: false
+
+os:
+  # fresh isn't a built-in editPreset, so wire it manually. `e` on a file uses
+  # `edit`; `e` in the diff view uses `editAtLine` to jump to the hovered line
+  # (fresh accepts file:line:col). editInTerminal suspends lazygit so the TUI
+  # editor gets the terminal, then resumes when fresh exits (it blocks like nano).
+  edit: fresh {{filename}}
+  editAtLine: "fresh {{filename}}:{{line}}"
+  editAtLineAndWait: "fresh {{filename}}:{{line}}"
+  openDirInEditor: fresh {{dir}}
+  editInTerminal: true
+
 gui:
   nerdFontsVersion: "3"
   theme:
@@ -30,3 +45,39 @@ git:
     - colorArg: always
       pager: hunk pager --no-hunk-headers --no-line-numbers
     - {}
+
+# Keybindings use the 0.62+ syntax: canonical <ctrl+x> tokens, arrays to bind
+# several keys to one action, and <disabled> to remove one. On macOS <meta+...>
+# is the ⌘ key (Ghostty forwards it).
+keybinding:
+  universal:
+    # Drop <ctrl+d> from scroll-down-main (default [<pgdown>, J, <ctrl+d>]) to
+    # free it for the working-tree Hunk command below. <pgdown> and J still
+    # scroll the main view, as do the arrows when it's focused.
+    scrollDownMain: [<pgdown>, J]
+    # Filtering (path/author menu) moved off <ctrl+s> -> <ctrl+f> so <ctrl+s>
+    # can drive staged Hunk below. <ctrl+f>'s old owner (findBaseCommitForFixup)
+    # is disabled.
+    filteringMenu: <ctrl+f>
+    # Submit commit message: keep ⌘+enter (the Mac default) plus ctrl+enter, and
+    # drop the default <ctrl+s> alternative so <ctrl+s> is free for staged Hunk.
+    confirmInEditor: [<meta+enter>, <ctrl+enter>]
+  files:
+    # No fixup workflow here; freed so <ctrl+f> is clean for filtering above.
+    # (Single config key, so this also removes it from the commits context.)
+    findBaseCommitForFixup: <disabled>
+
+customCommands:
+  # Open the full Hunk TUI, auto-reloading as files change. output: terminal
+  # suspends lazygit and hands hunk the screen; on quit it returns immediately
+  # (promptToReturnFromSubprocess is false; clean exit = 0).
+  - key: <ctrl+d>   # freed above (default scroll-down-main otherwise)
+    context: global
+    description: Review working tree in Hunk (--watch)
+    command: hunk diff --watch
+    output: terminal
+  - key: <ctrl+s>   # freed above (default filteringMenu + confirmInEditor alt)
+    context: global
+    description: Review staged changes in Hunk (--watch --staged)
+    command: hunk diff --watch --staged
+    output: terminal
