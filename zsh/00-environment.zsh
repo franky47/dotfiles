@@ -2,7 +2,7 @@ export PATH=\
 $HOME/.local/bin:\
 $PATH
 
-export EDITOR=nano
+export EDITOR=fresh   # terminal editor w/ multi-cursor — https://getfresh.dev/
 
 # In tmux, enable mouse mode in less so the scrollwheel works in bat's pager.
 # Outside tmux, terminals (e.g. Ghostty) handle alt-screen scroll natively.
