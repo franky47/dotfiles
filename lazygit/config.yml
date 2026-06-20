@@ -44,6 +44,10 @@ git:
   pagers:
     - colorArg: always
       pager: hunk pager --no-hunk-headers --no-line-numbers
+    # Absolute bun path, not bare `bun`: the latter hits the socket-firewall shim
+    # (sfw) on PATH. git runs GIT_PAGER via `sh -c`, so $HOME expands here.
+    - colorArg: always
+      pager: $HOME/.bun/bin/bun run $HOME/dev/floss/hunk/src/main.tsx -- pager --no-hunk-headers --no-line-numbers
     - {}
 
 # Keybindings use the 0.62+ syntax: canonical <ctrl+x> tokens, arrays to bind
