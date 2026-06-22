@@ -1,4 +1,6 @@
-alias g='lazygit'
+# SHELL= points lazygit's `:` prompt / customCommands at an interactive zsh
+# wrapper so they load ~/.zshrc (aliases + functions), just like a terminal.
+alias g='SHELL=$HOME/.local/bin/lazygit-shell lazygit'
 alias gl='git log --graph --oneline -n 10'
 alias gll='git log --graph -n 5'
 alias gls='git log --oneline -n 20'

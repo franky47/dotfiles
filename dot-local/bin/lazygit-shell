@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+# lazygit's shell wrapper — pointed at by the `g` alias via SHELL=.
+#
+# lazygit runs the `:` prompt, customCommands, and edit commands as
+# `$SHELL -c "<command>"`. Plain `zsh -c` does NOT expand aliases defined in a
+# sourced file: zsh parses the whole -c string before the source line runs, so
+# lazygit's shellFunctionsFile yields functions but never aliases. Re-execing as
+# an *interactive* shell loads the full ~/.zshrc up front (aliases, functions,
+# fnm, env) — so `:` behaves exactly like a real terminal.
+#
+# Safe to scope this to lazygit: git runs via argv (not the shell), so only
+# shell/custom/edit commands are affected, never lazygit's git internals.
+#
+# +m disables monitor mode (job control). An interactive shell otherwise turns
+# it on, which makes this transient zsh reassign the terminal's foreground
+# process group when it runs a full-screen child (e.g. `y` -> yazi). On the
+# child's exit the tty isn't handed back to lazygit, so lazygit's next write
+# raises SIGTTOU -> "zsh: suspended (tty output)". With +m the child shares
+# lazygit's foreground group and control returns cleanly. Aliases still load
+# (that comes from -i sourcing ~/.zshrc, independent of job control).
+[[ "$1" == "-c" ]] && exec zsh +m -ic "$2"
+exec zsh "$@"
