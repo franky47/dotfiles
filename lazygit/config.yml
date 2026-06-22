@@ -48,6 +48,16 @@ git:
     # (sfw) on PATH. git runs GIT_PAGER via `sh -c`, so $HOME expands here.
     - colorArg: always
       pager: $HOME/.bun/bin/bun run $HOME/dev/floss/hunk/src/main.tsx -- pager --no-hunk-headers --no-line-numbers
+    # Semantic quick-check pager (cycle with `|`): sem (github.com/Ataraxy-Labs/sem)
+    # shows entity-level changes (functions/classes/headings) instead of raw
+    # hunks — a fast "what changed", not a staging view. colorArg: never, unlike
+    # the hunk entries above: sem's --patch parser rejects ANSI-colored input, so
+    # it takes raw diff and re-colors itself. sem-pager (dot-local/bin) guards the
+    # empty/unparseable input lazygit pipes through verbatim. {{columnWidth}} is
+    # lazygit's InnerWidth/2-6 (see its pager_config.go), so sem-pager computes the
+    # full pane width as 2*columnWidth+12 (capped 120) to size its header rules.
+    - colorArg: never
+      pager: sem-pager {{columnWidth}}
     - {}
 
 # Keybindings use the 0.62+ syntax: canonical <ctrl+x> tokens, arrays to bind

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Lazygit pager: a semantic quick-check of the diff via `sem`
+# (github.com/Ataraxy-Labs/sem). Cycle to it with `|` (cyclePagers); it renders
+# entity-level changes — which functions/classes/headings were added, modified,
+# renamed — instead of raw +/- lines. For a fast "what changed" read, not for
+# staging (its output doesn't map 1:1 to git's lines, so cycle back to hunk or
+# the builtin pager to stage chunks).
+#
+# Wrapped in a script (not inline in config.yml) for three reasons sem forces:
+#   1. sem's --patch parser rejects ANSI-colored input ("no recognizable diff
+#      hunks"). So its pager entry alone sets `colorArg: never` (the hunk entries
+#      use `always`); sem takes the raw diff and re-colors via --color always.
+#      This script assumes that uncolored input.
+#   2. sem errors on empty stdin ("no input on stdin"), and on a diff it produces
+#      no output for. Lazygit pipes those through verbatim, so guard: empty in ->
+#      show nothing; empty out -> fall back to the raw diff.
+#   3. sem boxes each file in a frame sized to a fixed ~54-col default whenever
+#      stdout isn't a tty — which it never is under lazygit (piped, no tty), and
+#      sem honors neither COLUMNS nor any width flag in that mode, so its own frame
+#      can't be made to fit. Instead the perl filter strips sem's frame (bottom
+#      border + `│` gutter) and the top border becomes our own header
+#      " <icon> <file> ──────", the rule sized to fill the pane in one row.
+#      lazygit's {{columnWidth}} ($1) is NOT the pane width: per its pager_config.go
+#      it's `InnerWidth/2 - 6`, so the full pane width = 2*$1 + 12. We size to that
+#      (capped at 120 so it isn't absurd on big screens), kept ~1 col short so it
+#      reaches the edge but never wraps (lazygit's main view *wraps*, so overshoot
+#      is fatal).
+diff=$(cat)
+[[ -z "$diff" ]] && exit 0
+out=$(printf '%s\n' "$diff" | sem diff --patch --color always 2>/dev/null)
+[[ -z "$out" ]] && { printf '%s\n' "$diff"; exit 0; }
+cw=${1:-54}; case $cw in ''|*[!0-9]*) cw=54;; esac   # {{columnWidth}} = InnerWidth/2 - 6
+full=$(( 2 * cw + 12 )); [ "$full" -gt 120 ] && full=120   # full pane width, capped
+printf '%s\n' "$out" | WIDTH="$full" perl -CSDA -ne '
+  next if /\x{2514}/;                                    # drop bottom border (└──┘)
+  if (index($_, "\x{250c}") >= 0) {                      # top border (┌─ file ─) -> header
+    (my $t = $_) =~ s/\x1b\[[0-9;]*m//g;                 # strip ANSI, isolate the name
+    $t =~ s/^.*?\x{250c}\x{2500}*\s*//;                  # drop up to "┌── "
+    $t =~ s/\s*\x{2500}+.*$//; $t =~ s/\s+$//;           # drop trailing "──…"
+    my $d = $ENV{WIDTH} - length($t) - 5; $d = 0 if $d < 0; # dashes filling to the (full, capped) pane width
+    print(($n++ ? "\n\n" : ""),                          # two blanks before (where the border was)
+          "\x1b[2m \x{f15b} $t " . ("\x{2500}" x $d) . "\x1b[0m\n\n"); # dim " <icon> <file> ───" + blank
+    next;
+  }
+  (my $c = $_) =~ s/\x1b\[[0-9;]*m//g;                   # ANSI-stripped copy for matching
+  next if $c =~ /^Warning: .*line-based chunking/;       # drop per-file "unsupported ext" noise
+  next if $c =~ /^If this language should be supported/; #   and its "open an issue" follow-up
+  print "\n\n" if $c =~ /^Summary:/;                     # two blanks before the footer
+  s/^(\x1b\[[0-9;]*m)?\x{2502}(\x1b\[[0-9;]*m)?//;        # strip leading │ gutter
+  next if /^\s*$/;                                        # drop sem'\''s internal blank gutter lines
+  print;
+'
