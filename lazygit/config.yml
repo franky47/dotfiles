@@ -58,7 +58,6 @@ git:
     # full pane width as 2*columnWidth+12 (capped 120) to size its header rules.
     - colorArg: never
       pager: sem-pager {{columnWidth}}
-    - {}
 
 # Keybindings use the 0.62+ syntax: canonical <ctrl+x> tokens, arrays to bind
 # several keys to one action, and <disabled> to remove one. On macOS <meta+...>
