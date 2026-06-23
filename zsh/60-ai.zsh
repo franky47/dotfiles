@@ -4,15 +4,9 @@ o() {
 alias ocup="opencode upgrade"
 
 c() {
-  claude --dangerously-skip-permissions "$@"
-}
-cr() {
   claude --dangerously-skip-permissions "/remote-control" "$@"
 }
 cw() {
-  claude --dangerously-skip-permissions -w "${1//\//-S-}" "${@:2}"
-}
-cwr() {
   claude --dangerously-skip-permissions -w "${1//\//-S-}" "/remote-control" "${@:2}"
 }
 _claude_worktree_completions() {
@@ -24,7 +18,7 @@ _claude_worktree_completions() {
   done < <(git worktree list --porcelain 2>/dev/null)
   _describe 'worktree branch' branches
 }
-compdef _claude_worktree_completions cw cwr
+compdef _claude_worktree_completions cw
 
 alias bt='beans tui'
 alias bl='beans list'
