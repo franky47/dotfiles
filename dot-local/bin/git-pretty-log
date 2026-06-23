@@ -23,6 +23,15 @@
 #                 sits right after the node
 #   gutter:     | * / \       ->  │ ● ╱ ╲   (U+2502 U+25CF U+2571 U+2572)
 #                 (only the leading gutter, so / and \ in messages/refs survive)
+#   merge fork: `|\` (one parent lane opening) is drawn as a rounded corner on the
+#                 *node* line above — `●` becomes `●─╮` (U+2500 U+256E) and the old
+#                 fork line is straightened to plain lanes (`│ │`). Needs the node
+#                 line, so the filter buffers one line of lookahead.
+#   collapse:   `|/` (a lane folding back in) becomes `├─╯` (U+251C U+2500 U+256F) in
+#                 place — `├` marks the split point on the through-lane it folds into.
+#                 Both only fire for a single rightmost diagonal (gutter ending `|\`
+#                 / `|/`); compound junctions (`|\|`, `|\ \`, `|/ /`) stay diagonal.
+#                 One trailing gutter space is reclaimed so column width is unchanged.
 #   decoration: HEAD -> main  ->  HEAD ⟶ main   (U+27F6, only when ANSI-wrapped,
 #                 so a literal `->` in a commit message is left alone)
 #   metadata:   dimmed to #485163 (theme color, truecolor 38;2;72;81;99) —
@@ -32,8 +41,10 @@
 #                 starting with "Author:"/"Date:" is never touched.
 git --no-pager log --graph --color=always --abbrev-commit --decorate \
     --date=relative --pretty=medium "$@" \
-  | perl -CSDA -pe '
-s{^((?:\x1b\[[0-9;]*m|[ |*/\\_])+)}{ my $g=$1; $g=~s/\|/\x{2502}/g; $g=~s/\*/\x{25CF}/g; $g=~s{/}{\x{2571}}g; $g=~s/\\/\x{2572}/g; $g }ge;
+  | perl -CSDA -ne '
+my $r = $_; $r =~ s/\x1b\[[0-9;]*m//g; $r =~ /^([ |*\/\\_]*)/; my $g = $1; $g =~ s/\s+$//;
+my $fork = $g =~ /\|\\$/; my $coll = $g =~ /\|\/$/;
+s{^((?:\x1b\[[0-9;]*m|[ |*/\\_])+)}{ my $x=$1; $x=~s/\|/\x{2502}/g; $x=~s/\*/\x{25CF}/g; $x=~s{/}{\x{2571}}g; $x=~s/\\/\x{2572}/g; $x }ge;
 s/(\x1b\[[0-9;]*m) -> (\x1b\[m)/$1 \x{27F6} $2/g;
 my $gut = qr/(?:\x1b\[[0-9;]*m|[ \x{2502}\x{25CF}\x{2571}\x{2572}|*\/\\_])*/;
 (my $c = $_) =~ s/\x1b\[[0-9;]*m//g;
@@ -44,4 +55,8 @@ elsif ($H) {
     elsif ($c =~ /^Author:/) { s/^($gut)Author:\s+(.+?)\s+(<[^>]*>)/$1\x1b[38;2;72;81;99mAuthor: \x1b[m\x1b[1m$2\x1b[22m \x1b[38;2;72;81;99m$3\x1b[m/ }
     elsif ($c =~ /^(?:Date|Merge|Commit|AuthorDate|CommitDate|Reflog):/) { s/^($gut)(\S.*\S|\S)/$1\x1b[38;2;72;81;99m$2\x1b[m/ }
 }
+if ($coll) { s/(\x1b\[[0-9;]*m)?\x{2571}(\x1b\[[0-9;]*m)? /$1\x{2500}\x{256F}$2/; s/\x{2502}((?:\x1b\[[0-9;]*m)*\x{2500}\x{256F})/\x{251C}$1/ }
+if ($fork) { my ($lc) = /(\x1b\[[0-9;]*m)\x{2572}/; if (defined $lc && defined $prev && $prev =~ s/(\x{25CF})  /$1${lc}\x{2500}\x{256E}\x1b[m/) { s/(\x1b\[[0-9;]*m)?\x{2572}(\x1b\[[0-9;]*m)? / $1\x{2502}$2/ } }
+print $prev if defined $prev; $prev = $_;
+END { print $prev if defined $prev }
 '
