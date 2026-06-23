@@ -33,7 +33,9 @@
 #                 / `|/`); compound junctions (`|\|`, `|\ \`, `|/ /`) stay diagonal.
 #                 One trailing gutter space is reclaimed so column width is unchanged.
 #   decoration: HEAD -> main  ->  HEAD ⟶ main   (U+27F6, only when ANSI-wrapped,
-#                 so a literal `->` in a commit message is left alone)
+#                 so a literal `->` in a commit message is left alone). Tag refs
+#                 are recolored bold magenta (git color.decorate.tag override) to
+#                 match lazygit's FgMagenta tags; other ref slots keep git defaults.
 #   metadata:   dimmed to #485163 (theme color, truecolor 38;2;72;81;99) —
 #                 `Author:` label + `<email>` dimmed; the author NAME gets the
 #                 same per-name color lazygit paints in its commits panel —
@@ -42,7 +44,8 @@
 #                 `Date:` / `Merge:` whole line dimmed. Matched only inside the
 #                 header block (commit line .. blank line), so a message body
 #                 starting with "Author:"/"Date:" is never touched.
-git --no-pager log --graph --color=always --abbrev-commit --decorate \
+git --no-pager -c color.decorate.tag='bold magenta' \
+    log --graph --color=always --abbrev-commit --decorate \
     --date=relative --pretty=medium "$@" \
   | perl -CSDA -ne '
 use Digest::MD5 qw(md5); use Encode qw(encode_utf8);
