@@ -1,0 +1,71 @@
+# Hunk diff viewer — https://www.hunk.dev
+# Used standalone (hd) and as lazygit pager (see lazygit/config.yml).
+#
+# 47ng theme, derived from dot-config/ghostty/config (bg/fg) and the family
+# palette in dot-config/opencode/themes/ghostty.json + dot-config/zed/themes/47ng.json.
+# Backgrounds for context lines/gutter/rail are pinned to the ghostty terminal
+# bg (#101010): the lazygit pager uses hunk's *static* renderer, which always
+# paints theme backgrounds (transparent_background only affects the
+# interactive TUI — see hunk src/ui/staticDiffPager.ts).
+#
+# Keep base = "graphite": hunk 0.16.0 turned it into a compat alias for the
+# github-dark-default Shiki theme, but 0.15.x only accepts the legacy ids
+# (graphite/midnight/paper/ember/catppuccin-*/zenburn) and hard-errors on a
+# Shiki id like "one-dark-pro". Both pager versions must read this one file.
+
+theme = "custom"
+
+# Interactive TUI: let the terminal background show through
+transparent_background = true
+
+[custom_theme]
+base = "graphite"
+label = "47ng"
+background = "#101010"        # ghostty terminal bg
+panel = "#101010"             # rail column — flush with terminal
+panelAlt = "#18191e"          # collapsed-lines + hunk-header rows (zed panel bg)
+border = "#2d3139"
+accent = "#528aff"
+accentMuted = "#293b5b"
+text = "#d8dae0"
+muted = "#7f848e"
+addedBg = "#151c19"           # family green #1a2821 pre-blended 50% with #101010
+removedBg = "#221719"         # family red #2a1a1d pre-blended 70% with #101010
+contextBg = "#101010"         # unchanged lines — flush with terminal
+addedContentBg = "#151c19"
+removedContentBg = "#221719"
+contextContentBg = "#101010"
+addedSignColor = "#98c379"
+removedSignColor = "#e06c75"
+lineNumberBg = "#101010"      # gutter — flush with terminal
+lineNumberFg = "#495162"
+selectedHunk = "#42557b"
+badgeAdded = "#98c379"
+badgeRemoved = "#e06c75"
+badgeNeutral = "#9da5b4"
+fileNew = "#98c379"
+fileDeleted = "#e06c75"
+fileRenamed = "#e5c07b"
+fileModified = "#c678dd"
+fileUntracked = "#56b6c2"
+noteBorder = "#c678dd"
+
+# Defining this block opts every token out of the inherited Shiki theme: hunk
+# 0.16.0 sets syntaxTheme = undefined whenever custom_theme.syntax exists, so
+# code is tokenized with the legacy `pierre-dark` theme and each token is
+# remapped to ONE of these roles (see hunk src/ui/diff/pierre.ts). The role set
+# must be complete — any role left out collapses its tokens to `default`
+# (uncolored). 0.15.x was lenient and passed unmapped Pierre colors through, so
+# the missing `variable`/`operator` only regressed on the 0.16 (dev) pager.
+[custom_theme.syntax]
+default = "#d8dae0"
+keyword = "#c678dd"
+string = "#98c379"
+comment = "#7f8b97"
+number = "#e5c07b"
+function = "#528aff"
+property = "#FFA35A"          # object keys / .prop access / shell-alias names — warm orange, matches the stable pager's Pierre orange
+type = "#56b6c2"
+variable = "#abb2bf"          # identifiers — One Dark fg, a touch dimmer than `default`
+operator = "#56b6c2"          # = => + etc. — One Dark colors operators cyan (matches `type`)
+punctuation = "#9da5b4"
