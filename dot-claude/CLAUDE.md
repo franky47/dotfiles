@@ -9,17 +9,24 @@
 - Only start implementing straight off if the implementation requires trivial changes, otherwise explore the codebase or the web to find answers, and brainstorm with with me if clarification is needed.
 - Whenever you go in the wrong direction on a repository, propose changes to claude.md or create skills that will stop you from repeating the same mistake.
 - Use skills whenever it makes sense.
-- Before any task, scan available skills/plugins for relevance. Proactively invoke ones that apply (e.g. security skill when planning, debugging skill when fixing bugs) — don't wait to be told.
 - On project start, check `.claude/settings.json` for pre-allowed non-destructive commands (build, test, lint, etc.). Use the repo's package manager (check lockfiles: `pnpm-lock.yaml`→pnpm, `bun.lockb`→bun, `package-lock.json`→npm). Never substitute with `npx` or a different runner.
 - After implementation, run code-review agent on changes. Fix all issues found, then re-run. Loop until clean.
+
+## General coding guidelines
+
+- Resist commenting: prefer self-describing code to verbose comments leaking unnecessary details. 
+- If multi-line comments are needed, split lines semantically,
+  don't try and maximise the line width.
 
 ## Git
 
 - Never add a Co-Authored-By line for Claude when creating Git commits. Do not add Claude as a co-author.
 - Don't commit mid-work. Commit only when asked to — group related changes into logical commits.
 - Always use conventional commit titles with the outcome (`fix: memory leak`, `chore: improve build system`).
-- Explain **why** something was done in a short commit message body (1-2 paragraphs), never _what_ was done (it's in the diff).
+- Explain **why** something was done in a short commit message body (1-2 sentences), never _what_ was done (it's in the diff).
 - Never commit generated artifacts (plans, reports, analyses, summaries) — only commit source code changes. Exclude non-code files unless explicitly asked.
+- Never merge PRs yourself (nor propose to do so): that's my job.
+- Never amend commits, always create a new one on top, unless asked.
 
 ## Python
 
