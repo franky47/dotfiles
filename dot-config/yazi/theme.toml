@@ -1,0 +1,12 @@
+# Yazi theme overrides — merged onto the built-in defaults.
+# https://yazi-rs.github.io/docs/configuration/theme
+
+[mgr]
+# Vertical bars separating the columns (parent / current / preview).
+border_style = { fg = "#373D4A" }
+
+[indicator]
+# Pin the cursor-row background to a fixed slate. The default is
+# `reversed = true`, which tints the row with each file's own foreground
+# color — so the highlight changed depending on the file type underneath.
+current = { bg = "#383F4D", reversed = false }

@@ -1,0 +1,10 @@
+# Yazi keymap overrides — prepended onto the built-in defaults.
+# https://yazi-rs.github.io/docs/configuration/keymap
+
+# Space → macOS Quick Look (like Finder).
+# Previews the selected files, or the hovered file when nothing is selected.
+# Overrides the default Space (toggle selection); use `v`/`V` for visual selection.
+[[mgr.prepend_keymap]]
+on   = "<Space>"
+run  = 'shell -- qlmanage -p %s >/dev/null 2>&1'
+desc = "Quick Look (macOS)"

@@ -44,3 +44,18 @@ brew "uv"                           # Python tooling
 brew "anomalyco/tap/opencode"
 brew "rtk"                          # Token savings (setup in OpenCode)
 brew "llama-swap"                   # Local LLM router with auto-load/unload (LaunchAgent: m4x, echo)
+
+# Yazi (terminal file manager) + preview/extraction deps — https://yazi-rs.github.io
+# Reuses jq + ripgrep from Shell utilities above. ffmpeg-full/imagemagick-full are
+# keg-only; `link: :overwrite` makes `brew bundle` run `brew link --force --overwrite`
+# so their binaries win in PATH (wider codec/format support than the stock formulae).
+brew "yazi"                         # the file manager
+brew "ffmpeg-full", link: :overwrite      # video thumbnails (keg-only)
+brew "imagemagick-full", link: :overwrite # image previews / format support (keg-only)
+brew "sevenzip"                     # archive extraction & preview
+brew "poppler"                      # PDF previews
+brew "fd"                           # file-search backend
+brew "fzf"                          # fuzzy finder integration
+brew "zoxide"                       # directory jumping
+brew "resvg"                        # SVG previews
+cask "font-symbols-only-nerd-font"  # glyphs/icons (first cask here — drop if fonts managed elsewhere)

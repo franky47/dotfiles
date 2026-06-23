@@ -1,0 +1,6 @@
+# Yazi config overrides — merged onto the built-in defaults.
+# https://yazi-rs.github.io/docs/configuration/yazi
+
+[mgr]
+show_hidden = true
+show_symlink = true
