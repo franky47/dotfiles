@@ -115,7 +115,6 @@
       "Bash(wget * | bash *)",
       "Bash(wget * | sh *)",
       "Bash(wget * | zsh *)",
-      "Bash(git push *)",
       "Bash(npm *)",
       "Bash(yarn *)"
     ],
