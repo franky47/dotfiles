@@ -1,8 +1,12 @@
 alias ls='ls -F'
 alias ll='ls -hlaGF $1'
 alias rmds="find . -name '*.DS_Store' -type f -delete"
-alias cat='bat'
+# bat for humans; plain cat for agents (its pager/decorations hurt parsing).
+_is_agent || alias cat='bat'
 alias top='htop'
+# Plain alias on purpose: quitting yazi keeps the shell where it started.
+# For cd-on-exit instead, use yazi's shell-wrapper `y()`: https://yazi-rs.github.io/docs/quick-start#shell-wrapper
+alias y='yazi'
 alias flushdns='sudo killall -HUP mDNSResponder'
 alias lns='ln -s'
 alias python='python3'
