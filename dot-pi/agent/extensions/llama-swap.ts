@@ -9,6 +9,12 @@ const MODELS = [
     maxTokens: 262144,
   },
   {
+    id: 'ornith-1.0-35b-q4_k_m',
+    name: 'Ornith 1.0 35B (Q4_K_M)',
+    contextWindow: 262144,
+    maxTokens: 262144,
+  },
+  {
     id: 'qwen3.6-27b-q4_k_xl',
     name: 'Qwen 3.6 27B (Q4_K_XL)',
     contextWindow: 65536,

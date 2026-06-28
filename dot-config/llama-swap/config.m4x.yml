@@ -45,6 +45,28 @@ models:
     cmd: |
       llama-server
         -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
+  ornith-1.0-35b-q4_k_m:
+    # Qwen3.5-MoE arch (256 experts, 8 active), reasoning model emitting <think> blocks.
+    # Native ctx 262144: --parallel 2 over 524288 gives each agent the full 256k.
+    # Recommended sampling (left to client): temp 0.6, top-p 0.95, top-k 20.
+    cmd: |
+      llama-server
+        -hf deepreinforce-ai/Ornith-1.0-35B-GGUF:Q4_K_M
+        --port ${PORT}
+        --parallel 2
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --cache-type-k q4_0
+        --cache-type-v q4_0
+        --ctx-size 524288
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+    proxy: http://127.0.0.1:${PORT}
+    ttl: 0
+    concurrencyLimit: 2
+
         --port ${PORT}
         --parallel 1
         --cont-batching
