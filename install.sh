@@ -264,15 +264,31 @@ if [[ "${MACHINE_NAME}" == "m4x" || "${MACHINE_NAME}" == "echo" ]]; then
       -e "s|__HOME__|${HOME_DIR}|g" \
       "${DOTFILES}/templates/com.47ng.llama-swap.plist" \
     > ~/Library/LaunchAgents/com.47ng.llama-swap.plist
-  # bootout (idempotent) + bootstrap. With RunAtLoad=true the bootstrap already
-  # spawns the daemon; a plain kickstart force-spawns it if a cold load left the
-  # job in `spawn scheduled`. Avoid kickstart -k: it kills the just-spawned
-  # instance, which is then under launchd's 10s respawn throttle and blocks
-  # bootstrap for ~10s.
-  launchctl bootout gui/"$(id -u)"/com.47ng.llama-swap 2>/dev/null || true
-  launchctl bootstrap gui/"$(id -u)" ~/Library/LaunchAgents/com.47ng.llama-swap.plist 2>/dev/null || true
-  launchctl kickstart gui/"$(id -u)"/com.47ng.llama-swap >/dev/null 2>&1 || true
-  echo "Started llama-swap LaunchAgent"
+  # bootout is asynchronous: the old job lingers briefly, so an immediate
+  # bootstrap can fail with "Input/output error" and silently leave the daemon
+  # unloaded — with no KeepAlive to recover it. Wait for teardown, retry the
+  # bootstrap past the race, then verify (never report success blindly).
+  # RunAtLoad=true means bootstrap spawns the daemon; the plain kickstart only
+  # force-spawns if a cold load left the job in `spawn scheduled`. Avoid
+  # kickstart -k: it kills the fresh instance into launchd's 10s respawn throttle.
+  LS_DOMAIN="gui/$(id -u)"
+  LS_SVC="${LS_DOMAIN}/com.47ng.llama-swap"
+  LS_PLIST=~/Library/LaunchAgents/com.47ng.llama-swap.plist
+  launchctl bootout "${LS_SVC}" 2>/dev/null || true
+  for _ in $(seq 1 20); do                       # wait up to ~5s for teardown
+    launchctl print "${LS_SVC}" &>/dev/null || break
+    sleep 0.25
+  done
+  for _ in $(seq 1 5); do                         # retry past the teardown race
+    if launchctl bootstrap "${LS_DOMAIN}" "${LS_PLIST}" 2>/dev/null; then break; fi
+    sleep 1
+  done
+  launchctl kickstart "${LS_SVC}" >/dev/null 2>&1 || true
+  if launchctl print "${LS_SVC}" &>/dev/null; then
+    echo "Started llama-swap LaunchAgent"
+  else
+    echo "${YELLOW}WARN:${RESET} llama-swap LaunchAgent failed to bootstrap; start it with: launchctl bootstrap ${LS_DOMAIN} ${LS_PLIST}"
+  fi
 fi
 
 # tmux-ssh-autostart LaunchAgent (echo only — keeps one tmux server
