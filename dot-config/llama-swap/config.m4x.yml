@@ -1,6 +1,11 @@
 healthCheckTimeout: 300
 startPort: 10002
 
+# Every model pins `proxy` to 127.0.0.1: llama.cpp b9730 (2026-06-20) binds
+# llama-server to IPv4 127.0.0.1, but this host resolves `localhost` to ::1 only,
+# so llama-swap's default `http://localhost:${PORT}` upstream cannot connect and the
+# model hangs in "starting" until healthCheckTimeout. Pinning IPv4 sidesteps it.
+
 models:
 
   qwen3.6-35b-a3b-q4_k_m:
@@ -19,6 +24,7 @@ models:
         --gpu-layers all
         --reasoning-format deepseek
         --chat-template-kwargs '{"preserve_thinking":true}'
+    proxy: http://127.0.0.1:${PORT}
     ttl: 0
     concurrencyLimit: 2
 
@@ -35,16 +41,10 @@ models:
         --gpu-layers all
         --reasoning-format deepseek
         --chat-template-kwargs '{"preserve_thinking":true}'
+    proxy: http://127.0.0.1:${PORT}
     ttl: 0
     concurrencyLimit: 1
 
-  gemma4-31b-q4_k_m:
-    # Gemma 4 on Metal: flash-attn must be OFF (mixed SWA layout breaks Metal FA);
-    # KV-cache quant requires FA so it cannot be used here. Sampling per Google docs.
-    # enable_thinking:false — 31B has optional thinking mode; disable for direct answers.
-    cmd: |
-      llama-server
-        -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
   ornith-1.0-35b-q4_k_m:
     # Qwen3.5-MoE arch (256 experts, 8 active), reasoning model emitting <think> blocks.
     # Native ctx 262144: --parallel 2 over 524288 gives each agent the full 256k.
@@ -67,6 +67,13 @@ models:
     ttl: 0
     concurrencyLimit: 2
 
+  gemma4-31b-q4_k_m:
+    # Gemma 4 on Metal: flash-attn must be OFF (mixed SWA layout breaks Metal FA);
+    # KV-cache quant requires FA so it cannot be used here. Sampling per Google docs.
+    # enable_thinking:false — 31B has optional thinking mode; disable for direct answers.
+    cmd: |
+      llama-server
+        -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
         --port ${PORT}
         --parallel 1
         --cont-batching
@@ -75,6 +82,7 @@ models:
         --jinja
         --chat-template-kwargs '{"enable_thinking":false}'
         --temp 1.0 --top-p 0.95 --top-k 64
+    proxy: http://127.0.0.1:${PORT}
     ttl: 0
     concurrencyLimit: 1
 
@@ -98,64 +106,6 @@ models:
         --reasoning-format deepseek
         --chat-template-file ${env.HOME}/.config/llama-swap/lfm2.5-tool-fix.jinja
         --chat-template-kwargs '{"preserve_thinking":true}'
+    proxy: http://127.0.0.1:${PORT}
     ttl: 0
     concurrencyLimit: 8
-
-#   council-qwen3.6-35b-a3b-q4_k_m:
-#     cmd: |
-#       llama-server
-#         -hf unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_M
-#         --port ${PORT}
-#         --parallel 1
-#         --cont-batching
-#         --cache-reuse 256
-#         --flash-attn on
-#         --ctx-size 32768
-#         --gpu-layers all
-#         --reasoning-format deepseek
-#         --chat-template-kwargs '{"preserve_thinking":true}'
-#     ttl: 0
-#     concurrencyLimit: 1
-
-#   council-qwen3.6-27b-q4_k_xl:
-#     cmd: |
-#       llama-server
-#         -hf unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL
-#         --port ${PORT}
-#         --parallel 1
-#         --cont-batching
-#         --cache-reuse 256
-#         --flash-attn on
-#         --ctx-size 32768
-#         --gpu-layers all
-#         --reasoning-format deepseek
-#         --chat-template-kwargs '{"preserve_thinking":true}'
-#     ttl: 0
-#     concurrencyLimit: 1
-
-#   council-gemma4-31b-q4_k_m:
-#     # Gemma 4 on Metal requires flash-attn OFF; smaller ctx variant for council pool.
-#     # enable_thinking:false — 31B has optional thinking mode; disable for direct answers.
-#     cmd: |
-#       llama-server
-#         -hf unsloth/gemma-4-31B-it-GGUF:Q4_K_M
-#         --port ${PORT}
-#         --parallel 1
-#         --cont-batching
-#         --ctx-size 32768
-#         --gpu-layers 99
-#         --jinja
-#         --chat-template-kwargs '{"enable_thinking":false}'
-#         --temp 1.0 --top-p 0.95 --top-k 64
-#     ttl: 0
-#     concurrencyLimit: 1
-
-# groups:
-#   council:
-#     swap: false
-#     exclusive: false
-#     persistent: false
-#     members:
-#       - council-qwen3.6-35b-a3b-q4_k_m
-#       - council-qwen3.6-27b-q4_k_xl
-#       - council-gemma4-31b-q4_k_m
