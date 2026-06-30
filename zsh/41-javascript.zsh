@@ -19,11 +19,11 @@ alias bad='bun add -D'
 alias bur='bunx taze -r'
 alias bx='bunx'
 
-# PNPM
+# PNPM — global package bins live in $PNPM_HOME/bin (pnpm >= 8)
 export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 
 alias p='pnpm'
