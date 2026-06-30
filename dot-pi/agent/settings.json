@@ -1,13 +1,14 @@
 {
   "lastChangelogVersion": "0.80.2",
   "defaultProvider": "llama-swap",
-  "defaultModel": "ornith-1.0-35b-q4_k_m",
+  "defaultModel": "qwen3.6-27b-q6_k_xl",
   "defaultThinkingLevel": "low",
-  "hideThinkingBlock": false,
+  "hideThinkingBlock": true,
   "enabledModels": [
     "ds4/deepseek-v4-flash",
     "llama-swap/qwen3.6-35b-a3b-q4_k_m",
     "llama-swap/qwen3.6-27b-q4_k_xl",
+    "llama-swap/qwen3.6-27b-q6_k_xl",
     "llama-swap/ornith-1.0-35b-q4_k_m",
     "llama-swap/lfm2.5-8b-a1b",
     "github-copilot/gpt-5.4-mini",

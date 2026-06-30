@@ -45,6 +45,26 @@ models:
     ttl: 0
     concurrencyLimit: 1
 
+  # Fork of qwen3.6-27b-q4_k_xl at higher fidelity for A/B.
+  # KLD vs full precision: 0.0234 (Q6_K_XL) vs 0.0666 (Q4_K_XL) — ~2.85x closer.
+  # 25.6 GB vs 17.6 GB; the sweet spot before Q8's diminishing returns.
+  qwen3.6-27b-q6_k_xl:
+    cmd: |
+      llama-server
+        -hf unsloth/Qwen3.6-27B-GGUF:UD-Q6_K_XL
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --ctx-size 262144
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+    proxy: http://127.0.0.1:${PORT}
+    ttl: 0
+    concurrencyLimit: 1
+
   ornith-1.0-35b-q4_k_m:
     # Qwen3.5-MoE arch (256 experts, 8 active), reasoning model emitting <think> blocks.
     # Native ctx 262144: --parallel 2 over 524288 gives each agent the full 256k.
@@ -109,3 +129,16 @@ models:
     proxy: http://127.0.0.1:${PORT}
     ttl: 0
     concurrencyLimit: 8
+
+groups:
+  # Keep Ornith resident so opencode's small_model (title/summary gen) hits it
+  # instead of the 27B's single --parallel 1 slot (which 429s under concurrency).
+  # persistent: survives a 27B's exclusive (default-group) load; exclusive: false:
+  # title-gen requests don't unload the active 27B. The 27B quants stay ungrouped
+  # (default swap+exclusive), so they keep full 256k ctx at --parallel 1.
+  ornith-titlegen:
+    persistent: true
+    exclusive: false
+    swap: false
+    members:
+      - ornith-1.0-35b-q4_k_m

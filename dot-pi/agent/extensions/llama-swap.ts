@@ -17,8 +17,14 @@ const MODELS = [
   {
     id: 'qwen3.6-27b-q4_k_xl',
     name: 'Qwen 3.6 27B (Q4_K_XL)',
-    contextWindow: 65536,
-    maxTokens: 65536,
+    contextWindow: 262144,
+    maxTokens: 262144,
+  },
+  {
+    id: 'qwen3.6-27b-q6_k_xl',
+    name: 'Qwen 3.6 27B (Q6_K_XL)',
+    contextWindow: 262144,
+    maxTokens: 262144,
   },
   {
     id: 'gemma4-31b-q4_k_m',
