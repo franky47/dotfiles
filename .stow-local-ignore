@@ -2,6 +2,7 @@
 ^zshenv$
 ^local$
 ^README\.md$
+^CLAUDE\.md$
 ^install\.sh$
 ^Dockerfile$
 ^\.gitignore$

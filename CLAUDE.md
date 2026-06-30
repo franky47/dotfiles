@@ -1,0 +1,12 @@
+This repository is public on GitHub: https://github.com/franky47/dotfiles,
+you **MUST** filter out secrets & sensitive information before bringing it into the repo.
+If you are unsure, ask me.
+
+## Adding a model to llama-swap
+
+1. **Config** `dot-config/llama-swap/config.<machineName>.yml`: add a model block (`-hf <repo>:<TAG>`, copy an existing block's flags). Ask whether to **fork** a new entry (to A/B against an existing model) or **update** one in place — never mutate a live entry when experimenting.
+2. **Expose to clients** (reuse the same model id):
+   - pi: add `llama-swap/<id>` to `enabledModels` in `dot-pi/agent/settings.json` **and** a `MODELS` entry in `dot-pi/agent/extensions/llama-swap.ts`.
+   - opencode: add a model entry under the provider in `dot-config/opencode/opencode.json`.
+3. **Pre-pull the GGUF before first use**:  Map the tag `<repo>:<TAG>` → `<ModelName>-<TAG>.gguf`, then: `hf download <repo> <ModelName>-<TAG>.gguf`
+   (writes `~/.cache/huggingface/hub`, the cache llama.cpp's `-hf` reads). Monitor the download, then query once and confirm `/running` reaches `ready`.
