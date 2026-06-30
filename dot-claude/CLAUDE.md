@@ -23,10 +23,14 @@
 - Never add a Co-Authored-By line for Claude when creating Git commits. Do not add Claude as a co-author.
 - Don't commit mid-work. Commit only when asked to — group related changes into logical commits.
 - Always use conventional commit titles with the outcome (`fix: memory leak`, `chore: improve build system`).
-- Explain **why** something was done in a short commit message body (1-2 sentences), never _what_ was done (it's in the diff).
+- Explain **why** something was done in a short commit message body (1-2 sentences, max 100 char per line), never _what_ was done (it's in the diff).
 - Never commit generated artifacts (plans, reports, analyses, summaries) — only commit source code changes. Exclude non-code files unless explicitly asked.
+- When opening PRs:
+  - Use a short body (unwrapped lines), using the prose skill, explaining **why** the changes are made.
+  - Never add "by Claude Code" attribution
+  - Always open in draft state
 - Never merge PRs yourself (nor propose to do so): that's my job.
-- Never amend commits, always create a new one on top, unless asked.
+- Never amend commits, unless asked.
 
 ## Python
 
