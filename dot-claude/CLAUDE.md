@@ -20,7 +20,7 @@
 - When opening PRs:
   1. Use a short body (unwrapped lines), using the prose skill, explaining **why** the changes are made. Closing keywords at the end.
   2. Never add "by Claude Code" attribution
-  3. Always open in draft state (`--draft`). Single-quote the `--title`, write the body
+  3. Always open in draft state. Single-quote the `--title`, write the body
      to a scratch file and pass `--body-file`: this shape auto-approves for my repos
      (franky47, 47ng), while inline `$(…)` bodies trigger a permission prompt.
   4. Once opened, monitor CI
