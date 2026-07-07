@@ -89,7 +89,7 @@ CMD=$(jq -r '.tool_input.command // empty' <<<"$INPUT" 2>/dev/null) || exit 0
 # This guard is the real gate; do not remove it.
 TRIMMED="${CMD#"${CMD%%[![:space:]]*}"}"
 case "$TRIMMED" in
-  npm|npm\ *) ;;
+  npm|npm[[:space:]]*) ;;
   *) exit 0 ;;
 esac
 
