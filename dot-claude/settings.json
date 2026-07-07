@@ -153,6 +153,16 @@
         ]
       },
       {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/allow-draft-pr.sh",
+            "if": "Bash(*gh pr create*)"
+          }
+        ]
+      },
+      {
         "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit",
         "hooks": [
           {
