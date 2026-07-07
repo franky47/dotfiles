@@ -101,7 +101,7 @@ while [ "$i" -lt "$n" ]; do
     --repo=*) repo=${w#--repo=}; [ -n "$repo" ] || exit 0 ;;
     --assignee|--base|--body|--body-file|--head|--label|\
     --milestone|--project|--reviewer|--template|--title|--recover)
-      i=$((i + 1)) ;;
+      i=$((i + 1)); [ "$i" -lt "$n" ] || exit 0 ;;
     --fill|--fill-first|--fill-verbose|--dry-run|--no-maintainer-edit) ;;
     -*) exit 0 ;;
   esac

@@ -66,6 +66,11 @@ assert_no_decision 'gh pr create --draft --repo franky47/x --web'
 assert_no_decision 'gh pr create --draft --repo franky47/x --editor'
 assert_no_decision 'gh pr create --draft --repo franky47/x --some-future-flag'
 
+# a trailing value-taking flag with no value is not a fully-modeled command;
+# gh happens to reject it at parse time, but the hook must not vouch for it
+assert_no_decision 'gh pr create --draft --repo franky47/x --title'
+assert_no_decision 'gh pr create --draft --repo franky47/x --body-file'
+
 # --- missing/subverted --draft → abstain ------------------------------------
 assert_no_decision "gh pr create --repo franky47/dotfiles --title 'feat: x' --body-file /tmp/b.md"
 assert_no_decision 'gh pr create --draft=false --repo franky47/dotfiles --fill'
