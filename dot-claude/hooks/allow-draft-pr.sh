@@ -22,14 +22,20 @@
 # a parent whose owner cannot be resolved abstains rather than falling back
 # to the fork's own owner.
 #
-# Long-form flags only: ANY short flag abstains. pflag accepts spellings this
-# scanner does not model (-Rx, -R=x, combined -fR clusters), and a misparsed
-# target repo must never fall back to cwd resolution while gh sends the PR
-# elsewhere. Same reasoning for --repo with a missing/empty value.
+# Only flags the scanner fully models are accepted; anything else abstains.
+# Short flags: pflag accepts spellings this scanner does not model (-Rx,
+# -R=x, combined -fR clusters), and a misparsed target repo must never fall
+# back to cwd resolution while gh sends the PR elsewhere. Same reasoning for
+# --repo with a missing/empty value. Unknown long flags: a future gh
+# value-taking flag would swallow the next word, so `--newflag --draft`
+# would read as draft here while gh creates a non-draft PR — vocabulary
+# drift must fail toward prompting. Ditto `--draft=false` after `--draft`
+# (pflag is last-wins). --web and --editor are deliberately not allow-listed:
+# --web hands draft-ness to the browser, --editor hangs in a headless shell.
 #
 # Flag scan skips the value after each value-taking flag, so `--title
 # --draft` (a NON-draft PR titled "--draft") is not mistaken for a draft.
-# The value-flag list mirrors `gh pr create --help` and must be kept in sync.
+# Both flag lists mirror `gh pr create --help` and must be kept in sync.
 # Threat model is an inattentive agent, not an adversary (same stance as
 # block-dangerous-git.sh).
 
@@ -96,7 +102,7 @@ while [ "$i" -lt "$n" ]; do
     --assignee|--base|--body|--body-file|--head|--label|\
     --milestone|--project|--reviewer|--template|--title|--recover)
       i=$((i + 1)) ;;
-    --*) ;;
+    --fill|--fill-first|--fill-verbose|--dry-run|--no-maintainer-edit) ;;
     -*) exit 0 ;;
   esac
   i=$((i + 1))
