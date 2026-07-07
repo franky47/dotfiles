@@ -18,9 +18,11 @@
 - Explain **why** something was done in a short commit message body (1-2 sentences, max 100 char per line), never _what_ was done (it's in the diff).
 - Never commit generated artifacts (plans, reports, analyses, summaries) — only commit source code changes. Exclude non-code files unless explicitly asked.
 - When opening PRs:
-  1. Use a short body (unwrapped lines), using the prose skill, explaining **why** the changes are made.
+  1. Use a short body (unwrapped lines), using the prose skill, explaining **why** the changes are made. Closing keywords at the end.
   2. Never add "by Claude Code" attribution
-  3. Always open in draft state
+  3. Always open in draft state (`--draft`). Single-quote the `--title`, write the body
+     to a scratch file and pass `--body-file`: this shape auto-approves for my repos
+     (franky47, 47ng), while inline `$(…)` bodies trigger a permission prompt.
   4. Once opened, monitor CI
   5. When CI is green, run a flight of review sub-agents from the pr toolkit on the PR changes
 - Never merge PRs yourself (nor propose to do so): that's my job.
