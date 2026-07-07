@@ -119,6 +119,7 @@ assert_denies 'npm view react > /tmp/x'
 assert_denies 'npm view react >> /tmp/x'
 assert_denies $'npm view react\nrm -rf /tmp/x'
 assert_denies $'npm view react\trm'        # tab between args
+assert_denies $'npm\tview react'           # tab right after npm: still first-token npm
 
 # --- argument-injection via post-hook shell expansion ----------------------
 assert_denies 'npm view *'

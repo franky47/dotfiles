@@ -57,11 +57,21 @@ assert_allows "gh pr create --repo 47ng/nuqs --title \"feat: add thing\" --draft
 line two with \`backticks\` and \$afe chars inside single quotes'"
 assert_allows "gh pr create --draft --repo franky47/dotfiles --base main --head feat/x --title 'feat: z' --body-file /tmp/b.md"
 assert_allows "gh pr create --draft --repo='franky47/some-repo' --fill"
+assert_allows 'gh pr create --draft --repo franky47/dotfiles --fill-verbose'
+
+# long flags outside the known-boolean allow-list abstain: gh vocabulary
+# drift must fail toward prompting, --web hands draft-ness to the browser,
+# --editor hangs in a headless shell
+assert_no_decision 'gh pr create --draft --repo franky47/x --web'
+assert_no_decision 'gh pr create --draft --repo franky47/x --editor'
+assert_no_decision 'gh pr create --draft --repo franky47/x --some-future-flag'
 
 # --- missing/subverted --draft → abstain ------------------------------------
 assert_no_decision "gh pr create --repo franky47/dotfiles --title 'feat: x' --body-file /tmp/b.md"
 assert_no_decision 'gh pr create --draft=false --repo franky47/dotfiles --fill'
 assert_no_decision 'gh pr create --draft=true --repo franky47/dotfiles --fill'
+# pflag booleans are last-wins: gh would create a NON-draft PR here
+assert_no_decision 'gh pr create --draft --draft=false --repo franky47/dotfiles --fill'
 # --draft here is the VALUE of --title, not a flag: the PR would not be draft
 assert_no_decision 'gh pr create --title --draft --repo franky47/dotfiles --fill'
 assert_no_decision 'gh pr create -t --draft --repo franky47/dotfiles --fill'
