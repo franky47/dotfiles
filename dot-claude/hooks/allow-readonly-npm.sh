@@ -7,7 +7,7 @@
 #
 # To allow a new command verbatim, add a line to ALLOWED below. Each entry
 # is a human-readable template. Placeholders in <angle-brackets> are
-# substituted with the regex fragments defined above (<pkg>, <field>);
+# substituted with the regex fragments defined above (<pkg>, <field>, <json>);
 # the rest is matched literally as part of an anchored regex.
 #
 # Rules for any line you add to ALLOWED:
@@ -35,19 +35,27 @@ PKG='(@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*(@[a-zA-Z0-9._^~-]+)?'
 # instead.
 FIELD='[a-zA-Z0-9][a-zA-Z0-9._-]*'
 
+# Optional ` --json` output flag. Regex-only — never appears literally in an
+# ALLOWED template, so the parens/`?` are matching syntax, not part of the
+# approved command (which contains the harmless literal `--json`).
+JSON='( --json)?'
+
 ALLOWED=(
-  'npm view <pkg>'
-  'npm view <pkg> <field>'
-  'npm info <pkg>'
-  'npm info <pkg> <field>'
-  'npm show <pkg>'
-  'npm show <pkg> <field>'
+  'npm view <pkg><json>'
+  'npm view <pkg> <field><json>'
+  'npm info <pkg><json>'
+  'npm info <pkg> <field><json>'
+  'npm show <pkg><json>'
+  'npm show <pkg> <field><json>'
+  'npm --version'
+  'npm -v'
 )
 
 substitute() {
   local s=$1
   s=${s//<pkg>/${PKG}}
   s=${s//<field>/${FIELD}}
+  s=${s//<json>/${JSON}}
   printf '%s' "$s"
 }
 
@@ -66,11 +74,14 @@ CMD=$(jq -r '.tool_input.command // empty' <<<"$INPUT" 2>/dev/null) || exit 0
 
 # Only act on commands whose first token is literally `npm`. Anything else
 # (pnpm, yarn, bun, npx, anything containing $0/$@/$!, …) gets no decision so
-# static rules in settings.json decide. Empirically (tested 2026-05-12) the
-# `if: "Bash(npm *)"` clause on this hook is unreliable — it fires the hook
-# for many commands that contain no `npm` substring at all (e.g. `echo $0`,
-# `echo $@`, multi-line backgrounded commands with `$!`). This in-script
-# guard is the real gate; do not remove it.
+# static rules in settings.json / bypassPermissions decide. This hook is
+# wired with `if: "Bash(*npm*)"` (substring match), so it's only invoked for
+# commands that contain "npm" — not every Bash call. The substring form (not
+# the old `npm *` prefix) is deliberate: it also fires for ` npm install`
+# (leading space) and `FOO=1 npm install`, which a prefix glob would miss and
+# thus let auto-run under bypassPermissions. Over-firing on harmless matches
+# (pnpm, an `echo "npm"`, …) is fine — this in-script guard abstains on them.
+# This guard is the real gate; do not remove it.
 TRIMMED="${CMD#"${CMD%%[![:space:]]*}"}"
 case "$TRIMMED" in
   npm|npm\ *) ;;
@@ -88,7 +99,7 @@ done
 LIST=$(printf '  • %s\n' "${ALLOWED[@]}")
 emit deny "This npm invocation is not in the allow-list. Allowed shapes (must match the entire command):
 ${LIST}
-where <pkg> is a lowercase package name with an optional @scope/ prefix and optional @version, containing only [a-z0-9._-] in the name and [a-zA-Z0-9._^~-] in the version. No flags, no extra args, no shell metacharacters.
+where <pkg> is a lowercase package name with an optional @scope/ prefix and optional @version (containing only [a-z0-9._-] in the name and [a-zA-Z0-9._^~-] in the version), <field> is a dotted field path like version / dist-tags.latest, and <json> is an optional trailing --json flag. One package per call (npm reads only the first); for several, query each separately. No other flags, no extra args, no shell metacharacters.
 
 If you genuinely need a different invocation, ask the user to add it to ~/.claude/hooks/allow-readonly-npm.sh — do not try to work around this hook."
 exit 0

@@ -70,9 +70,6 @@
       "Bash(which *)",
       "Bash(xargs cat*)",
       "Bash(node --version*)",
-      "Bash(npm --version*)",
-      "Bash(npm info *)",
-      "Bash(npm view *)",
       "Bash(pnpm --version*)",
       "Bash(bun --version*)",
       "Bash(pnpm list *)",
@@ -115,7 +112,6 @@
       "Bash(wget * | bash *)",
       "Bash(wget * | sh *)",
       "Bash(wget * | zsh *)",
-      "Bash(npm *)",
       "Bash(yarn *)"
     ],
     "ask": [
@@ -152,7 +148,7 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/allow-readonly-npm.sh",
-            "if": "Bash(npm *)"
+            "if": "Bash(*npm*)"
           }
         ]
       },

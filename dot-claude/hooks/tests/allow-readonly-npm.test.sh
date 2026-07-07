@@ -52,6 +52,11 @@ assert_allows 'npm view react@^18'
 assert_allows 'npm view react@~18.2'
 assert_allows 'npm view react@18.0.0-rc.1'
 assert_allows 'npm view @types/node@20.10.0'
+assert_allows 'npm view react --json'
+assert_allows 'npm view react version --json'
+assert_allows 'npm info @types/node dist-tags.latest --json'
+assert_allows 'npm --version'
+assert_allows 'npm -v'
 
 # --- subcommand must be exactly one of view|info|show ----------------------
 assert_denies 'npm v react'
@@ -65,8 +70,6 @@ assert_denies 'npm why react'
 assert_denies 'npm outdated'
 assert_denies 'npm ping'
 assert_denies 'npm help install'
-assert_denies 'npm --version'
-assert_denies 'npm -v'
 assert_denies 'npm config get registry'
 assert_denies 'npm publish'
 assert_denies 'npm run build'
@@ -74,12 +77,12 @@ assert_denies 'npm exec left-pad'
 assert_denies 'npm uninstall react'
 assert_denies 'npm docs left-pad'
 
-# --- shape constraints: exactly one package arg, nothing else --------------
+# --- shape constraints: one package arg, optional field, nothing else ------
 assert_denies 'npm view'
-assert_denies 'npm view react version'
+assert_allows 'npm view react version'
 assert_denies 'npm view react foo bar'
-assert_denies 'npm view --json react'
-assert_denies 'npm view react --json'
+assert_denies 'npm view --json react'   # --json must be trailing
+assert_denies 'npm view react --json --json'
 assert_denies 'npm view  react'   # double space
 assert_denies ' npm view react'   # leading space
 assert_denies 'npm view react '   # trailing space
