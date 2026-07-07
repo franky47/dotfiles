@@ -16,12 +16,20 @@
 # redirection or globbing. Commands that don't fit (notably the
 # --body "$(cat <<'EOF'…)" idiom) abstain; agents should use --body-file.
 #
-# The target repo comes from --repo/-R when present, otherwise from
-# `gh repo view` in the session cwd. A fork's parent is where the PR lands
-# by default, so the parent owner is what gets checked.
+# The target repo comes from `--repo <value>` or `--repo=<value>` when
+# present, otherwise from `gh repo view` in the session cwd. A fork's parent
+# is where the PR lands by default, so the parent owner is what gets checked;
+# a parent whose owner cannot be resolved abstains rather than falling back
+# to the fork's own owner.
+#
+# Long-form flags only: ANY short flag abstains. pflag accepts spellings this
+# scanner does not model (-Rx, -R=x, combined -fR clusters), and a misparsed
+# target repo must never fall back to cwd resolution while gh sends the PR
+# elsewhere. Same reasoning for --repo with a missing/empty value.
 #
 # Flag scan skips the value after each value-taking flag, so `--title
 # --draft` (a NON-draft PR titled "--draft") is not mistaken for a draft.
+# The value-flag list mirrors `gh pr create --help` and must be kept in sync.
 # Threat model is an inattentive agent, not an adversary (same stance as
 # block-dangerous-git.sh).
 
@@ -83,11 +91,13 @@ while [ "$i" -lt "$n" ]; do
   w=${words[$i]}
   case "$w" in
     --draft) draft=1 ;;
-    --repo|-R) i=$((i + 1)); repo=${words[$i]:-} ;;
-    --repo=*) repo=${w#--repo=} ;;
-    --assignee|-a|--base|-B|--body|-b|--body-file|-F|--head|-H|--label|-l|\
-    --milestone|-m|--project|-p|--reviewer|-r|--template|-T|--title|-t|--recover)
+    --repo) i=$((i + 1)); repo=${words[$i]:-}; [ -n "$repo" ] || exit 0 ;;
+    --repo=*) repo=${w#--repo=}; [ -n "$repo" ] || exit 0 ;;
+    --assignee|--base|--body|--body-file|--head|--label|\
+    --milestone|--project|--reviewer|--template|--title|--recover)
       i=$((i + 1)) ;;
+    --*) ;;
+    -*) exit 0 ;;
   esac
   i=$((i + 1))
 done
@@ -102,7 +112,7 @@ fi
 CWD=$(jq -r '.cwd // empty' <<<"$INPUT" 2>/dev/null) || exit 0
 [ -d "$CWD" ] || exit 0
 info=$(cd "$CWD" 2>/dev/null && gh repo view --json owner,parent 2>/dev/null) || exit 0
-owner=$(jq -r '.parent.owner.login // .owner.login // empty' <<<"$info" 2>/dev/null) || exit 0
+owner=$(jq -r 'if .parent == null then .owner.login // empty else .parent.owner.login // empty end' <<<"$info" 2>/dev/null) || exit 0
 [[ $owner =~ ^(${ALLOWED_OWNERS})$ ]] || exit 0
 emit_allow "draft PR to $owner repo (resolved from git remote) auto-allowed"
 exit 0

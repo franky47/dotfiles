@@ -20,9 +20,10 @@
 - When opening PRs:
   1. Use a short body (unwrapped lines), using the prose skill, explaining **why** the changes are made. Closing keywords at the end.
   2. Never add "by Claude Code" attribution
-  3. Always open in draft state. Single-quote the `--title`, write the body
-     to a scratch file and pass `--body-file`: this shape auto-approves for my repos
-     (franky47, 47ng), while inline `$(…)` bodies trigger a permission prompt.
+  3. Always open in draft state. Single-quote the `--title` (no apostrophes in it),
+     write the body to a scratch file and pass `--body-file`, long-form flags only:
+     this shape auto-approves for my repos (franky47, 47ng), while inline `$(…)`
+     bodies, short flags, and apostrophes trigger a permission prompt.
   4. Once opened, monitor CI
   5. When CI is green, run a flight of review sub-agents from the pr toolkit on the PR changes
 - Never merge PRs yourself (nor propose to do so): that's my job.

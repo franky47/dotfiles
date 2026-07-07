@@ -156,6 +156,14 @@ assert_no_decision 'npx create-react-app'
 assert_no_decision 'npm-check'              # different binary, npm as prefix
 assert_no_decision 'echo npm view react'    # npm not the first token
 
+# env-prefixed and wrapper forms ABSTAIN by design (first token is not npm):
+# they fall through to static rules / bypassPermissions, exactly like before
+# this hook existed. Pinned so the guard comment and the code cannot drift.
+assert_no_decision 'FOO=1 npm install left-pad'
+assert_no_decision 'env npm install left-pad'
+assert_no_decision 'command npm view react'
+assert_no_decision 'true; npm install left-pad'
+
 # --- tool-name guard: non-Bash tool calls produce no decision --------------
 output=$(jq -nc '{tool_name:"Read",tool_input:{command:"npm view react"}}' | bash "$HOOK")
 if [ -n "$output" ]; then
