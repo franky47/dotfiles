@@ -1,9 +1,10 @@
 #!/bin/bash
 # PreToolUse hook for Bash. Pre-approves a *very* small allow-list of
-# read-only invocations that LLMs reach for often. Anything that doesn't
-# match emits a structured `deny` decision whose reason text tells the agent
-# exactly which shapes ARE allowed, so it can self-correct on the next turn
-# without bothering the user.
+# read-only invocations that LLMs reach for often. Any command whose first
+# token is `npm` and doesn't match emits a structured `deny` decision whose
+# reason text tells the agent exactly which shapes ARE allowed, so it can
+# self-correct on the next turn without bothering the user. Everything else
+# (pnpm, `echo npm`, env-prefixed npm, ...) gets no decision.
 #
 # To allow a new command verbatim, add a line to ALLOWED below. Each entry
 # is a human-readable template. Placeholders in <angle-brackets> are
@@ -35,9 +36,10 @@ PKG='(@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*(@[a-zA-Z0-9._^~-]+)?'
 # instead.
 FIELD='[a-zA-Z0-9][a-zA-Z0-9._-]*'
 
-# Optional ` --json` output flag. Regex-only — never appears literally in an
-# ALLOWED template, so the parens/`?` are matching syntax, not part of the
-# approved command (which contains the harmless literal `--json`).
+# Optional ` --json` output flag. The parens/`?` here are regex syntax that
+# exists only in this fragment, never in an ALLOWED template or in a matched
+# command (which contains at most the harmless literal ` --json`), so header
+# rule 1 is not violated.
 JSON='( --json)?'
 
 ALLOWED=(
@@ -78,8 +80,11 @@ CMD=$(jq -r '.tool_input.command // empty' <<<"$INPUT" 2>/dev/null) || exit 0
 # wired with `if: "Bash(*npm*)"` (substring match), so it's only invoked for
 # commands that contain "npm" — not every Bash call. The substring form (not
 # the old `npm *` prefix) is deliberate: it also fires for ` npm install`
-# (leading space) and `FOO=1 npm install`, which a prefix glob would miss and
-# thus let auto-run under bypassPermissions. Over-firing on harmless matches
+# (leading space), which a prefix glob would miss and thus let auto-run under
+# bypassPermissions. Env-prefixed forms (`FOO=1 npm install`) still ABSTAIN
+# here — their first token is not `npm` — and are accepted as out of scope,
+# unlike in block-dangerous-git.sh which strips env prefixes.
+# Over-firing on harmless matches
 # (pnpm, an `echo "npm"`, …) is fine — this in-script guard abstains on them.
 # This guard is the real gate; do not remove it.
 TRIMMED="${CMD#"${CMD%%[![:space:]]*}"}"
@@ -99,7 +104,7 @@ done
 LIST=$(printf '  • %s\n' "${ALLOWED[@]}")
 emit deny "This npm invocation is not in the allow-list. Allowed shapes (must match the entire command):
 ${LIST}
-where <pkg> is a lowercase package name with an optional @scope/ prefix and optional @version (containing only [a-z0-9._-] in the name and [a-zA-Z0-9._^~-] in the version), <field> is a dotted field path like version / dist-tags.latest, and <json> is an optional trailing --json flag. One package per call (npm reads only the first); for several, query each separately. No other flags, no extra args, no shell metacharacters.
+where <pkg> is a lowercase package name with an optional @scope/ prefix and optional @version (containing only [a-z0-9._-] in the name and [a-zA-Z0-9._^~-] in the version), <field> is a dotted field path like version / dist-tags.latest, and <json> is an optional trailing --json flag. One package per call (npm reads only the first); for several, query each separately. No other flags, no extra args, no shell metacharacters. The match starts at the command's first character: strip any leading whitespace.
 
 If you genuinely need a different invocation, ask the user to add it to ~/.claude/hooks/allow-readonly-npm.sh — do not try to work around this hook."
 exit 0
