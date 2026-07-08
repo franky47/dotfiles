@@ -116,8 +116,7 @@
     ],
     "ask": [
       "Bash(pnpm add *)",
-      "Bash(bun add *)",
-      "Bash(gh pr create *)"
+      "Bash(bun add *)"
     ],
     "defaultMode": "bypassPermissions"
   },

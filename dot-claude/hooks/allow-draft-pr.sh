@@ -1,8 +1,14 @@
 #!/bin/bash
 # PreToolUse hook for Bash. Auto-approves a command that opens DRAFT
-# `gh pr create` PRs, every one targeting a repo owned by franky47 or 47ng.
-# Anything it is unsure about gets no decision, so the `ask` rule in
-# settings.json prompts as usual — this hook never denies.
+# `gh pr create` PRs, every one targeting a repo owned by franky47 or 47ng, and
+# prompts (permissionDecision "ask") for any other `gh pr create`.
+#
+# This hook IS the gate: there is deliberately no `Bash(gh pr create *)` rule in
+# settings.json, because an `ask` rule cannot be downgraded by a hook's `allow`
+# (the prompt fires regardless), which would make the auto-approve impossible.
+# And a bare abstain (exit 0) would let `defaultMode: bypassPermissions` run any
+# gh pr create unprompted — so the hook must actively `ask` for the cases it
+# will not vouch for, rather than staying silent.
 #
 # Design — parse, don't validate. permissionDecision=allow re-runs the WHOLE
 # string, but this shell already runs under `defaultMode: bypassPermissions`,
@@ -21,24 +27,24 @@
 #     flags left to right, stopping at --title/--body/--body-file — --draft and
 #     --repo always precede the free-text region, which may hold heredocs and
 #     substitutions we deliberately never parse.
-#   - Require at least one PR command, and every one draft + owned. A second,
-#     non-draft or foreign `gh pr create` bundled in the chain makes the whole
-#     thing abstain.
+#   - Require at least one PR command, and every one draft + owned → allow.
+#     A second, non-draft or foreign `gh pr create` bundled in the chain makes
+#     the whole thing ask.
 #
 # Owner comes from `--repo owner/repo`/`--repo=…`; else it is resolved LOCALLY
 # from `git remote get-url origin` in the effective cwd (the last `cd` in the
 # chain, or the session cwd) — no network call, so it does not flake. A `-R`
-# short repo flag we do not parse forces an abstain rather than a cwd fallback
-# that would vouch for the wrong repo. Threat model is an inattentive agent,
-# not an adversary (same stance as block-dangerous-git.sh).
+# short repo flag we do not parse forces an ask rather than a cwd fallback that
+# would vouch for the wrong repo. Threat model is an inattentive agent, not an
+# adversary (same stance as block-dangerous-git.sh).
 
 set -uo pipefail
 
 ALLOWED='franky47|47ng'
 
-emit_allow() {
-  jq -nc --arg r "$1" \
-    '{ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "allow", permissionDecisionReason: $r } }'
+emit() {
+  jq -nc --arg d "$1" --arg r "$2" \
+    '{ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: $d, permissionDecisionReason: $r } }'
 }
 
 # Split $1 into top-level command segments (SEG[]) so each `gh pr create`
@@ -154,11 +160,11 @@ for seg in "${SEG[@]}"; do
   [ "${WORDS[0]:-}" = cd ] && [ -n "${WORDS[1]:-}" ] && CD_DIR=${WORDS[1]}
   parse_pr || continue
   found=$((found + 1))
-  [ "$PR_BAD" = 0 ] || exit 0
-  [ "$PR_DRAFT" = 1 ] || exit 0
-  owner_ok "$PR_REPO" || exit 0
+  if [ "$PR_BAD" != 0 ] || [ "$PR_DRAFT" != 1 ] || ! owner_ok "$PR_REPO"; then
+    emit ask "gh pr create is not a confirmed draft to an owned repo — confirm"
+    exit 0
+  fi
 done
 
-[ "$found" -ge 1 ] || exit 0
-emit_allow "draft PR(s) to an owned repo auto-allowed"
+[ "$found" -ge 1 ] && emit allow "draft PR(s) to an owned repo auto-allowed"
 exit 0

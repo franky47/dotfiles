@@ -35,6 +35,15 @@ assert_allows() {
   fi
 }
 
+assert_asks() {
+  local out
+  out=$(run_hook "$1" "${2:-$OWNED}")
+  if [ "$(jq -r '.hookSpecificOutput.permissionDecision // empty' <<<"$out" 2>/dev/null || true)" != ask ]; then
+    printf 'FAIL: expected ask for: %s\nactual: %s\n' "$1" "$out" >&2
+    exit 1
+  fi
+}
+
 assert_no_decision() {
   local out
   out=$(run_hook "$1" "${2:-$OWNED}")
@@ -76,55 +85,55 @@ git push -u origin release/x && gh pr create --draft --title 'chore: a release' 
 # cd into another owned repo, then create the PR there
 assert_allows "cd $MINE && gh pr create --draft --base main --head feat/x --title x --body-file /tmp/b.md"
 
-# --- not a draft → abstain --------------------------------------------------
-assert_no_decision 'gh pr create --base next --title "doc: a note" --body "" --label documentation --label sponsors'
-assert_no_decision 'gh pr create --repo franky47/app --title "x" --body-file /tmp/b.md'
+# --- not a draft → ask ------------------------------------------------------
+assert_asks 'gh pr create --base next --title "doc: a note" --body "" --label documentation --label sponsors'
+assert_asks 'gh pr create --repo franky47/app --title "x" --body-file /tmp/b.md'
 # --draft as the VALUE of --title is not a draft flag
-assert_no_decision 'gh pr create --title --draft --repo franky47/app --fill'
+assert_asks 'gh pr create --title --draft --repo franky47/app --fill'
 # --draft after the free-text region is not parsed (agents put it first)
-assert_no_decision 'gh pr create --repo franky47/app --title x --draft'
+assert_asks 'gh pr create --repo franky47/app --title x --draft'
 
-# --- foreign repo → abstain -------------------------------------------------
-assert_no_decision 'gh pr create --repo acme/tool --base main --head franky47:feat/x --title x --body-file /tmp/b.md'
-assert_no_decision 'gh pr create --draft --repo acme/tool --title x --fill'
-# implicit repo resolves to a repo I do not own → abstain
-assert_no_decision 'gh pr create --draft --base main --title "feat: x" --body-file /tmp/b.md 2>&1 | tail -5' "$FOREIGN"
-# no origin remote → cannot resolve → abstain
-assert_no_decision 'gh pr create --draft --title x --fill' "$NOREMOTE"
-# nonexistent cwd → abstain
-assert_no_decision 'gh pr create --draft --title x --fill' /nonexistent-dir
+# --- foreign repo → ask -----------------------------------------------------
+assert_asks 'gh pr create --repo acme/tool --base main --head franky47:feat/x --title x --body-file /tmp/b.md'
+assert_asks 'gh pr create --draft --repo acme/tool --title x --fill'
+# implicit repo resolves to a repo I do not own → ask
+assert_asks 'gh pr create --draft --base main --title "feat: x" --body-file /tmp/b.md 2>&1 | tail -5' "$FOREIGN"
+# no origin remote → cannot resolve → ask
+assert_asks 'gh pr create --draft --title x --fill' "$NOREMOTE"
+# nonexistent cwd → ask
+assert_asks 'gh pr create --draft --title x --fill' /nonexistent-dir
 
-# --- owner-spoofing shapes → abstain ----------------------------------------
-assert_no_decision 'gh pr create --draft --repo franky47-evil/x --fill'
-assert_no_decision 'gh pr create --draft --repo 47ngx/x --fill'
-assert_no_decision 'gh pr create --draft --repo franky47 --fill'
-assert_no_decision 'gh pr create --draft --repo evilfranky47/x --fill'
+# --- owner-spoofing shapes → ask --------------------------------------------
+assert_asks 'gh pr create --draft --repo franky47-evil/x --fill'
+assert_asks 'gh pr create --draft --repo 47ngx/x --fill'
+assert_asks 'gh pr create --draft --repo franky47 --fill'
+assert_asks 'gh pr create --draft --repo evilfranky47/x --fill'
 # short -R repo flag we do not parse must not fall back to cwd resolution
-assert_no_decision 'gh pr create --draft -Racme/tool --fill'
-assert_no_decision 'gh pr create --draft -R acme/tool --fill'
-assert_no_decision 'gh pr create --draft -R=acme/tool --fill'
+assert_asks 'gh pr create --draft -Racme/tool --fill'
+assert_asks 'gh pr create --draft -R acme/tool --fill'
+assert_asks 'gh pr create --draft -R=acme/tool --fill'
 # empty --repo value must not fall back to cwd
-assert_no_decision 'gh pr create --draft --repo --fill'
-assert_no_decision "gh pr create --draft --repo='' --fill"
+assert_asks 'gh pr create --draft --repo --fill'
+assert_asks "gh pr create --draft --repo='' --fill"
 
 # --- multiple PRs: any non-draft or foreign one poisons the whole chain -----
-assert_no_decision 'gh pr create --draft --repo franky47/app --fill && gh pr create --repo acme/tool --title x --body y'
-assert_no_decision 'gh pr create --draft --repo franky47/app --fill && gh pr create --repo franky47/app --title x --body y'
+assert_asks 'gh pr create --draft --repo franky47/app --fill && gh pr create --repo acme/tool --title x --body y'
+assert_asks 'gh pr create --draft --repo franky47/app --fill && gh pr create --repo franky47/app --title x --body y'
 
-# --- hook-vs-shell parse gaps that would false-allow → abstain --------------
-# a short value-flag can swallow --draft (gh makes a NON-draft PR) → abstain on any short flag
-assert_no_decision 'gh pr create --repo franky47/app -t --draft --body y'
-assert_no_decision 'gh pr create --draft -d --repo franky47/app --fill'
+# --- hook-vs-shell parse gaps that would false-allow → ask ------------------
+# a short value-flag can swallow --draft (gh makes a NON-draft PR) → ask on any short flag
+assert_asks 'gh pr create --repo franky47/app -t --draft --body y'
+assert_asks 'gh pr create --draft -d --repo franky47/app --fill'
 # subshell cd into a foreign repo runs gh there → resolve that repo, not the outer cwd
-assert_no_decision "( cd $FOREIGN ; gh pr create --draft --title x --body y )" "$OWNED"
-assert_no_decision "cd $OWNED && ( cd $FOREIGN ; gh pr create --draft --title x --body y )" "$OWNED"
+assert_asks "( cd $FOREIGN ; gh pr create --draft --title x --body y )" "$OWNED"
+assert_asks "cd $OWNED && ( cd $FOREIGN ; gh pr create --draft --title x --body y )" "$OWNED"
 # an unquoted \$(gh …) inner command is surfaced and checked
-assert_no_decision 'gh pr create --draft --repo franky47/app --title $(gh pr create --repo acme/tool)'
+assert_asks 'gh pr create --draft --repo franky47/app --title $(gh pr create --repo acme/tool)'
 # backslash-escaped quote must not swallow the ; that separates a foreign second PR
-assert_no_decision "gh pr create --repo franky47/app --draft --title x\\' ; gh pr create --repo acme/tool --title z\\'"
+assert_asks "gh pr create --repo franky47/app --draft --title x\\' ; gh pr create --repo acme/tool --title z\\'"
 
-# --- no real gh pr create (only mentioned in a body) → abstain --------------
-# the ask rule fires on the substring, but there is no draft PR to vouch for
+# --- no real gh pr create (only mentioned in a body) → defer, no prompt ------
+# no command-position gh pr create to gate; let the normal flow (bypass) handle it
 assert_no_decision 'echo "run gh pr create --draft --repo franky47/x later"'
 
 echo "All allow-draft-pr tests passed"
