@@ -2,6 +2,10 @@ This repository is public on GitHub: https://github.com/franky47/dotfiles,
 you **MUST** filter out secrets & sensitive information before bringing it into the repo.
 If you are unsure, ask me.
 
+## Before committing
+
+Update `README.md` (e.g. the skills table) and any relevant tests to reflect your changes, then commit them together.
+
 ## Adding a model to llama-swap
 
 1. **Config** `dot-config/llama-swap/config.<machineName>.yml`: add a model block (`-hf <repo>:<TAG>`, copy an existing block's flags). Ask whether to **fork** a new entry (to A/B against an existing model) or **update** one in place — never mutate a live entry when experimenting.

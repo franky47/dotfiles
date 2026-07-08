@@ -12,6 +12,8 @@ Original sources attributed, but skills have been adapted for my usage.
 | --- | --- | --- |
 | [`audit-github-actions`](dot-claude/skills/audit-github-actions/) | Audit GitHub Actions for supply-chain / CI-CD vulns (Shai-Hulud-class worms, expression injection, token exfil) | ✏️ |
 | [`prose`](dot-claude/skills/prose/SKILL.md) | Write human-readable prose: PRs, docs, emails, memos | ✏️ |
+| [`html`](dot-claude/skills/html/SKILL.md) | Render a document, diagram, or report as HTML for humans | ✏️ |
+| [`issue`](dot-claude/skills/issue/SKILL.md) | Research and word a good GitHub issue (never posts it) | ✏️ |
 | [`github-stars-lists`](dot-claude/skills/github-stars-lists/SKILL.md) | Scrape repos from your GitHub Stars lists (no API for them) | ✏️ |
 | [`research`](dot-claude/skills/research/SKILL.md) | Run a deep-research session and save it to Obsidian | ✏️ |
 | [`taildrop`](dot-claude/skills/taildrop/SKILL.md) | Send files to Tailscale devices via Taildrop | ✏️ |
@@ -20,6 +22,7 @@ Original sources attributed, but skills have been adapted for my usage.
 | [`brainstorm`](dot-claude/skills/brainstorm/SKILL.md) | Interview you relentlessly to stress-test a plan or design | Matt Pocock |
 | [`frontend-design`](dot-claude/skills/frontend-design/) | Build distinctive, production-grade UIs that dodge generic AI aesthetics | Anthropic |
 | [`handoff`](dot-claude/skills/handoff/SKILL.md) | Compact the conversation into a handoff doc for a fresh agent | Matt Pocock |
+| [`improve`](dot-claude/skills/improve/) | Survey a codebase read-only and produce prioritized handoff plans for other agents | shadcn |
 | [`improve-codebase-architecture`](dot-claude/skills/improve-codebase-architecture/) | Surface deep-module refactors (Ousterhout) for testability | Matt Pocock |
 | [`prd-to-issues`](dot-claude/skills/prd-to-issues/SKILL.md) | Split a PRD into independently-grabbable beans issues (tracer bullets) | Matt Pocock |
 | [`repro`](dot-claude/skills/repro/SKILL.md) | Build a minimal, self-contained bug reproduction | Matt Pocock |
