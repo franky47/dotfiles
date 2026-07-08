@@ -11,9 +11,10 @@
 #   - a single-quoted string (the shell expands nothing inside)
 #   - a double-quoted string containing none of  " $ \ ` !
 # separated by blanks (never unquoted newlines — those separate commands in
-# the shell). No metacharacter can appear outside quotes, so an
-# approved command is a single simple command — no chaining, substitution,
-# redirection or globbing. Commands that don't fit (notably the
+# the shell). No metacharacter can appear outside quotes, so the gh command
+# is a single simple command — no substitution, redirection or globbing. The
+# one allowed chain is a leading `cd <dir> &&|;` prefix (see below); every
+# other chain abstains. Commands that don't fit (notably the
 # --body "$(cat <<'EOF'…)" idiom) abstain; agents should use --body-file.
 #
 # The target repo comes from `--repo <value>` or `--repo=<value>` when
@@ -57,6 +58,39 @@ CMD=$(jq -r '.tool_input.command // empty' <<<"$INPUT" 2>/dev/null) || exit 0
 BARE='[A-Za-z0-9@%+,./:=_~-]+'
 SQ="'[^']*'"
 DQ='"[^"$\`!]*"'
+
+# Accept at most one leading `cd <dir> &&|; ` prefix — agents cd into the target
+# repo when it differs from the session cwd. Both halves are simple commands
+# (a benign `cd`, then the gh command), so approving the whole string stays
+# safe. The <dir> must be a single bare/quoted word (a substituted `cd $(…)`
+# abstains), and gh then runs there, so implicit-repo resolution uses this dir
+# instead of the session cwd (a leading ~ is expanded there, as the shell
+# would). Any further chaining lands in the strict tokenizer below and abstains.
+CD_CWD=''
+if [[ $CMD =~ ^[[:blank:]]*cd[[:blank:]]+ ]]; then
+  after=${CMD:${#BASH_REMATCH[0]}}
+  dir='' matched=0
+  while :; do
+    if [[ $after =~ ^$BARE ]]; then
+      seg=${BASH_REMATCH[0]}
+      dir+=$seg
+    elif [[ $after =~ ^$SQ ]] || [[ $after =~ ^$DQ ]]; then
+      seg=${BASH_REMATCH[0]}
+      dir+=${seg:1:$((${#seg} - 2))}
+    else
+      break
+    fi
+    after=${after:${#seg}}
+    matched=1
+  done
+  [ "$matched" = 1 ] || exit 0
+  if [[ $after =~ ^[[:blank:]]*('&&'|';')[[:blank:]]* ]]; then
+    CMD=${after:${#BASH_REMATCH[0]}}
+    CD_CWD=$dir
+  else
+    exit 0
+  fi
+fi
 
 # Tokenize into words, concatenating adjacent segments (--repo='x' is one
 # word) and stripping quotes so semantic checks see unquoted values.
@@ -115,7 +149,11 @@ if [ -n "$repo" ]; then
   exit 0
 fi
 
-CWD=$(jq -r '.cwd // empty' <<<"$INPUT" 2>/dev/null) || exit 0
+CWD=${CD_CWD:-$(jq -r '.cwd // empty' <<<"$INPUT" 2>/dev/null)} || exit 0
+case "$CWD" in
+  '~') CWD=$HOME ;;
+  '~/'*) CWD=$HOME/${CWD#'~/'} ;;
+esac
 [ -d "$CWD" ] || exit 0
 info=$(cd "$CWD" 2>/dev/null && gh repo view --json owner,parent 2>/dev/null) || exit 0
 owner=$(jq -r 'if .parent == null then .owner.login // empty else .parent.owner.login // empty end' <<<"$info" 2>/dev/null) || exit 0
