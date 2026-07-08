@@ -44,10 +44,12 @@ git:
   pagers:
     - colorArg: always
       pager: hunk pager --no-hunk-headers --no-line-numbers
+    # Local hunk for testing PRs - Uncomment to use.
     # Absolute bun path, not bare `bun`: the latter hits the socket-firewall shim
     # (sfw) on PATH. git runs GIT_PAGER via `sh -c`, so $HOME expands here.
-    - colorArg: always
-      pager: $HOME/.bun/bin/bun run $HOME/dev/floss/hunk/src/main.tsx -- pager --no-hunk-headers --no-line-numbers
+    # - colorArg: always
+    #   pager: $HOME/.bun/bin/bun run $HOME/dev/floss/hunk/src/main.tsx -- pager --no-hunk-headers --no-line-numbers
+
     # Semantic quick-check pager (cycle with `|`): sem (github.com/Ataraxy-Labs/sem)
     # shows entity-level changes (functions/classes/headings) instead of raw
     # hunks — a fast "what changed", not a staging view. colorArg: never, unlike
