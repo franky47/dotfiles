@@ -1,7 +1,7 @@
 {
   "lastChangelogVersion": "0.80.2",
-  "defaultProvider": "llama-swap",
-  "defaultModel": "qwen3.6-27b-q6_k_xl",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "low",
   "hideThinkingBlock": true,
   "enabledModels": [
