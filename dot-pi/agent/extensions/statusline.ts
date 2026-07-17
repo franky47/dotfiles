@@ -160,7 +160,11 @@ export default function (pi: ExtensionAPI) {
 					const pad = " ".repeat(Math.max(1, width - totalW));
 					const line1 = truncateToWidth(location + pad + SEP + " " + ctxStr + " " + SEP + " " + modelStr, width);
 
-					// --- Line 2: dirty | cost/tokens (no location prefix) ---
+					// --- Line 2: extension statuses | dirty | cost/tokens ---
+
+					// Custom footers replace Pi's default footer, so explicitly carry
+					// statuses set by other extensions (for example 🕵️ private mode).
+					const statuses = [...footerData.getExtensionStatuses().values()].join(" ");
 
 					// Git dirty state
 					const dirtyParts: string[] = [];
@@ -168,15 +172,15 @@ export default function (pi: ExtensionAPI) {
 					if (state.dirty.a) dirtyParts.push(`${GREEN}${state.dirty.a}+${RESET}`);
 					if (state.dirty.d) dirtyParts.push(`${RED}${state.dirty.d}-${RESET}`);
 					if (state.dirty.u) dirtyParts.push(`${MAGENTA}${state.dirty.u}?${RESET}`);
-					const dirty = dirtyParts.length > 0 ? SEP + " " + dirtyParts.join(" ") : "";
+					const line2Parts = statuses ? [statuses] : [];
+					if (dirtyParts.length > 0) line2Parts.push(dirtyParts.join(" "));
 
 					// Cost/tokens
-					let costInfo = "";
 					if (state.cost > 0 || state.input > 0) {
-						costInfo = SEP + ` ${DIM}$${state.cost.toFixed(3)}${RESET} ${DIM}${fmt(state.input)}k↓/${fmt(state.output)}k↑${RESET}`;
+						line2Parts.push(`${DIM}$${state.cost.toFixed(3)}${RESET} ${DIM}${fmt(state.input)}k↓/${fmt(state.output)}k↑${RESET}`);
 					}
 
-					const line2 = truncateToWidth(dirty + costInfo, width);
+					const line2 = truncateToWidth(line2Parts.join(` ${SEP} `), width);
 
 					return [line1, line2];
 				},
