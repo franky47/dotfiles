@@ -248,6 +248,10 @@ if [[ "${MACHINE_NAME}" == "m4x" || "${MACHINE_NAME}" == "echo" ]]; then
       ;;
   esac
   mkdir -p "${LLAMA_SWAP_LOG_DIR}"
+  # Private, unversioned model configs (*.yml) live outside the stowed tree and
+  # are loaded additively via -config-dir. Must exist or llama-swap refuses to start.
+  LLAMA_SWAP_PRIVATE_DIR="${HOME}/.config/llama-swap.private"
+  mkdir -p "${LLAMA_SWAP_PRIVATE_DIR}"
   LLAMA_SWAP="$(which llama-swap 2>/dev/null || true)"
   if [[ -z "${LLAMA_SWAP}" ]]; then
     case "${MACHINE_NAME}" in
@@ -258,6 +262,7 @@ if [[ "${MACHINE_NAME}" == "m4x" || "${MACHINE_NAME}" == "echo" ]]; then
   HOME_DIR="$HOME"
   sed -e "s|__LLAMA_SWAP_BIN__|${LLAMA_SWAP}|g" \
       -e "s|__LLAMA_SWAP_CONFIG__|${HOME_DIR}/.config/llama-swap/config.yml|g" \
+      -e "s|__LLAMA_SWAP_PRIVATE_DIR__|${LLAMA_SWAP_PRIVATE_DIR}|g" \
       -e "s|__LLAMA_SWAP_LOG_OUT__|${LLAMA_SWAP_LOG_DIR}/stdout.txt|g" \
       -e "s|__LLAMA_SWAP_LOG_ERR__|${LLAMA_SWAP_LOG_DIR}/stderr.txt|g" \
       -e "s|__LAUNCH_PATH__|${LAUNCH_PATH}|g" \

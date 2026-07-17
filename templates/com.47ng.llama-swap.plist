@@ -16,6 +16,8 @@
 		<string>__LLAMA_SWAP_BIN__</string>
 		<string>-config</string>
 		<string>__LLAMA_SWAP_CONFIG__</string>
+		<string>-config-dir</string>
+		<string>__LLAMA_SWAP_PRIVATE_DIR__</string>
 		<string>-listen</string>
 		<string>127.0.0.1:10001</string>
 		<string>-watch-config</string>
