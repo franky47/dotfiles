@@ -1,18 +1,15 @@
 {
-  "lastChangelogVersion": "0.80.2",
+  "lastChangelogVersion": "0.80.10",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5",
-  "defaultThinkingLevel": "low",
-  "hideThinkingBlock": true,
+  "defaultModel": "gpt-5.6-sol",
+  "defaultThinkingLevel": "high",
+  "hideThinkingBlock": false,
   "enabledModels": [
-    "ds4/deepseek-v4-flash",
-    "llama-swap/qwen3.6-35b-a3b-q4_k_m",
-    "llama-swap/qwen3.6-27b-q4_k_xl",
+    "openai-codex/gpt-5.5",
     "llama-swap/qwen3.6-27b-q6_k_xl",
+    "llama-swap/qwen3.6-35b-a3b-q4_k_m",
     "llama-swap/ornith-1.0-35b-q4_k_m",
-    "llama-swap/lfm2.5-8b-a1b",
-    "github-copilot/gpt-5.4-mini",
-    "github-copilot/gpt-5.5"
+    "llama-swap-private/*"
   ],
   "theme": "dark"
 }
