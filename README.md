@@ -109,6 +109,12 @@ The install script:
 
 Re-run `install.sh` after any changes. Stow's `--restow` handles re-runs cleanly.
 
+## Pi extensions
+
+User-level Pi extensions are stored in `dot-pi/agent/extensions/`. The `private-session/` extension adds user-only `/private` and `/delete-session` commands. `/private` stops future local transcript persistence without removing existing history; `/delete-session` first makes the process private, then explicitly removes the current transcript (trash first, unlink fallback). A persistent 🕵️ footer indicator marks non-persisted sessions, including Pi's built-in ephemeral mode.
+
+Third-party packages are declared in `dot-pi/agent/settings.json`: `pi-subagents`, `pi-web-access`, `pi-add-dir`, `@tintinweb/pi-tasks`, `pi-btw`, and `pi-web-access`.
+
 ## Claude Code settings
 
 Claude Code has a built-in scope system (user → project → local). Stow symlinks `dot-claude/` into `~/.claude/` as the **user** scope. Per-project overrides use Claude's native `.claude/settings.json` (shared) and `.claude/settings.local.json` (personal, gitignored) — no custom merge needed.
