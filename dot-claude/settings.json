@@ -120,6 +120,7 @@
     ],
     "defaultMode": "bypassPermissions"
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -128,16 +129,6 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/block-dangerous-git.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/check-rm-git-tracked.sh",
-            "if": "Bash(rm *)"
           }
         ]
       },
@@ -182,7 +173,6 @@
       }
     ]
   },
-  "enableWorkflows": false,
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
@@ -214,7 +204,10 @@
     ]
   },
   "effortLevel": "high",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "editorMode": "normal",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }
