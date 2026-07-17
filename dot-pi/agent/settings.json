@@ -2,14 +2,21 @@
   "lastChangelogVersion": "0.80.10",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.6-sol",
-  "defaultThinkingLevel": "high",
+  "defaultThinkingLevel": "xhigh",
   "hideThinkingBlock": false,
   "enabledModels": [
-    "openai-codex/gpt-5.5",
+    "openai-codex/gpt-5.6-sol",
+    "openai-codex/gpt-5.6-luna",
     "llama-swap/qwen3.6-27b-q6_k_xl",
     "llama-swap/qwen3.6-35b-a3b-q4_k_m",
-    "llama-swap/ornith-1.0-35b-q4_k_m",
-    "llama-swap-private/*"
+    "llama-swap/ornith-1.0-35b-q4_k_m"
   ],
-  "theme": "dark"
+  "theme": "dark",
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-web-access",
+    "npm:pi-add-dir",
+    "npm:@tintinweb/pi-tasks",
+    "npm:pi-btw"
+  ]
 }

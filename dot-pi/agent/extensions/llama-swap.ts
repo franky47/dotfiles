@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { homedir } from 'node:os'
-import { join } from 'node:path'
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent'
 
 type LocalModel = {
@@ -50,27 +47,6 @@ const MODELS: LocalModel[] = [
   },
 ]
 
-// Unversioned models, kept out of the public dotfiles repo. Their llama-swap
-// entries live in ~/.config/llama-swap.private/*.yml (loaded via -config-dir);
-// this manifest mirrors them for pi. Enabled via the llama-swap-private/* glob
-// in settings.json, so model names never appear in versioned files.
-function loadPrivateModels(): LocalModel[] {
-  const manifest = join(homedir(), '.config/llama-swap.private/pi-models.json')
-  try {
-    const parsed = JSON.parse(readFileSync(manifest, 'utf-8'))
-    const models = Array.isArray(parsed.models) ? parsed.models : []
-    return models.filter(
-      (m: Partial<LocalModel>) =>
-        typeof m.id === 'string' &&
-        typeof m.name === 'string' &&
-        typeof m.contextWindow === 'number' &&
-        typeof m.maxTokens === 'number',
-    )
-  } catch {
-    return []
-  }
-}
-
 function toProviderModel(m: LocalModel) {
   return {
     id: m.id,
@@ -87,7 +63,6 @@ export default async function (pi: ExtensionAPI) {
   const baseUrl = 'http://127.0.0.1:10001/v1'
 
   const models = MODELS.map(toProviderModel)
-  const privateModels = loadPrivateModels().map(toProviderModel)
 
   const compat = {
     supportsDeveloperRole: false,
@@ -103,22 +78,11 @@ export default async function (pi: ExtensionAPI) {
     compat,
   })
 
-  if (privateModels.length > 0) {
-    pi.registerProvider('llama-swap-private', {
-      name: 'llama-swap (private)',
-      baseUrl,
-      api: 'openai-completions',
-      apiKey: 'LLAMA_SWAP',
-      models: privateModels,
-      compat,
-    })
-  }
-
   pi.on('session_start', async (_event, ctx) => {
     try {
       if (ctx.hasUI) {
         ctx.ui.notify(
-          `llama-swap provider registered (${models.length} public, ${privateModels.length} private model(s))`,
+          `llama-swap provider registered (${models.length} model(s))`,
           'info',
         )
       }
