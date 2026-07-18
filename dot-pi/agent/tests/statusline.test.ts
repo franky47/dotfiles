@@ -6,7 +6,7 @@ import statusline, {
 	parseDirtyState,
 	parseUnifiedPatchLineChanges,
 	sanitizeStatusText,
-} from "./statusline.ts";
+} from "../extensions/statusline.ts";
 
 describe("parseDirtyState", () => {
 	it("counts staged and unstaged porcelain states", () => {
