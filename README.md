@@ -111,7 +111,9 @@ Re-run `install.sh` after any changes. Stow's `--restow` handles re-runs cleanly
 
 ## Pi extensions
 
-User-level Pi extensions are stored in `dot-pi/agent/extensions/`. The `private-session/` extension adds user-only `/private` and `/delete-session` commands. `/private` stops future local transcript persistence without removing existing history; `/delete-session` first makes the process private, then explicitly removes the current transcript (trash first, unlink fallback). A persistent 🕵️ footer indicator marks non-persisted sessions, including Pi's built-in ephemeral mode.
+User-level Pi extensions are stored in `dot-pi/agent/extensions/`. The `statusline.ts` extension shows repository state, context usage, token and cost totals, and the active model's reasoning level while preserving statuses from other extensions. Optional rows are omitted when empty.
+
+The `private-session/` extension adds user-only `/private` and `/delete-session` commands. `/private` stops future local transcript persistence without removing existing history; `/delete-session` first makes the process private, then explicitly removes the current transcript (trash first, unlink fallback). A persistent 🕵️ footer indicator marks non-persisted sessions, including Pi's built-in ephemeral mode.
 
 Third-party packages are declared in `dot-pi/agent/settings.json`: `pi-subagents`, `pi-web-access`, `pi-add-dir`, `@tintinweb/pi-tasks`, `pi-btw`, and `pi-web-access`.
 
