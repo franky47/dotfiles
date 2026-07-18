@@ -36,7 +36,7 @@ Original sources attributed, but skills have been adapted for my usage.
 
 1. **Shared vs local**: Top-level directories hold configs shared across all machines. `local/<machine>/` mirrors the same structure for machine-specific overrides.
 2. **Numbered files, glob-sourced**: Sourceable configs (zsh) are loaded alphabetically. Numeric prefixes (00-, 10-, 20-, ...) control load order with gaps of 10 for future insertions.
-3. **Stow for symlinking**: `dot-` prefixed directories are symlinked into `~/` by stow's `--dotfiles` flag (e.g., `dot-claude/` becomes `~/.claude/`). Tools with their own layering (like Claude Code's user/project/local scopes) are stowed directly.
+3. **Stow for symlinking**: `dot-` prefixed directories are symlinked into `~/` by stow's `--dotfiles` flag (e.g., `dot-claude/` becomes `~/.claude/`). Tools with their own layering (like Claude Code's user/project/local scopes) are stowed directly. Project-local Pi runtime directories (`.pi/` and `.pi-subagents/`) are excluded through `.stow-local-ignore`; only the managed `dot-pi/` tree is linked into the home directory.
 
 ```
 <tool>/                         # Shared sourceable configs (all machines)

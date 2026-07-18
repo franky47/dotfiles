@@ -25,6 +25,12 @@ RUN mkdir -p /home/testuser/dotfiles/local/testbox/claude/skills/testbox-only \
 # (config.yml itself is gitignored — generated per host from config.<host>.yml).
 RUN echo 'models: {}' > /home/testuser/dotfiles/dot-config/llama-swap/config.testbox.yml
 
+# Create project-local Pi runtime artifacts. Stow must leave these in the
+# checkout instead of linking them into the home directory.
+RUN mkdir -p /home/testuser/dotfiles/.pi/tasks /home/testuser/dotfiles/.pi-subagents/artifacts \
+    && echo '{}' > /home/testuser/dotfiles/.pi/tasks/tasks-test.json \
+    && echo 'runtime artifact' > /home/testuser/dotfiles/.pi-subagents/artifacts/test.txt
+
 # Ensure ~/.config exists so stow unfolds into it.
 # Pre-create ~/.config/opencode to simulate opencode having been installed first
 # (matches real-world layout: opencode owns the dir, stow contributes per-file symlinks).
@@ -32,6 +38,13 @@ RUN mkdir -p ~/.config/opencode
 
 # Run install
 RUN bash -o pipefail -c '/home/testuser/dotfiles/install.sh 2>&1 | tee /tmp/install.out'
+
+# Assertions: project-local Pi runtime directories are ignored by Stow
+RUN echo "=== Pi runtime directories ===" \
+    && ! test -e ~/.pi/tasks && echo "OK: ~/.pi/tasks not stowed" \
+    && ! test -e ~/.pi-subagents && echo "OK: ~/.pi-subagents not stowed" \
+    && test -f /home/testuser/dotfiles/.pi/tasks/tasks-test.json && echo "OK: project tasks preserved" \
+    && test -f /home/testuser/dotfiles/.pi-subagents/artifacts/test.txt && echo "OK: project artifacts preserved"
 
 # Assertions: shell loaders
 RUN echo "=== Shell loaders ===" \

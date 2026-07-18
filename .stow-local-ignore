@@ -15,3 +15,5 @@
 ^tests$
 ^dot-pi/agent/auth\.json$
 ^dot-pi/agent/sessions$
+\.pi
+\.pi-subagents
