@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import statusline, { formatTokens, parseDirtyState, sanitizeStatusText } from "./statusline.ts";
+import statusline, {
+	formatCost,
+	formatTokens,
+	parseDirtyState,
+	parseUnifiedPatchLineChanges,
+	sanitizeStatusText,
+} from "./statusline.ts";
 
 describe("parseDirtyState", () => {
 	it("counts staged and unstaged porcelain states", () => {
@@ -32,6 +38,32 @@ describe("formatTokens", () => {
 	});
 });
 
+describe("formatCost", () => {
+	it("uses at most two decimal places", () => {
+		assert.equal(formatCost(0), "0");
+		assert.equal(formatCost(1.2), "1.2");
+		assert.equal(formatCost(1.234), "1.23");
+	});
+});
+
+describe("parseUnifiedPatchLineChanges", () => {
+	it("counts changed lines inside patch hunks without counting headers", () => {
+		assert.deepEqual(
+			parseUnifiedPatchLineChanges([
+				"--- a/file.ts",
+				"+++ b/file.ts",
+				"@@ -1,3 +1,4 @@",
+				" unchanged",
+				"-old",
+				"+new",
+				"+++content that starts with pluses",
+				"+added",
+			].join("\n")),
+			{ added: 3, removed: 1 },
+		);
+	});
+});
+
 describe("sanitizeStatusText", () => {
 	it("keeps statuses on one compact line", () => {
 		assert.equal(sanitizeStatusText("  private\n\tmode  "), "private mode");
@@ -43,6 +75,8 @@ describe("statusline footer", () => {
 		model?: { provider: string; id: string; reasoning: boolean };
 		thinkingLevel?: "off" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
 		statuses?: ReadonlyMap<string, string>;
+		sessionId?: string;
+		branchEntries?: any[];
 	} = {}) {
 		const handlers = new Map<string, (...args: any[]) => any>();
 		let footerFactory: ((tui: any, theme: any, footerData: any) => any) | undefined;
@@ -61,7 +95,10 @@ describe("statusline footer", () => {
 			cwd: "/tmp/project",
 			model: options.model,
 			getContextUsage: () => null,
-			sessionManager: { getBranch: () => [] },
+			sessionManager: {
+				getBranch: () => options.branchEntries ?? [],
+				getSessionId: () => options.sessionId ?? "",
+			},
 			ui: {
 				setFooter(factory: typeof footerFactory) {
 					footerFactory = factory;
@@ -95,6 +132,35 @@ describe("statusline footer", () => {
 	it("omits an empty optional row", () => {
 		const { lines } = renderFooter({ statuses: new Map([["blank", "\n\t"]]) });
 		assert.equal(lines.length, 1);
+	});
+
+	it("shows session ID, edit line counts, and formatted cost and I/O", () => {
+		const { lines } = renderFooter({
+			sessionId: "session-123",
+			branchEntries: [
+				{
+					type: "message",
+					message: {
+						role: "assistant",
+						usage: { input: 123_000, output: 456_000, cost: { total: 1.2 } },
+					},
+				},
+				{
+					type: "message",
+					message: {
+						role: "toolResult",
+						toolName: "edit",
+						isError: false,
+						details: { patch: "--- a/file\n+++ b/file\n@@ -1 +1,2 @@\n-old\n+new\n+added" },
+					},
+				},
+			],
+		});
+		assert.equal(lines.length, 2);
+		assert.match(lines[1], /session-123/);
+		assert.match(lines[1], /\+2/);
+		assert.match(lines[1], /-1/);
+		assert.match(lines[1], /\$1\.2 ↑123k ↓456k/);
 	});
 
 	it("shows reasoning after a middle dot using the prompt-border color", () => {

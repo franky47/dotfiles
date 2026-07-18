@@ -6,7 +6,7 @@ import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
  * Claude Code-inspired statusline footer.
  *
  * Line 1: location | ctx: XX% | model · reasoning
- * Line 2: extension statuses | dirty(+~?| -?) | cost/tokens
+ * Line 2: session ID | extension statuses | dirty | changed lines | cost/tokens
  *
  * Inspired by: dot-claude/statusline-command.sh
  */
@@ -20,7 +20,7 @@ const GREEN = "\x1b[32m";
 const MAGENTA = "\x1b[35m";
 const RESET = "\x1b[0m";
 
-const SEP = `${DIM}|${RESET}`;
+const SEP = `${DIM}·${RESET}`;
 
 /** Git porcelain status counts */
 export interface DirtyState { m: number; a: number; d: number; u: number }
@@ -49,6 +49,29 @@ export function formatTokens(count: number): string {
 	return `${Math.round(count / 1_000_000)}M`;
 }
 
+export function formatCost(cost: number): string {
+	return cost.toFixed(2).replace(/\.?0+$/, "");
+}
+
+export interface LineChanges { added: number; removed: number }
+
+export function parseUnifiedPatchLineChanges(patch: string): LineChanges {
+	const changes: LineChanges = { added: 0, removed: 0 };
+	let inHunk = false;
+
+	for (const line of patch.split(/\r?\n/)) {
+		if (line.startsWith("@@")) {
+			inHunk = true;
+			continue;
+		}
+		if (!inHunk) continue;
+		if (line.startsWith("+")) changes.added++;
+		else if (line.startsWith("-")) changes.removed++;
+	}
+
+	return changes;
+}
+
 export function sanitizeStatusText(text: string): string {
 	return text.replace(/[\r\n\t]/g, " ").replace(/ +/g, " ").trim();
 }
@@ -64,10 +87,12 @@ class StatuslineState {
 	cwd = "";
 	/** Git dirty counts */
 	dirty: DirtyState = emptyDirtyState();
-	/** Token/cost accumulators */
+	/** Token, cost, and edit accumulators */
 	input = 0;
 	output = 0;
 	cost = 0;
+	added = 0;
+	removed = 0;
 	private dirtyRefreshInFlight = false;
 	private generation = 0;
 	private requestRender: (() => void) | null = null;
@@ -113,12 +138,22 @@ class StatuslineState {
 		this.input = 0;
 		this.output = 0;
 		this.cost = 0;
+		this.added = 0;
+		this.removed = 0;
 		for (const e of ctx.sessionManager.getBranch()) {
-			if (e.type === "message" && e.message.role === "assistant") {
+			if (e.type !== "message") continue;
+			if (e.message.role === "assistant") {
 				const message = e.message as AssistantMessage;
 				this.input += message.usage.input || 0;
 				this.output += message.usage.output || 0;
 				this.cost += message.usage.cost.total || 0;
+			} else if (e.message.role === "toolResult" && e.message.toolName === "edit" && !e.message.isError) {
+				const patch = (e.message.details as { patch?: unknown } | undefined)?.patch;
+				if (typeof patch === "string") {
+					const changes = parseUnifiedPatchLineChanges(patch);
+					this.added += changes.added;
+					this.removed += changes.removed;
+				}
 			}
 		}
 	}
@@ -185,12 +220,13 @@ export default function (pi: ExtensionAPI) {
 					}
 
 					const sepW = visibleWidth(SEP);
-					const totalW = visibleWidth(location) + sepW + visibleWidth(ctxStr) + sepW + visibleWidth(modelStr) + 4;
+					const totalW = visibleWidth(location) + visibleWidth(ctxStr) + sepW + visibleWidth(modelStr) + 2;
 					const pad = " ".repeat(Math.max(1, width - totalW));
-					const line1 = truncateToWidth(location + pad + SEP + " " + ctxStr + " " + SEP + " " + modelStr, width);
+					const line1 = truncateToWidth(location + pad + ctxStr + " " + SEP + " " + modelStr, width);
 
-					// --- Line 2: extension statuses | dirty | cost/tokens ---
+					// --- Line 2: session ID | extension statuses | dirty | changed lines | cost/tokens ---
 
+					const sessionId = ctx.sessionManager.getSessionId();
 					const statuses = [...footerData.getExtensionStatuses().values()]
 						.map(sanitizeStatusText)
 						.filter((status) => visibleWidth(status) > 0)
@@ -202,12 +238,18 @@ export default function (pi: ExtensionAPI) {
 					if (state.dirty.d) dirtyParts.push(`${RED}${state.dirty.d}-${RESET}`);
 					if (state.dirty.u) dirtyParts.push(`${MAGENTA}${state.dirty.u}?${RESET}`);
 
-					const line2Parts = statuses ? [statuses] : [];
+					const line2Parts = sessionId ? [`${DIM}${sessionId}${RESET}`] : [];
+					if (statuses) line2Parts.push(statuses);
 					if (dirtyParts.length > 0) line2Parts.push(dirtyParts.join(" "));
+
+					const changedLines: string[] = [];
+					if (state.added > 0) changedLines.push(`${GREEN}+${state.added}${RESET}`);
+					if (state.removed > 0) changedLines.push(`${RED}-${state.removed}${RESET}`);
+					if (changedLines.length > 0) line2Parts.push(changedLines.join(" "));
 
 					if (state.cost > 0 || state.input > 0 || state.output > 0) {
 						line2Parts.push(
-							`${DIM}$${state.cost.toFixed(3)}${RESET} ${DIM}${formatTokens(state.input)}↓/${formatTokens(state.output)}↑${RESET}`,
+							`${DIM}$${formatCost(state.cost)} ↑${formatTokens(state.input)} ↓${formatTokens(state.output)}${RESET}`,
 						);
 					}
 
