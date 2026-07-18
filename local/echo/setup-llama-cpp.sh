@@ -13,7 +13,7 @@ YELLOW=$'\033[33m'
 GREEN=$'\033[32m'
 RESET=$'\033[0m'
 
-REPO_DIR="/Volumes/Storage/dev/franky47/llama.cpp"
+REPO_DIR="${HOME}/dev/franky47/llama.cpp"
 FORK_URL="git@github.com:franky47/llama.cpp.git"
 UPSTREAM_URL="https://github.com/ggml-org/llama.cpp.git"
 BRANCH="macos12-build"

@@ -18,7 +18,7 @@ models:
     # calls return HTTP 500. The override carries that literal in a Jinja
     # comment so detection trips. See config.m4x.yml for the longer note.
     cmd: |
-      /Volumes/Storage/dev/franky47/llama.cpp/build/bin/llama-server
+      ${env.HOME}/dev/franky47/llama.cpp/build/bin/llama-server
         -hf LiquidAI/LFM2.5-8B-A1B-GGUF:Q4_K_M
         --port ${PORT}
         --parallel 1

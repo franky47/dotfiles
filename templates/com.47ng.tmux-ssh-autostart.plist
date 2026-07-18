@@ -6,11 +6,10 @@
   Keychain access from SSH-attached tmux panes (e.g. Claude Code
   credentials), which otherwise fail with errSecInteractionNotAllowed.
 
-  The watchdog logic is inlined here rather than referenced as a script
-  in the dotfiles repo because the repo lives on /Volumes/Storage, and
-  TCC blocks launchd from executing scripts on non-system volumes
-  (`Operation not permitted`, exit 126). Embedding keeps the plist
-  self-contained on the system volume after install.sh writes it.
+  The watchdog logic is inlined here so the installed plist remains
+  self-contained and launchd does not depend on the dotfiles repo path.
+  This also avoids TCC failures if the repo is ever hosted on a
+  non-system volume (`Operation not permitted`, exit 126).
 
   Watchdog flow:
     1. Create the long-lived `ssh` session if missing (using

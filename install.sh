@@ -105,7 +105,7 @@ check_prereqs() {
   fi
 
   if [[ "${MACHINE_NAME}" == "echo" ]]; then
-    if [[ ! -x /Volumes/Storage/dev/franky47/llama.cpp/build/bin/llama-server ]]; then
+    if [[ ! -x "${HOME}/dev/franky47/llama.cpp/build/bin/llama-server" ]]; then
       echo "${YELLOW}WARN:${RESET} echo llama.cpp build missing — llama-server unavailable."
       echo "  ${DOTFILES}/local/echo/setup-llama-cpp.sh"
       warn=1
