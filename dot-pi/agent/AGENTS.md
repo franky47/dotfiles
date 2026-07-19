@@ -14,32 +14,22 @@
 - Comments are brittle and leak abstractions. Write self-documenting code instead.
 - If multi-line comments are needed, split lines semantically,
   don't try and maximise the line width.
-- After implementation, run code-review agent on changes. Fix all issues found, then re-run. Loop until clean.
+- After implementation, run a code review subagent on changes. Fix all issues found, then re-run. Loop until clean.
 
 ## Git
 
-- Never add a Co-Authored-By line for Claude when creating Git commits. Do not add Claude as a co-author.
-- Don't commit mid-work. Commit only when asked to — group related changes into logical commits.
-- Always use conventional commit titles with the outcome (`fix: memory leak`, `chore: improve build system`).
+- Don't commit mid-work. Commit only when asked to. Group related changes into logical commits.
+- Use conventional commit titles with the outcome (`fix: memory leak`, `chore: improve build system`).
 - Explain **why** something was done in a short commit message body (1-2 sentences, max 100 char per line), never _what_ was done (it's in the diff).
 - Never commit generated artifacts (plans, reports, analyses, summaries) — only commit source code changes. Exclude non-code files unless explicitly asked.
 - When opening PRs:
   1. Use a short body (unwrapped lines), using the prose skill, explaining **why** the changes are made. Closing keywords at the end.
-  2. Never add "by Claude Code" attribution
-  3. Always open in draft state. Single-quote the `--title` (no apostrophes in it),
-     write the body to a scratch file and pass `--body-file`, long-form flags only:
-     this shape auto-approves for my repos (franky47, 47ng), while inline `$(…)`
-     bodies, short flags, and apostrophes trigger a permission prompt.
-  4. Once opened, monitor CI
-  5. When CI is green, run a flight of review sub-agents from the pr toolkit on the PR changes
+  2. Always open in draft state, with the appropriate labels.
+  3. Once opened, monitor CI, fix any issues found. Loop until CI is green.
+  4. When CI is green, run a high-reasoning subagent on the PR changes, and fix any issues found. Loop until clean.
 - Never merge PRs yourself (nor propose to do so): that's my job.
 - Never amend commits, unless asked.
 
 ## Python
 
-- Always use `uv` for everything Python-related (e.g. `uv run`, `uv pip install`). Never use raw `python3` or `pip` directly.
-
-## TypeScript
-
-- Use the `typescript-advanced-types` skill for any TypeScript task.
-- Never make your own type definitions for external libraries, install `@types` packages instead. If they don't exist, look for alternatives. Always prefer type-safe libraries.
+- Always use `uv` for everything Python-related (e.g. `uv run`, `uv pip install`). Never use raw `python` or `pip` directly.
