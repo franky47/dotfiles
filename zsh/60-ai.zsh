@@ -32,7 +32,7 @@ alias ocunmute='rm -f ~/.config/opencode/plugins/soundboard/mute'
 # Pi coding agent — invoked via π
 π() {
   : ${PI_BIN:=$(command npm prefix -g)/bin/pi}
-  "$PI_BIN" "$@"
+  PI_TASKS=off "$PI_BIN" "$@"
 }
 
 # ds4 local inference server (DeepSeek V4 Flash on Metal)
