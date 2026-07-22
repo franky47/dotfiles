@@ -115,6 +115,8 @@ User-level Pi extensions are stored in `dot-pi/agent/extensions/`. The `statusli
 
 The `private-session/` extension adds user-only `/private` and `/delete-session` commands. `/private` stops future local transcript persistence without removing existing history; `/delete-session` first makes the process private, then explicitly removes the current transcript (trash first, unlink fallback). A persistent 🕵️ footer indicator marks non-persisted sessions, including Pi's built-in ephemeral mode.
 
+The `update.ts` extension adds `/update` for Pi itself and `/update-extensions` for installed Pi packages. Each command reloads Pi's configuration after an update.
+
 The `π` wrapper in `zsh/60-ai.zsh` launches Pi with `PI_TASKS=off`, keeping `pi-tasks` records in memory. `@tintinweb/pi-subagents` uses in-memory subagent sessions by default; `dot-pi/agent/subagents.json` also disables output transcripts and scheduled jobs so it does not write run records to disk.
 
 Third-party packages are declared in `dot-pi/agent/settings.json`: `@tintinweb/pi-subagents`, `pi-web-access`, `pi-add-dir`, `@tintinweb/pi-tasks`, and `pi-btw`.

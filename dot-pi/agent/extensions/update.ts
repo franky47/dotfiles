@@ -45,4 +45,42 @@ export default function (pi: ExtensionAPI) {
       return;
     },
   });
+
+  pi.registerCommand("update-extensions", {
+    description: "Update installed pi extensions and reload configuration",
+    handler: async (_args, ctx) => {
+      ctx.ui.notify("Updating pi extensions...", "info");
+
+      let result;
+      try {
+        result = await pi.exec("pi", ["update", "--extensions"], { timeout: 120_000 });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        ctx.ui.notify(`pi extension update failed: ${message}`, "error");
+        return;
+      }
+
+      if (result.killed) {
+        ctx.ui.notify("pi extension update timed out.", "error");
+        return;
+      }
+
+      if (result.code !== 0) {
+        const error = result.stderr.trim() || result.stdout.trim() || "Unknown error";
+        ctx.ui.notify(`pi extension update failed: ${error}`, "error");
+        return;
+      }
+
+      ctx.ui.notify("Pi extensions updated successfully.", "info");
+      ctx.ui.notify("Reloading configuration...", "info");
+
+      try {
+        await ctx.reload();
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        ctx.ui.notify(`pi configuration reload failed: ${message}`, "error");
+      }
+      return;
+    },
+  });
 }
