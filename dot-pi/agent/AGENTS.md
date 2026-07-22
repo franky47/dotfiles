@@ -16,6 +16,11 @@
   don't try and maximise the line width.
 - After implementation, run a code review subagent on changes. Fix all issues found, then re-run. Loop until clean.
 
+## Pi extensions
+
+- Never place tests in `~/.pi/agent/extensions` or `dot-pi/agent/extensions`. Pi loads each file in this directory as an extension, so a test file stops Pi from starting.
+- Place extension tests in `dot-pi/agent/tests`.
+
 ## Git
 
 - Don't commit mid-work. Commit only when asked to. Group related changes into logical commits.

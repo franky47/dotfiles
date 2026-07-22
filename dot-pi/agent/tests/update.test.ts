@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import updateExtension from "./update.ts";
+import updateExtension from "../extensions/update.ts";
 
 type Command = {
   handler: (args: string, ctx: CommandContext) => Promise<void>;
