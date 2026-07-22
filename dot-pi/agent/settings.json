@@ -17,6 +17,7 @@
     "npm:pi-web-access",
     "npm:pi-add-dir",
     "npm:@tintinweb/pi-tasks",
-    "npm:pi-btw"
+    "npm:pi-btw",
+    "npm:@diegopetrucci/pi-openai-fast"
   ]
 }
