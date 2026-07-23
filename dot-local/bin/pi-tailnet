@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export PLANNOTATOR_REMOTE=1
+export PLANNOTATOR_PORT=19432-19463
+: "${PI_BIN:=$(npm prefix -g)/bin/pi}"
+PI_TASKS=off exec "$PI_BIN" "$@"

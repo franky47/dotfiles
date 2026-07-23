@@ -17,6 +17,9 @@ Original sources attributed, but skills have been adapted for my usage.
 | [`github-stars-lists`](dot-claude/skills/github-stars-lists/SKILL.md) | Scrape repos from your GitHub Stars lists (no API for them) | ✏️ |
 | [`research`](dot-claude/skills/research/SKILL.md) | Run a deep-research session and save it to Obsidian | ✏️ |
 | [`taildrop`](dot-claude/skills/taildrop/SKILL.md) | Send files to Tailscale devices via Taildrop | ✏️ |
+| [`plannotator-review`](dot-claude/skills/plannotator-review/SKILL.md) | Review a worktree or pull request in Plannotator | backnotprop/plannotator v0.24.2 |
+| [`plannotator-annotate`](dot-claude/skills/plannotator-annotate/SKILL.md) | Annotate a file, web page, or folder in Plannotator | backnotprop/plannotator v0.24.2 |
+| [`plannotator-last`](dot-claude/skills/plannotator-last/SKILL.md) | Annotate the last assistant response in Plannotator | backnotprop/plannotator v0.24.2 |
 | [`work`](dot-claude/skills/work/SKILL.md) | Pick one open beans task and implement it end-to-end | ✏️ |
 | [`premortem`](dot-claude/skills/premortem/SKILL.md) | Assume the plan already failed, work backward to find why (Gary Klein) | Ohle Lehmann |
 | [`brainstorm`](dot-claude/skills/brainstorm/SKILL.md) | Interview you relentlessly to stress-test a plan or design | Matt Pocock |
@@ -121,7 +124,29 @@ The `update.ts` extension adds `/update` for Pi itself and `/update-extensions` 
 
 The `π` wrapper in `zsh/60-ai.zsh` launches Pi with `PI_TASKS=off`, keeping `pi-tasks` records in memory. `@tintinweb/pi-subagents` uses in-memory subagent sessions by default; `dot-pi/agent/subagents.json` also disables output transcripts and scheduled jobs so it does not write run records to disk.
 
-Third-party packages are declared in `dot-pi/agent/settings.json`: `@tintinweb/pi-subagents`, `pi-web-access`, `pi-add-dir`, `@tintinweb/pi-tasks`, and `pi-btw`.
+Third-party packages are declared in `dot-pi/agent/settings.json`: `@tintinweb/pi-subagents`, `pi-web-access`, `pi-add-dir`, `@tintinweb/pi-tasks`, `pi-btw`, `@diegopetrucci/pi-openai-fast`, and `@plannotator/pi-extension@0.24.2`.
+
+## Plannotator
+
+Install Plannotator CLI 0.24.2 separately before using these files. Check the installed version with `plannotator --version`.
+
+Claude Code loads the three Plannotator skills from `dot-claude/skills/`. Pi loads the pinned extension from `dot-pi/agent/settings.json`. Both open reviews on localhost during normal `c` and `π` sessions. `dot-plannotator/config.json` keeps web page annotation direct rather than sending the address through Jina Reader, and disables external share links.
+
+The Pi extension also provides its own plan mode. This setup does not use it. Do not start Pi with `--plan`, toggle `/plannotator`, or call `plannotator_submit_plan`.
+
+Use `claude-tailnet` or `pi-tailnet` when an iPhone on the Tailnet needs access. These launchers bind Plannotator to ports 19432 through 19463 on all network interfaces. Remote mode has no HTTP login. `claude-tailnet` also skips Claude Code permission prompts, matching the normal `c` command. Use it only on trusted networks, keep the host firewall on, and limit Tailnet access with ACLs.
+
+Start a review, then find its port:
+
+```sh
+plannotator sessions
+```
+
+Replace `localhost` with the development host's Tailnet DNS name and open the result on the iPhone. End the review when done, then clear stale sessions:
+
+```sh
+plannotator sessions --clean
+```
 
 ## Claude Code settings
 

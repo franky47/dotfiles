@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export PLANNOTATOR_REMOTE=1
+export PLANNOTATOR_PORT=19432-19463
+exec claude --dangerously-skip-permissions "/remote-control" "$@"

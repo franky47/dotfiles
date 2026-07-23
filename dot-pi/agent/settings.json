@@ -18,6 +18,7 @@
     "npm:pi-add-dir",
     "npm:@tintinweb/pi-tasks",
     "npm:pi-btw",
-    "npm:@diegopetrucci/pi-openai-fast"
+    "npm:@diegopetrucci/pi-openai-fast",
+    "npm:@plannotator/pi-extension@0.24.2"
   ]
 }

@@ -135,7 +135,7 @@ ensure_sfw() {
 ensure_sfw
 
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
-mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/Library/Application\ Support/lazygit ~/.pi/agent/extensions
+mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/Library/Application\ Support/lazygit ~/.pi/agent/extensions ~/.plannotator
 
 # Stow: first run uses --adopt to pull existing files into the repo, then --restow for re-runs.
 # --adopt moves conflicting files into the package dir so stow can create symlinks.
