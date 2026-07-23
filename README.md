@@ -22,6 +22,8 @@ Original sources attributed, but skills have been adapted for my usage.
 | [`brainstorm`](dot-claude/skills/brainstorm/SKILL.md) | Interview you relentlessly to stress-test a plan or design | Matt Pocock |
 | [`frontend-design`](dot-claude/skills/frontend-design/) | Build distinctive, production-grade UIs that dodge generic AI aesthetics | Anthropic |
 | [`handoff`](dot-claude/skills/handoff/SKILL.md) | Compact the conversation into a handoff doc for a fresh agent | Matt Pocock |
+| [`docs`](dot-claude/skills/docs/SKILL.md) | Write short docs built around what readers need to do | Alem Tuzlak |
+| [`no-ai-slop`](dot-claude/skills/no-ai-slop/SKILL.md) | Edit drafts or flag AI writing patterns while keeping the author's voice | Peter Yang |
 | [`improve`](dot-claude/skills/improve/) | Survey a codebase read-only and produce prioritized handoff plans for other agents | shadcn |
 | [`improve-codebase-architecture`](dot-claude/skills/improve-codebase-architecture/) | Surface deep-module refactors (Ousterhout) for testability | Matt Pocock |
 | [`prd-to-issues`](dot-claude/skills/prd-to-issues/SKILL.md) | Split a PRD into independently-grabbable beans issues (tracer bullets) | Matt Pocock |
