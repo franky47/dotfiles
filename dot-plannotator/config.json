@@ -1,4 +1,13 @@
 {
   "jina": false,
-  "share": "disabled"
+  "share": "disabled",
+  "diffOptions": {
+    "fontFamily": "JetBrains Mono",
+    "lineBgIntensity": "subtle",
+    "expandUnchanged": false,
+    "showLineNumbers": true,
+    "showDiffBackground": false,
+    "diffStyle": "unified",
+    "overflow": "wrap"
+  }
 }
