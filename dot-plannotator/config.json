@@ -1,6 +1,7 @@
 {
   "jina": false,
   "share": "disabled",
+  "displayName": "François Best",
   "diffOptions": {
     "fontFamily": "JetBrains Mono",
     "lineBgIntensity": "subtle",
@@ -8,6 +9,8 @@
     "showLineNumbers": true,
     "showDiffBackground": false,
     "diffStyle": "unified",
-    "overflow": "wrap"
+    "overflow": "wrap",
+    "hideWhitespace": false,
+    "lineDiffType": "word-alt"
   }
 }
