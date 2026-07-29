@@ -6,11 +6,12 @@
     "fontFamily": "JetBrains Mono",
     "lineBgIntensity": "subtle",
     "expandUnchanged": false,
-    "showLineNumbers": true,
+    "showLineNumbers": false,
     "showDiffBackground": false,
     "diffStyle": "unified",
     "overflow": "wrap",
     "hideWhitespace": false,
     "lineDiffType": "word-alt"
+    "diffIndicators": "bars"
   }
 }
