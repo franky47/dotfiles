@@ -8,34 +8,35 @@ Agent skills live in `dot-claude/skills/` (shared) and `local/<machine>/claude/s
 
 Original sources attributed, but skills have been adapted for my usage.
 
-| Skill | What it does | Original Source |
-| --- | --- | --- |
-| [`audit-github-actions`](dot-claude/skills/audit-github-actions/) | Audit GitHub Actions for supply-chain / CI-CD vulns (Shai-Hulud-class worms, expression injection, token exfil) | ✏️ |
-| [`prose`](dot-claude/skills/prose/SKILL.md) | Write human-readable prose: PRs, docs, emails, memos | ✏️ |
-| [`html`](dot-claude/skills/html/SKILL.md) | Render a document, diagram, or report as HTML for humans | ✏️ |
-| [`issue`](dot-claude/skills/issue/SKILL.md) | Research and word a good GitHub issue (never posts it) | ✏️ |
-| [`github-stars-lists`](dot-claude/skills/github-stars-lists/SKILL.md) | Scrape repos from your GitHub Stars lists (no API for them) | ✏️ |
-| [`research`](dot-claude/skills/research/SKILL.md) | Run a deep-research session and save it to Obsidian | ✏️ |
-| [`taildrop`](dot-claude/skills/taildrop/SKILL.md) | Send files to Tailscale devices via Taildrop | ✏️ |
-| [`plannotator-review`](dot-claude/skills/plannotator-review/SKILL.md) | Review a worktree or pull request in Plannotator | backnotprop/plannotator v0.24.2 |
-| [`plannotator-annotate`](dot-claude/skills/plannotator-annotate/SKILL.md) | Annotate a file, web page, or folder in Plannotator | backnotprop/plannotator v0.24.2 |
-| [`plannotator-last`](dot-claude/skills/plannotator-last/SKILL.md) | Annotate the last assistant response in Plannotator | backnotprop/plannotator v0.24.2 |
-| [`work`](dot-claude/skills/work/SKILL.md) | Pick one open beans task and implement it end-to-end | ✏️ |
-| [`premortem`](dot-claude/skills/premortem/SKILL.md) | Assume the plan already failed, work backward to find why (Gary Klein) | Ohle Lehmann |
-| [`brainstorm`](dot-claude/skills/brainstorm/SKILL.md) | Interview you relentlessly to stress-test a plan or design | Matt Pocock |
-| [`frontend-design`](dot-claude/skills/frontend-design/) | Build distinctive, production-grade UIs that dodge generic AI aesthetics | Anthropic |
-| [`handoff`](dot-claude/skills/handoff/SKILL.md) | Compact the conversation into a handoff doc for a fresh agent | Matt Pocock |
-| [`docs`](dot-claude/skills/docs/SKILL.md) | Write short docs built around what readers need to do | Alem Tuzlak |
-| [`no-ai-slop`](dot-claude/skills/no-ai-slop/SKILL.md) | Edit drafts or flag AI writing patterns while keeping the author's voice | Peter Yang |
-| [`improve`](dot-claude/skills/improve/) | Survey a codebase read-only and produce prioritized handoff plans for other agents | shadcn |
-| [`improve-codebase-architecture`](dot-claude/skills/improve-codebase-architecture/) | Surface deep-module refactors (Ousterhout) for testability | Matt Pocock |
-| [`prd-to-issues`](dot-claude/skills/prd-to-issues/SKILL.md) | Split a PRD into independently-grabbable beans issues (tracer bullets) | Matt Pocock |
-| [`repro`](dot-claude/skills/repro/SKILL.md) | Build a minimal, self-contained bug reproduction | Matt Pocock |
-| [`tdd`](dot-claude/skills/tdd/) | Red-green-refactor with behavior-focused integration tests | Matt Pocock |
-| [`typescript-advanced-types`](dot-claude/skills/typescript-advanced-types/SKILL.md) | Generics, conditional/mapped/template-literal types, utility types | Matt Pocock |
-| [`ubiquitous-language`](dot-claude/skills/ubiquitous-language/SKILL.md) | Extract a DDD glossary from the conversation | Matt Pocock |
-| [`write-a-prd`](dot-claude/skills/write-a-prd/SKILL.md) | Create a PRD via interview, codebase exploration, module design | Matt Pocock |
-| [`write-a-skill`](dot-claude/skills/write-a-skill/SKILL.md) | Author new skills with progressive disclosure and bundled resources | Matt Pocock |
+| Skill                                                                               | What it does                                                                                                    | Original Source                 |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| [`audit-github-actions`](dot-claude/skills/audit-github-actions/)                   | Audit GitHub Actions for supply-chain / CI-CD vulns (Shai-Hulud-class worms, expression injection, token exfil) | ✏️                              |
+| [`prose`](dot-claude/skills/prose/SKILL.md)                                         | Write human-readable prose: PRs, docs, emails, memos                                                            | ✏️                              |
+| [`html`](dot-claude/skills/html/SKILL.md)                                           | Render a document, diagram, or report as HTML for humans                                                        | ✏️                              |
+| [`issue`](dot-claude/skills/issue/SKILL.md)                                         | Research and word a good GitHub issue (never posts it)                                                          | ✏️                              |
+| [`github-stars-lists`](dot-claude/skills/github-stars-lists/SKILL.md)               | Scrape repos from your GitHub Stars lists (no API for them)                                                     | ✏️                              |
+| [`research`](dot-claude/skills/research/SKILL.md)                                   | Run a deep-research session and save it to Obsidian                                                             | ✏️                              |
+| [`taildrop`](dot-claude/skills/taildrop/SKILL.md)                                   | Send files to Tailscale devices via Taildrop                                                                    | ✏️                              |
+| [`plannotator-review`](dot-claude/skills/plannotator-review/SKILL.md)               | Review a worktree or pull request in Plannotator                                                                | backnotprop/plannotator v0.24.2 |
+| [`plannotator-annotate`](dot-claude/skills/plannotator-annotate/SKILL.md)           | Annotate a file, web page, or folder in Plannotator                                                             | backnotprop/plannotator v0.24.2 |
+| [`plannotator-last`](dot-claude/skills/plannotator-last/SKILL.md)                   | Annotate the last assistant response in Plannotator                                                             | backnotprop/plannotator v0.24.2 |
+| [`work`](dot-claude/skills/work/SKILL.md)                                           | Pick one open beans task and implement it end-to-end                                                            | ✏️                              |
+| [`premortem`](dot-claude/skills/premortem/SKILL.md)                                 | Assume the plan already failed, work backward to find why (Gary Klein)                                          | Ohle Lehmann                    |
+| [`brainstorm`](dot-claude/skills/brainstorm/SKILL.md)                               | Interview you relentlessly to stress-test a plan or design                                                      | Matt Pocock                     |
+| [`frontend-design`](dot-claude/skills/frontend-design/)                             | Build distinctive, production-grade UIs that dodge generic AI aesthetics                                        | Anthropic                       |
+| [`handoff`](dot-claude/skills/handoff/SKILL.md)                                     | Compact the conversation into a handoff doc for a fresh agent                                                   | Matt Pocock                     |
+| [`docs`](dot-claude/skills/docs/SKILL.md)                                           | Write short docs built around what readers need to do                                                           | Alem Tuzlak                     |
+| [`no-ai-slop`](dot-claude/skills/no-ai-slop/SKILL.md)                               | Edit drafts or flag AI writing patterns while keeping the author's voice                                        | Peter Yang                      |
+| [`improve`](dot-claude/skills/improve/)                                             | Survey a codebase read-only and produce prioritized handoff plans for other agents                              | shadcn                          |
+| [`improve-codebase-architecture`](dot-claude/skills/improve-codebase-architecture/) | Surface deep-module refactors (Ousterhout) for testability                                                      | Matt Pocock                     |
+| [`prd-to-issues`](dot-claude/skills/prd-to-issues/SKILL.md)                         | Split a PRD into independently-grabbable beans issues (tracer bullets)                                          | Matt Pocock                     |
+| [`prototype`](dot-claude/skills/prototype/SKILL.md)                                 | Prototype ideas for UI & logic                                                                                  | Matt Pocock                     |
+| [`repro`](dot-claude/skills/repro/SKILL.md)                                         | Build a minimal, self-contained bug reproduction                                                                | Matt Pocock                     |
+| [`tdd`](dot-claude/skills/tdd/)                                                     | Red-green-refactor with behavior-focused integration tests                                                      | Matt Pocock                     |
+| [`typescript-advanced-types`](dot-claude/skills/typescript-advanced-types/SKILL.md) | Generics, conditional/mapped/template-literal types, utility types                                              | Matt Pocock                     |
+| [`ubiquitous-language`](dot-claude/skills/ubiquitous-language/SKILL.md)             | Extract a DDD glossary from the conversation                                                                    | Matt Pocock                     |
+| [`write-a-prd`](dot-claude/skills/write-a-prd/SKILL.md)                             | Create a PRD via interview, codebase exploration, module design                                                 | Matt Pocock                     |
+| [`write-a-skill`](dot-claude/skills/write-a-skill/SKILL.md)                         | Author new skills with progressive disclosure and bundled resources                                             | Matt Pocock                     |
 
 ## Conventions
 
@@ -151,8 +152,6 @@ plannotator sessions --clean
 ## Claude Code settings
 
 Claude Code has a built-in scope system (user → project → local). Stow symlinks `dot-claude/` into `~/.claude/` as the **user** scope. Per-project overrides use Claude's native `.claude/settings.json` (shared) and `.claude/settings.local.json` (personal, gitignored) — no custom merge needed.
-
-
 
 ## How the zsh loader works
 
