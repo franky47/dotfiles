@@ -40,5 +40,4 @@ and use their guidelines to drive the _shape_ of the output.
 
 ## Output
 
-When you have collected all you need, write the issue text to a temporary file
-and open it in Sublime Text.
+When you have collected all you need, write the issue text to my Obsidian vault, in Inbox.
