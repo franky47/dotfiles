@@ -1,13 +1,14 @@
 {
-  "lastChangelogVersion": "0.82.1",
+  "lastChangelogVersion": "0.84.2",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.6-sol",
+  "defaultModel": "gpt-5.6-luna",
   "hideThinkingBlock": false,
-  "defaultThinkingLevel": "medium",
+  "defaultThinkingLevel": "high",
   "enabledModels": [
     "openai-codex/gpt-5.6-sol",
     "openai-codex/gpt-5.6-luna",
     "llama-swap/qwen3.6-27b-q6_k_xl",
+    "llama-swap/qwen3.8-27b-q6_k_xl",
     "llama-swap/qwen3.6-35b-a3b-q4_k_m",
     "llama-swap/ornith-1.0-35b-q4_k_m"
   ],

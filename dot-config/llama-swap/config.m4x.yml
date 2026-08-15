@@ -1,4 +1,5 @@
-healthCheckTimeout: 300
+# Qwen3.8's -hf load also fetches a 928 MB vision projector on first use.
+healthCheckTimeout: 900
 startPort: 10002
 
 # Every model pins `proxy` to 127.0.0.1: llama.cpp b9730 (2026-06-20) binds
@@ -61,6 +62,31 @@ models:
         --gpu-layers all
         --reasoning-format deepseek
         --chat-template-kwargs '{"preserve_thinking":true}'
+    proxy: http://127.0.0.1:${PORT}
+    ttl: 0
+    concurrencyLimit: 1
+
+  # Fork of qwen3.6-27b-q6_k_xl with Qwen3.8 weights for A/B.
+  # Sampling defaults match Unsloth's Qwen3.8 thinking-mode recommendations.
+  qwen3.8-27b-q6_k_xl:
+    cmd: |
+      llama-server
+        -hf unsloth/Qwen3.8-27B-GGUF:UD-Q6_K_XL
+        --port ${PORT}
+        --parallel 1
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --ctx-size 262144
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+        --temp 1.0
+        --top-p 0.95
+        --top-k 20
+        --min-p 0.0
+        --presence-penalty 0.0
+        --repeat-penalty 1.0
     proxy: http://127.0.0.1:${PORT}
     ttl: 0
     concurrencyLimit: 1

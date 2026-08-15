@@ -74,6 +74,16 @@
             "output": 262144
           }
         },
+        "qwen3.8-27b-q6_k_xl": {
+          "name": "Qwen 3.8 27B (Q6_K_XL)",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": {
+            "context": 262144,
+            "input": 262144,
+            "output": 262144
+          }
+        },
         "gemma4-31b-q4_k_m": {
           "name": "Gemma 4 31B (Q4_K_M)",
           "reasoning": true,
