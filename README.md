@@ -127,15 +127,13 @@ The `update.ts` extension adds `/update` for Pi itself and `/update-extensions` 
 
 The `π` wrapper in `zsh/60-ai.zsh` launches Pi with `PI_TASKS=off`, keeping `pi-tasks` records in memory. `@tintinweb/pi-subagents` uses in-memory subagent sessions by default; `dot-pi/agent/subagents.json` also disables output transcripts and scheduled jobs so it does not write run records to disk.
 
-Third-party packages are declared in `dot-pi/agent/settings.json`: `@tintinweb/pi-subagents`, `pi-web-access`, `pi-add-dir`, `@tintinweb/pi-tasks`, `pi-btw`, `@diegopetrucci/pi-openai-fast`, and `@plannotator/pi-extension@0.27.3`.
+Third-party packages are declared in `dot-pi/agent/settings.json`: `@tintinweb/pi-subagents`, `pi-web-access`, `pi-add-dir`, `@tintinweb/pi-tasks`, `pi-btw`, and `@diegopetrucci/pi-openai-fast`.
 
 ## Plannotator
 
 Install Plannotator CLI 0.27.3 separately before using these files. Check the installed version with `plannotator --version`.
 
-Claude Code and shared agents load the three Plannotator skills from `dot-claude/skills/`. Pi loads the pinned extension from `dot-pi/agent/settings.json`. On `echo`, `local/echo/codex/hooks.json` enables Codex plan review through the Plannotator Stop hook. `dot-plannotator/config.json` keeps web page annotation direct, disables external share links, and tells agents to implement validated review feedback without waiting for another confirmation.
-
-The Pi extension also provides its own plan mode. This setup does not use it. Do not start Pi with `--plan`, toggle `/plannotator`, or call `plannotator_submit_plan`.
+Claude Code and shared agents load the three Plannotator skills from `dot-claude/skills/`. `dot-plannotator/config.json` keeps web page annotation direct, disables external share links, and tells agents to implement validated review feedback without waiting for another confirmation.
 
 Use `claude-tailnet` or `pi-tailnet` when an iPhone on the Tailnet needs access. These launchers bind Plannotator to ports 19432 through 19463 on all network interfaces. Remote mode has no HTTP login. `claude-tailnet` also skips Claude Code permission prompts, matching the normal `c` command. Use it only on trusted networks, keep the host firewall on, and limit Tailnet access with ACLs.
 

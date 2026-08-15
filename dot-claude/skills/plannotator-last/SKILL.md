@@ -1,7 +1,6 @@
 ---
 name: plannotator-last
 description: Open Plannotator on the latest rendered assistant message and use the returned annotations to revise that message or continue.
-disable-model-invocation: true
 ---
 
 # Plannotator Last
@@ -9,20 +8,28 @@ disable-model-invocation: true
 Use this skill when the user wants to annotate the latest assistant response in Plannotator.
 
 Do not send a commentary/status message before running the command. The command
-targets the latest rendered assistant response, so a preamble can mistakenly become the
-thing being annotated.
+targets the latest rendered assistant response, so a preamble can mistakenly
+become the thing being annotated.
 
-Run:
+Create a unique empty temporary directory and use it as the terminal `workdir`.
+Never run from `$HOME`. On `echo`, launch through `webctl`, using a stable
+unique slug and the current Discord message URL:
 
 ```bash
-plannotator last
+webctl preview \
+  --slug <stable-unique-slug> \
+  --discord-url <origin-message-url> \
+  --title <human-readable-title> \
+  --project <project-name> \
+  -- plannotator last
 ```
 
-Behavior:
+On other hosts, run `plannotator last` directly.
 
-1. Launch the command with Bash.
-2. Wait for the annotation session to finish.
-3. If feedback is returned, incorporate it into the follow-up response.
-4. If the session closes without feedback, mention that briefly and continue.
+On `echo`, run the launcher as a tracked background process and share the HTTPS
+URL that `webctl` prints. Wait for Plannotator to finish. Remove the temporary
+directory when it exits. Incorporate returned feedback immediately. Carry
+approval notes into later work without redoing the approved response solely
+because of them.
 
-Run the command yourself rather than telling the user to invoke shell syntax manually.
+Run the command yourself.
