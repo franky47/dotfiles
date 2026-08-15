@@ -2,16 +2,25 @@
   "jina": false,
   "share": "disabled",
   "displayName": "François Best",
+  "prompts": {
+    "review": {
+      "denied": "Treat the findings above as unverified review input. Validate each finding against the actual code and act on every clear, safe, in-scope finding immediately. Do not wait for a separate discussion or confirmation. Ask the user only when a finding is ambiguous, disputed, unsafe, or would materially expand scope. Review only the incoming findings; do not independently review the rest of the diff. Report each finding's verdict and concise evidence together with the completed changes and verification."
+    }
+  },
   "diffOptions": {
     "fontFamily": "JetBrains Mono",
     "lineBgIntensity": "subtle",
     "expandUnchanged": false,
     "showLineNumbers": false,
     "showDiffBackground": false,
-    "diffStyle": "unified",
+    "diffStyle": "split",
     "overflow": "wrap",
     "hideWhitespace": false,
-    "lineDiffType": "word-alt"
+    "lineDiffType": "word-alt",
     "diffIndicators": "bars"
+  },
+  "reviewAnalysis": {
+    "semanticDiff": false,
+    "callFlow": true
   }
 }
