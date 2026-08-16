@@ -30,7 +30,8 @@ brew "fresh-editor"                 # text editor & IDE - https://getfresh.dev/
 # Git
 brew "lazygit"
 brew "modem-dev/tap/hunk"           # terminal diff viewer — lazygit pager, git dlog/dshow, zsh alias d="hunk diff"
-brew "sem-cli"                       # semantic (entity-level) diffs — lazygit quick-check pager via sem-pager
+brew "sem-cli"                      # semantic (entity-level) diffs — lazygit quick-check pager via sem-pager
+brew "worktrunk"                    # worktree management - https://worktrunk.dev/ - https://github.com/max-sixty/worktrunk
 
 # GitHub Actions
 brew "pinact"                       # pin actions to commit SHAs
