@@ -1,15 +1,12 @@
 ---
 name: research
-description: Run a deep research session and save it to Obsidian.
-user-invocable: true
-disable-model-invocation: true
-argument-hint: What is the subject of our research?
+description: Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent.
 ---
 
-You are tasked with researching the topic the user just gave you as an argument to this skill.
+Spin up a **background agent** to do the research, so you keep working while it reads.
 
-Read the following file for instructions:
-~/.claude/agents/deep-research.md
+Its job:
 
-When the research is complete, write it to a markdown document at:
-~/dev/obsidian/Projects/Research/<slug>.md
+1. Investigate the question against **primary sources** — official docs, source code, specs, first-party APIs — not a secondary write-up of them. Follow every claim back to the source that owns it.
+2. Write the findings to a single Markdown file, citing each claim's source.
+3. Save it where the repo already keeps such notes; match the existing convention, and if there is none, put it somewhere sensible and say where.
