@@ -10,7 +10,8 @@
     "llama-swap/qwen3.6-27b-q6_k_xl",
     "llama-swap/qwen3.8-27b-q6_k_xl",
     "llama-swap/qwen3.6-35b-a3b-q4_k_m",
-    "llama-swap/ornith-1.0-35b-q4_k_m"
+    "llama-swap/ornith-1.0-35b-q4_k_m",
+    "llama-swap/ornith-1.5-35b-q4_k_m"
   ],
   "theme": "dark",
   "packages": [

@@ -43,6 +43,17 @@ const MODELS: LocalModel[] = [
     maxTokens: 262144,
   },
   {
+    id: 'ornith-1.5-35b-q4_k_m',
+    name: 'Ornith 1.5 35B (Q4_K_M)',
+    contextWindow: 262144,
+    maxTokens: 262144,
+    samplingParams: {
+      temperature: 0.6,
+      top_p: 0.95,
+      top_k: 20,
+    },
+  },
+  {
     id: 'qwen3.6-27b-q4_k_xl',
     name: 'Qwen 3.6 27B (Q4_K_XL)',
     contextWindow: 262144,

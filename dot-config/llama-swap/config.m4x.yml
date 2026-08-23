@@ -113,6 +113,30 @@ models:
     ttl: 0
     concurrencyLimit: 2
 
+  ornith-1.5-35b-q4_k_m:
+    # Qwen3.5-MoE arch (256 experts, 8 active), reasoning model emitting <think> blocks.
+    # Native ctx 262144: --parallel 4 over 1048576 gives each agent the full 256k.
+    cmd: |
+      llama-server
+        -hf ornith-ai/Ornith-1.5-35B-A3B-GGUF:Q4_K_M
+        --port ${PORT}
+        --parallel 4
+        --cont-batching
+        --cache-reuse 256
+        --flash-attn on
+        --cache-type-k q4_0
+        --cache-type-v q4_0
+        --ctx-size 1048576
+        --gpu-layers all
+        --reasoning-format deepseek
+        --chat-template-kwargs '{"preserve_thinking":true}'
+        --temp 0.6
+        --top-p 0.95
+        --top-k 20
+    proxy: http://127.0.0.1:${PORT}
+    ttl: 0
+    concurrencyLimit: 4
+
   gemma4-31b-q4_k_m:
     # Gemma 4 on Metal: flash-attn must be OFF (mixed SWA layout breaks Metal FA);
     # KV-cache quant requires FA so it cannot be used here. Sampling per Google docs.
