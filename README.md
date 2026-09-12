@@ -121,6 +121,8 @@ Re-run `install.sh` after any changes. Stow's `--restow` handles re-runs cleanly
 
 User-level Pi extensions are stored in `dot-pi/agent/extensions/`. The `statusline.ts` extension shows the session ID, repository state, context usage, edit line counts, token and cost totals, and the active model's reasoning level while preserving statuses from other extensions. Optional rows are omitted when empty.
 
+The `inline-skills/` extension lets an idle TUI prompt refer to skills naturally, such as `let's work on this with /tdd`. It keeps the prompt unchanged and adds changed skill bodies as separate user-authority context. Typing an eligible `/` opens skill completion. Prompt-start commands remain under Pi's normal handling; streaming queue parity is deferred until Pi exposes message identity to extensions.
+
 The `private-session/` extension adds user-only `/private` and `/delete-session` commands. `/private` stops future local transcript persistence without removing existing history; `/delete-session` first makes the process private, then explicitly removes the current transcript (trash first, unlink fallback). A persistent 🕵️ footer indicator marks non-persisted sessions, including Pi's built-in ephemeral mode.
 
 The `update.ts` extension adds `/update` for Pi itself and `/update-extensions` for installed Pi packages. Each command reloads Pi's configuration after an update.
