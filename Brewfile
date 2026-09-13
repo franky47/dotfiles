@@ -5,7 +5,6 @@
 # pass `--upgrade` explicitly to refresh existing formulae.
 
 tap "anomalyco/tap"
-tap "modem-dev/tap"
 tap "mostlygeek/llama-swap"
 
 # Core
@@ -29,7 +28,9 @@ brew "fresh-editor"                 # text editor & IDE - https://getfresh.dev/
 
 # Git
 brew "lazygit"
-brew "modem-dev/tap/hunk"           # terminal diff viewer — lazygit pager, git dlog/dshow, zsh alias d="hunk diff"
+# One-time migration from the old tap:
+# brew uninstall modem-dev/tap/hunk && brew untap modem-dev/tap && brew install hunk
+brew "hunk"                         # terminal diff viewer — lazygit pager, git dlog/dshow, zsh alias d="hunk diff"
 brew "sem-cli"                      # semantic (entity-level) diffs — lazygit quick-check pager via sem-pager
 brew "worktrunk"                    # worktree management - https://worktrunk.dev/ - https://github.com/max-sixty/worktrunk
 

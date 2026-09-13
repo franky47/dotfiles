@@ -46,9 +46,13 @@ check_prereqs() {
   # Optional — dotfiles install fine but the configs won't be useful without these
   local warn=0
 
-  if ! command -v hunk &>/dev/null; then
+  if command -v brew &>/dev/null && brew list --formula modem-dev/tap/hunk &>/dev/null; then
+    echo "${YELLOW}WARN:${RESET} hunk uses the old modem-dev tap."
+    echo "  brew uninstall modem-dev/tap/hunk && brew untap modem-dev/tap && brew install hunk"
+    warn=1
+  elif ! command -v hunk &>/dev/null; then
     echo "${YELLOW}WARN:${RESET} hunk not found — git diff will fall back to built-in diff."
-    echo "  brew install modem-dev/tap/hunk"
+    echo "  brew install hunk"
     warn=1
   fi
 
