@@ -93,7 +93,7 @@ const prepared = (body: string, hash: string): PreparedSkill => ({
   hash,
 })
 
-test("commits a body hash only after its matching custom message starts", () => {
+test("records a body hash only after its matching custom message starts", () => {
   const state = new InlineSkillState()
   state.prepare([prepared("first", "hash-1")])
 
@@ -107,12 +107,12 @@ test("commits a body hash only after its matching custom message starts", () => 
     },
   ])
 
-  state.commit({ customType: SKILL_CONTEXT_TYPE, details: { batchId: "wrong" } })
+  state.recordIngested({ customType: SKILL_CONTEXT_TYPE, details: { batchId: "wrong" } })
   state.prepare([prepared("first", "hash-1")])
-  assert.ok(state.takeContextMessage(), "a mismatched message must not commit")
+  assert.ok(state.takeContextMessage(), "a mismatched message must not record")
 
   const matching = state.pendingBatchId()
-  state.commit({
+  state.recordIngested({
     customType: SKILL_CONTEXT_TYPE,
     details: { batchId: matching },
   })
@@ -130,7 +130,7 @@ test("compaction invalidates hashes but keeps the current preparation", () => {
   const state = new InlineSkillState()
   state.prepare([prepared("first", "hash-1")])
   const first = state.takeContextMessage()!
-  state.commit({ customType: first.customType, details: first.details })
+  state.recordIngested({ customType: first.customType, details: first.details })
 
   state.prepare([prepared("first", "hash-1")])
   state.compact()

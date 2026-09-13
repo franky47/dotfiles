@@ -160,7 +160,7 @@ export default function inlineSkills(pi: ExtensionAPI): void {
   })
 
   pi.on("message_start", async (event) => {
-    state.commit(event.message)
+    state.recordIngested(event.message)
   })
 
   pi.on("session_compact", async () => {

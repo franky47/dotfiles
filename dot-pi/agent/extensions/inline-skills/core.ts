@@ -13,6 +13,17 @@ function isLeftBoundary(character: string): boolean {
   return ASCII_WHITESPACE.test(character) || LEFT_BOUNDARIES.includes(character)
 }
 
+function hasRightBoundary(line: string, end: number): boolean {
+  let boundary = end
+  while (
+    boundary < line.length &&
+    TRAILING_PUNCTUATION.includes(line[boundary]!)
+  ) {
+    boundary += 1
+  }
+  return boundary === line.length || ASCII_WHITESPACE.test(line[boundary]!)
+}
+
 export type SkillDefinition = {
   name: string
   path: string
@@ -178,7 +189,7 @@ export class InlineSkillState {
     return this.pendingCommit?.batchId
   }
 
-  commit(message: StartedMessage): void {
+  recordIngested(message: StartedMessage): void {
     if (
       message.customType !== SKILL_CONTEXT_TYPE ||
       !message.details ||
@@ -238,17 +249,6 @@ export type AutocompleteProvider = {
     cursorLine: number,
     cursorCol: number,
   ): boolean
-}
-
-function hasRightBoundary(line: string, end: number): boolean {
-  let boundary = end
-  while (
-    boundary < line.length &&
-    TRAILING_PUNCTUATION.includes(line[boundary]!)
-  ) {
-    boundary += 1
-  }
-  return boundary === line.length || ASCII_WHITESPACE.test(line[boundary]!)
 }
 
 type CompletionCandidate = {
