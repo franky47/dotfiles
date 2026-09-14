@@ -1,9 +1,9 @@
 ---
 name: html
-description: Render a document, a diagram, or a report as HTML for human visualisation.
+description: Render a standalone HTML file when the user explicitly asks for a durable file outside Sideshow.
 ---
 
-Generate a self-contained HTML document summarising what the user asked for in this session.
+Generate a self-contained HTML document summarising what the user asked for in this session. If the user asks for Sideshow or a live visual surface, load and use the `sideshow` skill instead; it owns publication, rendering, and comments.
 
 ## Contents
 

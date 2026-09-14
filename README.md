@@ -12,8 +12,9 @@ Original sources attributed, but skills have been adapted for my usage.
 | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------- |
 | [`audit-github-actions`](dot-claude/skills/audit-github-actions/)                   | Audit GitHub Actions for supply-chain / CI-CD vulns (Shai-Hulud-class worms, expression injection, token exfil) | ✏️                              |
 | [`prose`](dot-claude/skills/prose/SKILL.md)                                         | Write human-readable prose: PRs, docs, emails, memos                                                            | ✏️                              |
-| [`html`](dot-claude/skills/html/SKILL.md)                                           | Render a document, diagram, or report as HTML for humans                                                        | ✏️                              |
+| [`html`](dot-claude/skills/html/SKILL.md)                                           | Render a document, diagram, or report as standalone HTML for humans                                             | ✏️                              |
 | [`show-me`](dot-claude/skills/show-me/SKILL.md)                                     | Understand things visually rather than a wall of text                                                           | Dex Horthy                      |
+| [`sideshow`](dot-claude/skills/sideshow/SKILL.md)                                   | Publish live visual cards, verify rendering, and handle comments                                                | modem-dev/sideshow v0.13.0      |
 | [`issue`](dot-claude/skills/issue/SKILL.md)                                         | Research and word a good GitHub issue (never posts it)                                                          | ✏️                              |
 | [`github-stars-lists`](dot-claude/skills/github-stars-lists/SKILL.md)               | Scrape repos from your GitHub Stars lists (no API for them)                                                     | ✏️                              |
 | [`research`](dot-claude/skills/research/SKILL.md)                                   | Research a question from primary sources and save cited findings in the repo                                    | Matt Pocock                     |
@@ -114,6 +115,7 @@ The install script:
 1. Runs `stow --dotfiles --restow` to symlink `.zshrc`, `.zshenv`, and `dot-claude/` contents into `~`
 2. Mirrors shared skills into `~/.agents/skills/`
 3. Symlinks machine-local skills into `~/.claude/skills/` and `~/.agents/skills/`
+4. Installs the pinned Sideshow CLI under `~/.local/share/` and links it into the shared `~/.local/bin/` path
 
 Re-run `install.sh` after any changes. Stow's `--restow` handles re-runs cleanly.
 
@@ -132,6 +134,16 @@ The `update.ts` extension adds `/update` for Pi itself and `/update-extensions` 
 The `π` wrapper in `zsh/60-ai.zsh` launches Pi with `PI_TASKS=off`, keeping `pi-tasks` records in memory. `@tintinweb/pi-subagents` uses in-memory subagent sessions by default; `dot-pi/agent/subagents.json` also disables output transcripts and scheduled jobs so it does not write run records to disk.
 
 Third-party packages are declared in `dot-pi/agent/settings.json`: `@tintinweb/pi-subagents`, `pi-web-access`, `pi-add-dir`, `@tintinweb/pi-tasks`, `pi-btw`, and `@diegopetrucci/pi-openai-fast`.
+
+## Sideshow
+
+`install.sh` installs the pinned Sideshow CLI in `~/.local/share/sideshow-cli` and links it to `~/.local/bin/sideshow` on both `echo` and `m4x`. The shared `sideshow` skill uses that bare command as an HTTPS client for the Tailnet workspace:
+
+```text
+https://sideshow.echo.47ng.com/
+```
+
+Tailnet membership is the access boundary, so this Sideshow deployment intentionally uses no bearer token. Agents set `SIDESHOW_URL` to the complete URL above, identify themselves with `SIDESHOW_AGENT`, and clear any stale `SIDESHOW_TOKEN`; they do not use host-specific paths or run the CLI in the server container.
 
 ## Plannotator
 

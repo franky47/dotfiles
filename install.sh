@@ -138,6 +138,42 @@ ensure_sfw() {
 
 ensure_sfw
 
+# Install the pinned Sideshow HTTPS client for shared agent skills. Keep it in
+# ~/.local so this works on both Intel and Apple Silicon without a global npm
+# prefix or a Homebrew-specific path.
+ensure_sideshow() {
+  local version="0.13.0"
+  local prefix="${HOME}/.local/share/sideshow-cli"
+  local cli="${prefix}/node_modules/.bin/sideshow"
+  local target="${HOME}/.local/bin/sideshow"
+
+  if [[ -x "${cli}" && "$("${cli}" --version 2>/dev/null)" == "sideshow ${version}" ]]; then
+    mkdir -p "${HOME}/.local/bin"
+    if [[ -e "${target}" && ! -L "${target}" ]]; then
+      echo "${YELLOW}WARN:${RESET} ${target} is not a symlink; leaving the existing file unchanged." >&2
+      return
+    fi
+    ln -sfn "${cli}" "${target}"
+    return
+  fi
+
+  if ! command -v npm &>/dev/null; then
+    echo "${YELLOW}WARN:${RESET} Sideshow ${version} is not installed and npm is unavailable." >&2
+    return
+  fi
+
+  echo "Installing Sideshow CLI ${version}..."
+  mkdir -p "${prefix}" "${HOME}/.local/bin"
+  npm install --prefix "${prefix}" "sideshow@${version}"
+  if [[ -e "${target}" && ! -L "${target}" ]]; then
+    echo "${YELLOW}WARN:${RESET} ${target} is not a symlink; the pinned CLI was installed but not linked." >&2
+    return
+  fi
+  ln -sfn "${cli}" "${target}"
+}
+
+ensure_sideshow
+
 # Ensure target dirs exist so stow unfolds (per-file symlinks) instead of folding (one dir symlink)
 mkdir -p ~/.claude/{skills,agents,hooks} ~/.agents/skills ~/Library/Application\ Support/lazygit ~/.pi/agent/extensions ~/.plannotator
 
