@@ -10,6 +10,16 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const readJson = (path: string) => JSON.parse(readFileSync(resolve(repoRoot, path), 'utf8'))
 
 describe('Pi package configuration', () => {
+  it('lets Ghostty paste text before forwarding image-only Cmd+V', () => {
+    const config = readFileSync(resolve(repoRoot, 'dot-config/ghostty/config'), 'utf8')
+    const pasteBindings = config.split('\n').filter((line) =>
+      /^keybind\s*=\s*(?:[a-z]+:)*super\+v=/.test(line),
+    )
+    assert.deepEqual(pasteBindings, [
+      'keybind = performable:super+v=paste_from_clipboard',
+    ])
+  })
+
   it('uses @tintinweb/pi-subagents without durable run records', () => {
     const settings = readJson('dot-pi/agent/settings.json')
     const subagents = readJson('dot-pi/agent/subagents.json')

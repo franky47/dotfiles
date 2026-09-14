@@ -24,3 +24,5 @@ selection-foreground = #fafafa
 # Quick word deletion with alt+backspace
 # From https://pi.dev/docs/latest/terminal-setup
 keybind = alt+backspace=text:\x1b\x7f
+# Keep text paste; forward image-only Cmd+V to Pi's clipboard handler.
+keybind = performable:super+v=paste_from_clipboard

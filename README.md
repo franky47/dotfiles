@@ -125,6 +125,20 @@ The `inline-skills/` extension lets an idle TUI prompt refer to skills naturally
 
 It builds on ideas from [`@tifan/pi-inline-skills`](https://github.com/tifandotme/pi-extensions/tree/main/packages/pi-inline-skills), with stricter parsing, body-change tracking, and compaction handling.
 
+### Image paste on macOS
+
+Cmd+V keeps normal text and file-path paste. For an image-only clipboard:
+
+- Ghostty's `performable:super+v` binding forwards Cmd+V to Pi when it cannot paste text. `dot-pi/agent/keybindings.json` binds it to Pi's clipboard action and keeps Ctrl+V available.
+- VS Code sends an empty bracketed paste. The `inline-skills` editor passes that event to Pi's clipboard handler. No VS Code key mapping is needed.
+- cmux saves the image and pastes its file path as usual.
+
+Pi saves clipboard images to temporary files and inserts their paths. If the terminal finds text or a file path on the clipboard, it pastes that instead, even if an image is also present. The empty-paste fallback needs the `inline-skills` editor; it does not run if another extension owns the editor. These handlers read the clipboard on the machine running Pi, not a remote client's clipboard.
+
+After installing the config, reload Ghostty's configuration and run `/reload` in Pi. Check image-only, plain-text, and multiline-text paste in Pi, and text paste at a shell prompt. Automatic inline `/` completion stays enabled.
+
+### Other extensions
+
 The `private-session/` extension adds user-only `/private` and `/delete-session` commands. `/private` stops future local transcript persistence without removing existing history; `/delete-session` first makes the process private, then explicitly removes the current transcript (trash first, unlink fallback). A persistent 🕵️ footer indicator marks non-persisted sessions, including Pi's built-in ephemeral mode.
 
 The `update.ts` extension adds `/update` for Pi itself and `/update-extensions` for installed Pi packages. Each command reloads Pi's configuration after an update.

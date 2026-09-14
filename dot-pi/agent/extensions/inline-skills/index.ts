@@ -36,6 +36,11 @@ export default function inlineSkills(pi: ExtensionAPI): void {
 
   class InlineSkillEditor extends CustomEditor {
     override handleInput(data: string): void {
+      if (data === "\x1b[200~\x1b[201~") {
+        this.onPasteImage?.()
+        return
+      }
+
       const typedSlash = data === "/" || decodeKittyPrintable(data) === "/"
       if (!typedSlash) {
         super.handleInput(data)
@@ -91,7 +96,7 @@ export default function inlineSkills(pi: ExtensionAPI): void {
       if (!conflictNotified) {
         conflictNotified = true
         ctx.ui.notify(
-          "inline-skills: another custom editor is active; automatic completion is disabled",
+          "inline-skills: another custom editor is active; inline completion and image-paste fallback are disabled",
           "warning",
         )
       }
