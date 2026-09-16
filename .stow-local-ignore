@@ -13,6 +13,7 @@
 ^templates
 ^.github
 ^tests$
+^hermes$
 ^dot-pi/agent/auth\.json$
 ^dot-pi/agent/sessions$
 ^\.pi/agent/tests$

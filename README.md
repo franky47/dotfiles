@@ -41,6 +41,12 @@ Original sources attributed, but skills have been adapted for my usage.
 | [`write-a-prd`](dot-claude/skills/write-a-prd/SKILL.md)                             | Create a PRD via interview, codebase exploration, module design                                                 | Matt Pocock                     |
 | [`write-a-skill`](dot-claude/skills/write-a-skill/SKILL.md)                         | Author new skills with progressive disclosure and bundled resources                                             | Matt Pocock                     |
 
+## Hermes plugins
+
+Shared Hermes plugins live in `hermes/plugins/`. When `~/.hermes` already exists, `install.sh` links and enables them for the default profile and every existing named profile. Existing plugin directories are preserved beside the new symlink. Re-run the installer after creating a profile, then restart the Hermes gateway.
+
+- `thread-done`: adds `/done` to Discord threads.
+
 ## Conventions
 
 1. **Shared vs local**: Top-level directories hold configs shared across all machines. `local/<machine>/` mirrors the same structure for machine-specific overrides.

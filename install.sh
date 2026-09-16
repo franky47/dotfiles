@@ -188,6 +188,62 @@ for d in "${DOTFILES}/dot-claude/skills/"*/; do
 done
 echo "Mirrored shared skills to ~/.agents/skills/"
 
+# Share Hermes plugins across the default home and every existing profile.
+# Keep this guarded: installing unrelated dotfiles must not create ~/.hermes.
+if [[ -d "${HOME}/.hermes" ]]; then
+  if ! command -v hermes &>/dev/null; then
+    echo "ERROR: ~/.hermes exists but the hermes command is unavailable." >&2
+    exit 1
+  fi
+
+  for plugin in "${DOTFILES}/hermes/plugins/"*/; do
+    [[ -d "$plugin" ]] || continue
+    plugin="${plugin%/}"
+    plugin_name="$(basename "$plugin")"
+
+    link_hermes_plugin() {
+      local profile_home="$1" profile_name="$2"
+      local target="${profile_home}/plugins/${plugin_name}"
+      local backup=""
+      mkdir -p "${profile_home}/plugins"
+
+      if [[ -e "$target" && ! -L "$target" && ! -d "$target" ]]; then
+        echo "ERROR: refusing to replace non-directory plugin target $target." >&2
+        return 1
+      fi
+      if [[ -d "$target" && ! -L "$target" ]]; then
+        backup="${target}.pre-dotfiles.$(date +%s).$$"
+        mv "$target" "$backup"
+        echo "Preserved existing plugin at $backup"
+      fi
+
+      if ! ln -sfn "$plugin" "$target"; then
+        [[ -n "$backup" ]] && mv "$backup" "$target"
+        return 1
+      fi
+      if [[ ! -L "$target" || "$(readlink "$target")" != "$plugin" ]]; then
+        echo "ERROR: failed to link ${plugin_name} for profile ${profile_name}." >&2
+        rm -f "$target"
+        [[ -n "$backup" ]] && mv "$backup" "$target"
+        return 1
+      fi
+
+      hermes -p "$profile_name" plugins enable "$plugin_name" --no-allow-tool-override </dev/null
+      if [[ "$plugin_name" == "thread-done" ]]; then
+        hermes -p "$profile_name" config set plugins.entries.thread-done.allow_platform_actions true
+      fi
+      echo "Linked shared Hermes plugin: ${plugin_name} (${profile_name})"
+    }
+
+    link_hermes_plugin "${HOME}/.hermes" default
+    for profile_home in "${HOME}/.hermes/profiles/"*/; do
+      [[ -d "$profile_home" ]] || continue
+      link_hermes_plugin "$profile_home" "$(basename "$profile_home")"
+    done
+    unset -f link_hermes_plugin
+  done
+fi
+
 # Wire hunk's bundled review skill into both skill dirs. `hunk skill path`
 # returns a versioned Cellar path (stale on upgrade), so rebase it onto
 # `brew --prefix hunk` — a stable symlink brew re-points to the current version

@@ -1,0 +1,9 @@
+name: thread-done
+version: 1.0.3
+description: Deterministically mark idle native Discord work threads complete
+provides_hooks:
+  - pre_gateway_dispatch
+  - pre_command
+  - gateway_platform_event
+capabilities:
+  - gateway.platform_actions
