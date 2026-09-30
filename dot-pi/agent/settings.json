@@ -11,6 +11,7 @@
     "llama-swap/ornith-1.5-35b-q4_k_m",
     "llama-swap/qwen3.8-27b-q6_k_xl"
   ],
+  "defaultTools": ["+codemode"],
   "theme": "dark",
   "packages": [
     "npm:@tintinweb/pi-subagents",
