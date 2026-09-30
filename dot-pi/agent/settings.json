@@ -1,18 +1,15 @@
 {
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "0.99.1",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6-astra",
   "hideThinkingBlock": false,
   "defaultThinkingLevel": "high",
   "enabledModels": [
-    "openai-codex/gpt-5.6-sol",
-    "openai-codex/gpt-5.6-luna",
-    "llama-swap/qwen3.6-27b-q6_k_xl",
-    "llama-swap/qwen3.8-27b-q6_k_xl",
-    "llama-swap/qwen3.6-35b-a3b-q4_k_m",
-    "llama-swap/ornith-1.0-35b-q4_k_m",
+    "openai-codex/gpt-6-astra",
+    "openai-codex/gpt-6.1-sol",
+    "xai/grok-4.6",
     "llama-swap/ornith-1.5-35b-q4_k_m",
-    "openai-codex/gpt-6-astra"
+    "llama-swap/qwen3.8-27b-q6_k_xl"
   ],
   "theme": "dark",
   "packages": [
