@@ -1,7 +1,8 @@
 ---
 name: unslop
 description: Cut AI tells from any writing. Must always apply.
-author: Lauren Tan (@poteto)
+metadata:
+  author: Lauren Tan (@poteto)
 ---
 
 # Unslop
