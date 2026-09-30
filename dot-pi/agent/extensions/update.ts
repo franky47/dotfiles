@@ -2,85 +2,46 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
   pi.registerCommand("update", {
-    description: "Update pi and reload configuration",
+    description: "Update Pi and installed extensions, then reload configuration",
     handler: async (_args, ctx) => {
-      ctx.ui.notify("Updating pi...", "info");
-
-      try {
-        const beforeResult = await pi.exec("pi", ["--version"], { timeout: 5_000 });
-        const before = beforeResult.stdout.trim() || beforeResult.stderr.trim() || "unknown";
-
-        const result = await pi.exec("pi", ["update", "--self"], { timeout: 120_000 });
-
-        // "already up to date" is a success state, not an error
-        const combinedOutput = (result.stdout + "\n" + result.stderr).trim();
-        const isUpToDate = /already up to date/i.test(combinedOutput);
-
-        if (result.code !== 0 && !isUpToDate) {
-          const err = result.stderr.trim() || result.stdout.trim() || "Unknown error";
-          ctx.ui.notify(`pi update failed: ${err}`, "error");
-          return;
-        }
-
-        if (isUpToDate) {
-          ctx.ui.notify("pi is already up to date.", "info");
-          return;
-        }
-
-        const afterResult = await pi.exec("pi", ["--version"], { timeout: 5_000 });
-        const after = afterResult.stdout.trim() || afterResult.stderr.trim() || "unknown";
-        const versionMsg = before !== after && before !== "unknown" && after !== "unknown"
-          ? `pi updated: ${before} → ${after}`
-          : "pi updated successfully.";
-
-        // Reload configuration only when there was an actual update
-        ctx.ui.notify("Reloading configuration...", "info");
-        await ctx.reload();
-
-        // Print after reload so the message isn't wiped by the screen reset
-        ctx.ui.notify(versionMsg, "info");
-      } catch (error) {
-        ctx.ui.notify(`pi update failed: ${error instanceof Error ? error.message : String(error)}`, "error");
-      }
-      return;
-    },
-  });
-
-  pi.registerCommand("update-extensions", {
-    description: "Update installed pi extensions and reload configuration",
-    handler: async (_args, ctx) => {
-      ctx.ui.notify("Updating pi extensions...", "info");
+      ctx.ui.notify("Updating Pi and extensions...", "info");
 
       let result;
       try {
-        result = await pi.exec("pi", ["update", "--extensions"], { timeout: 120_000 });
+        result = await pi.exec("pi", ["update", "--all"], { timeout: 240_000 });
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        ctx.ui.notify(`pi extension update failed: ${message}`, "error");
+        ctx.ui.notify(`Pi update failed: ${message}`, "error");
         return;
       }
 
       if (result.killed) {
-        ctx.ui.notify("pi extension update timed out.", "error");
+        ctx.ui.notify("Pi update timed out. Some updates may have completed. Run /update again.", "error");
         return;
       }
 
       if (result.code !== 0) {
         const error = result.stderr.trim() || result.stdout.trim() || "Unknown error";
-        ctx.ui.notify(`pi extension update failed: ${error}`, "error");
+        ctx.ui.notify(
+          `Pi update failed: ${error}. Some updates may have completed. Resolve the error, then run /update again.`,
+          "error",
+        );
         return;
       }
 
-      ctx.ui.notify("Pi extensions updated successfully.", "info");
-      ctx.ui.notify("Reloading configuration...", "info");
-
+      ctx.ui.notify(
+        "Pi and extensions are up to date. Restart Pi to use a new Pi version. Reloading configuration...",
+        "info",
+      );
       try {
         await ctx.reload();
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        ctx.ui.notify(`pi configuration reload failed: ${message}`, "error");
+        throw new Error(
+          `Pi and extensions are up to date, but configuration reload failed: ${message}. Restart Pi.`,
+          { cause: error },
+        );
       }
-      return;
     },
   });
 }
