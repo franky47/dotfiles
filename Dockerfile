@@ -43,6 +43,7 @@ RUN bash -o pipefail -c '/home/testuser/dotfiles/install.sh 2>&1 | tee /tmp/inst
 RUN echo "=== Pi runtime directories ===" \
     && ! test -e ~/.pi/tasks && echo "OK: ~/.pi/tasks not stowed" \
     && ! test -e ~/.pi-subagents && echo "OK: ~/.pi-subagents not stowed" \
+    && ! test -e ~/firefox && echo "OK: Firefox sources not stowed" \
     && test -f /home/testuser/dotfiles/.pi/tasks/tasks-test.json && echo "OK: project tasks preserved" \
     && test -f /home/testuser/dotfiles/.pi-subagents/artifacts/test.txt && echo "OK: project artifacts preserved"
 

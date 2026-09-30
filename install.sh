@@ -156,6 +156,19 @@ fi
 ln -sfn "${DOTFILES}/lazygit/config.yml" ~/Library/Application\ Support/lazygit/config.yml
 echo "Linked lazygit config"
 
+case "$(uname -s)" in
+  Darwin) FIREFOX_HOME="${HOME}/Library/Application Support/Firefox" ;;
+  Linux) FIREFOX_HOME="${HOME}/.mozilla/firefox" ;;
+  *) FIREFOX_HOME="" ;;
+esac
+if [[ -n "$FIREFOX_HOME" && -f "$FIREFOX_HOME/profiles.ini" ]]; then
+  if command -v uv &>/dev/null; then
+    uv run --no-project --python 3.13 "${DOTFILES}/firefox/install.py" --firefox-home "$FIREFOX_HOME"
+  else
+    echo "${YELLOW}WARN:${RESET} Firefox styles skipped: install uv, then re-run install.sh." >&2
+  fi
+fi
+
 # OBS scene collections live under ~/.config/obs (stow-folded with the rest of
 # dot-config). OBS demands its scenes at basic/scenes, so re-point that dir at the
 # managed one. A whole-dir symlink (not per-file) survives OBS's atomic save —

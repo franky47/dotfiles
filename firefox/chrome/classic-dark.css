@@ -1,0 +1,65 @@
+@-moz-document url("chrome://browser/content/browser.xhtml") {
+  @media not (forced-colors) {
+    :root:not([privatebrowsingmode="temporary"]) {
+      color-scheme: dark !important;
+      --toolbar-color-scheme: dark !important;
+      --toolbox-background-color: #1c1b22 !important;
+      --toolbox-background-color-inactive: #1f1e25 !important;
+      --toolbox-background-gradient: none !important;
+      --toolbox-background-image: none !important;
+      --toolbox-text-color: #fbfbfe !important;
+      --toolbox-text-color-inactive: #fbfbfe !important;
+      --toolbar-background-color: #1c1b22 !important;
+      --toolbar-text-color: #fbfbfe !important;
+      --toolbar-field-background-color: rgba(0, 0, 0, 0.3) !important;
+      --toolbar-field-background-color-focus: #42414d !important;
+      --toolbar-field-text-color: #fbfbfe !important;
+      --toolbar-field-text-color-focus: #fbfbfe !important;
+      --toolbar-field-border-color: transparent !important;
+      --toolbar-field-border-color-focus: #00ddff !important;
+      --toolbarbutton-icon-fill: #fbfbfe !important;
+      --toolbarbutton-icon-fill-attention: #00ddff !important;
+      --toolbarbutton-background-color-hover: rgba(251, 251, 254, 0.17) !important;
+      --toolbarbutton-background-color-active: rgba(251, 251, 254, 0.3) !important;
+      --sidebar-background-color: #1c1b22 !important;
+      --sidebar-text-color: #f9f9fa !important;
+      --sidebar-border-color: rgba(251, 251, 254, 0.1) !important;
+      --tab-background-color: transparent !important;
+      --tab-background-color-hover: rgba(251, 251, 254, 0.11) !important;
+      --tab-background-color-selected: rgba(106, 106, 120, 0.7) !important;
+      --tab-text-color: #fbfbfe !important;
+      --tab-text-color-hover: #fbfbfe !important;
+      --tab-text-color-selected: #ffffff !important;
+      --tab-border-color-selected-leading: transparent !important;
+      --tab-border-color-selected-trailing: transparent !important;
+      --urlbar-box-background-color: #42414d !important;
+      --urlbar-box-background-color-hover: rgba(251, 251, 254, 0.22) !important;
+      --urlbar-box-background-color-active: rgba(251, 251, 254, 0.3) !important;
+      --urlbarview-background-color-hover: rgba(251, 251, 254, 0.1) !important;
+      --urlbarview-background-color-selected: #2b2a33 !important;
+      --urlbarview-text-color-selected: #fbfbfe !important;
+      --urlbarview-text-color-secondary: #bfbfc9 !important;
+      --urlbarview-text-color-action: #bfbfc9 !important;
+      --urlbarview-separator-color: #52525e !important;
+      --background-color-box: #2b2a33 !important;
+      --popup-background-color: #42414d !important;
+      --popup-color: #fbfbfe !important;
+      --popup-border-color: #52525e !important;
+      --panel-background-color: #42414d !important;
+      --panel-color: #fbfbfe !important;
+      --panel-border-color: #52525e !important;
+      --text-color: #fbfbfe !important;
+      --focus-outline-color: #00ddff !important;
+      --color-accent-primary: #00ddff !important;
+      --color-accent-primary-hover: #80ebff !important;
+      --color-accent-primary-active: #aaf2ff !important;
+      --button-text-color-primary: #2b2a33 !important;
+      --chrome-content-separator-color: rgba(251, 251, 254, 0.1) !important;
+
+      & #nav-bar,
+      & #PersonalToolbar {
+        background-color: #1c1b22 !important;
+      }
+    }
+  }
+}

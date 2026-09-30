@@ -1,0 +1,6 @@
+@-moz-document url("chrome://browser/content/browser.xhtml") {
+  #tabbrowser-tabs[orient="vertical"]:not([expanded])
+    .tab-close-button:not(:focus-visible) {
+    outline: 0 !important;
+  }
+}

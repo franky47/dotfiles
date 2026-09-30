@@ -47,6 +47,12 @@ Shared Hermes plugins live in `hermes/plugins/`. When `~/.hermes` already exists
 
 - `thread-done`: adds `/done` to Discord threads.
 
+## Firefox
+
+[Firefox styles](firefox/README.md) restore the flat dark colors and remove the close-button border in collapsed vertical tabs. `install.sh` uses `uv` to find existing `default-release` profiles on macOS and Linux, then links the CSS files from `firefox/chrome/`. It keeps other profile settings and backs up replaced files locally.
+
+Restart Firefox after installation or CSS edits. Run the installer again after creating a profile or moving this repo.
+
 ## Conventions
 
 1. **Shared vs local**: Top-level directories hold configs shared across all machines. `local/<machine>/` mirrors the same structure for machine-specific overrides.
@@ -67,6 +73,7 @@ local/<machine>/<tool>/         # Machine-specific overrides
 .stow-local-ignore              # Excludes internal dirs from stow
 .machine-name                   # Machine identifier (gitignored, per-clone)
 install.sh                      # Install script: stow + link
+firefox/                        # Firefox CSS, profile installer, and tests (not stowed)
 
 zsh/                            # Shared interactive shell modules
   00-environment.zsh            # PATH, EDITOR
@@ -121,6 +128,7 @@ The install script:
 1. Runs `stow --dotfiles --restow` to symlink `.zshrc`, `.zshenv`, and `dot-claude/` contents into `~`
 2. Mirrors shared skills into `~/.agents/skills/`
 3. Symlinks machine-local skills into `~/.claude/skills/` and `~/.agents/skills/`
+4. Links Firefox styles into existing `default-release` profiles when `uv` is available
 
 Re-run `install.sh` after any changes. Stow's `--restow` handles re-runs cleanly.
 
