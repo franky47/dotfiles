@@ -1,4 +1,9 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "env": {
     "ENABLE_EXPERIMENTAL_MCP_CLI": "true"
   },
