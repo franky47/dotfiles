@@ -1,5 +1,7 @@
 # FNM - https://github.com/Schniz/fnm
-eval "$(fnm env --shell zsh)"
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --shell zsh --use-on-cd --version-file-strategy recursive)"
+fi
 
 # fnm (above) prepends the active Node version's bin, which ships a bundled npm.
 # Keep our globally-installed npm/npx (~/.npm-packages) ahead of it so the npm
