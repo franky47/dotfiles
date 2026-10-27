@@ -70,6 +70,7 @@ local/<machine>/<tool>/         # Machine-specific overrides
 ```
 .zshrc                          # Loader: zsh/ then local/<machine>/zsh/
 .zshenv                         # Loader: zshenv/ then local/<machine>/zshenv/
+.zprofile                       # Login shell: Docker PATH, Homebrew, fnm
 .stow-local-ignore              # Excludes internal dirs from stow
 .machine-name                   # Machine identifier (gitignored, per-clone)
 install.sh                      # Install script: stow + link
@@ -125,7 +126,7 @@ echo "<machine>" > ~/dotfiles/.machine-name
 
 The install script:
 
-1. Runs `stow --dotfiles --restow` to symlink `.zshrc`, `.zshenv`, and `dot-claude/` contents into `~`
+1. Runs `stow --dotfiles --restow` to symlink `.zshrc`, `.zshenv`, `.zprofile`, and `dot-claude/` contents into `~`
 2. Mirrors shared skills into `~/.agents/skills/`
 3. Symlinks machine-local skills into `~/.claude/skills/` and `~/.agents/skills/`
 4. Links Firefox styles into existing `default-release` profiles when `uv` is available
@@ -201,10 +202,15 @@ for f in ${DOTFILES}/local/${MACHINE_NAME}/zsh/*.zsh(N); do source "$f"; done
 - **`${0:A:h}`** resolves the directory of the script, following symlinks. The repo can be checked out anywhere.
 - **`(N)`** is the zsh nullglob qualifier — no error if the directory or files don't exist.
 
-### .zshrc vs .zshenv
+### Shell startup files
 
 - **`.zshenv`** is sourced by every zsh invocation (interactive, non-interactive, login, non-login). Use `zshenv/` for environment variables that non-interactive scripts may need.
+- **`.zprofile`** is sourced by login shells, including non-interactive `zsh -lc` agent commands. It adds Docker Desktop's CLI directory, initializes Homebrew when available, and selects Node with fnm when installed.
 - **`.zshrc`** is sourced only by interactive shells. Use `zsh/` for everything else.
+
+Both `.zprofile` and `zsh/41-javascript.zsh` enable fnm's `--use-on-cd` with recursive version-file lookup. Shells select Node from the nearest `.node-version` or `.nvmrc` in the current directory or its parents, and update it when you change directories.
+
+If `~/.zprofile` already exists as a regular file, review it for secrets before installing. The installer's Stow adoption can copy its contents into the repo. Keep credentials in the gitignored `secrets.*` files described below.
 
 ## Machine identification
 

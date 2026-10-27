@@ -50,7 +50,8 @@ RUN echo "=== Pi runtime directories ===" \
 # Assertions: shell loaders
 RUN echo "=== Shell loaders ===" \
     && test -L ~/.zshrc && readlink ~/.zshrc | grep -q dotfiles && echo "OK: ~/.zshrc" \
-    && test -L ~/.zshenv && readlink ~/.zshenv | grep -q dotfiles && echo "OK: ~/.zshenv"
+    && test -L ~/.zshenv && readlink ~/.zshenv | grep -q dotfiles && echo "OK: ~/.zshenv" \
+    && test -L ~/.zprofile && readlink ~/.zprofile | grep -q dotfiles && echo "OK: ~/.zprofile"
 
 # Assertions: stow-managed Claude files
 RUN echo "=== Claude configs ===" \
@@ -117,6 +118,10 @@ RUN echo "=== Zshenv exports ===" \
     && zsh -c 'source ~/.zshenv && [[ "$HOMEBREW_BUNDLE_NO_UPGRADE" == 1 ]]' && echo "OK: HOMEBREW_BUNDLE_NO_UPGRADE=1" \
     && zsh -c 'source ~/.zshenv && [[ ":$PATH:" == *:/opt/homebrew/bin:* ]]' && echo "OK: PATH contains /opt/homebrew/bin" \
     && zsh -c 'source ~/.zshenv && [[ ":$PATH:" == *:/usr/local/bin:* ]]' && echo "OK: PATH contains /usr/local/bin"
+
+# Login shells must start on hosts without Homebrew or fnm installed.
+RUN zsh -lc '[[ ":$PATH:" == *:"$HOME/.docker/bin":* ]]' \
+    && echo "OK: login profile loads without Homebrew or fnm"
 
 # === Test --adopt path: simulate pre-existing files ===
 # Unstow everything, create conflicting files, re-run install
