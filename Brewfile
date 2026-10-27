@@ -23,6 +23,7 @@ brew "mosh"                         # roaming SSH replacement — survives sleep
 brew "jq"
 brew "ripgrep"
 brew "tree"
+brew "coreutils"                    # GNU timeout, which macOS lacks (agents expect it)
 brew "nano"                         # macOS ships ancient pico-as-nano with no syntax highlighting
 brew "fresh-editor"                 # text editor & IDE - https://getfresh.dev/
 
