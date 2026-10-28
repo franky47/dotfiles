@@ -1,11 +1,11 @@
 {
+  "env": {
+    "DISABLE_TELEMETRY": "1"
+  },
   "attribution": {
     "commit": "",
     "pr": "",
     "sessionUrl": false
-  },
-  "env": {
-    "ENABLE_EXPERIMENTAL_MCP_CLI": "true"
   },
   "permissions": {
     "allow": [
