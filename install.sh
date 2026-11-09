@@ -204,7 +204,7 @@ echo "Mirrored shared skills to ~/.agents/skills/"
 # Share Hermes plugins across the default home and every existing profile.
 # Keep this guarded: installing unrelated dotfiles must not create ~/.hermes.
 if [[ -d "${HOME}/.hermes" ]]; then
-  if ! command -v hermes &>/dev/null; then
+  if ! hermes --help &>/dev/null; then
     echo "ERROR: ~/.hermes exists but the hermes command is unavailable." >&2
     exit 1
   fi
