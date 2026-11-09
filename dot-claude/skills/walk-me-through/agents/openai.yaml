@@ -1,0 +1,15 @@
+interface:
+  display_name: Walk Me Through
+  short_description: Explore unfamiliar code through a guided discussion
+  default_prompt: Use $walk-me-through to guide me through this unfamiliar codebase
+    in a discussion, grounding each explanation in the code and letting my questions
+    steer.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
