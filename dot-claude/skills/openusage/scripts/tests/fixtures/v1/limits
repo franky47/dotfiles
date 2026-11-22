@@ -1,0 +1,230 @@
+{
+  "errors": [],
+  "generatedAt": "2026-11-20T18:00:00.000Z",
+  "providers": {
+    "claude": {
+      "displayName": "Claude",
+      "plan": "Ultra",
+      "stale": false,
+      "resources": {
+        "weekly": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 67,
+          "resetsAt": "2026-11-24T04:00:00.309Z",
+          "unit": "percent",
+          "used": 33,
+          "utilization": 0.33,
+          "windowSeconds": 604800
+        },
+        "fable": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 62,
+          "resetsAt": "2026-11-24T04:00:00.310Z",
+          "unit": "percent",
+          "used": 38,
+          "utilization": 0.38,
+          "windowSeconds": 604800
+        },
+        "rateLimitResets": {
+          "available": 3,
+          "kind": "balance",
+          "unit": "resets"
+        }
+      }
+    },
+    "codex": {
+      "displayName": "Codex",
+      "plan": "Pro 200",
+      "stale": false,
+      "resources": {
+        "weekly": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 40,
+          "resetsAt": "2026-11-23T18:00:00.000Z",
+          "unit": "percent",
+          "used": 60,
+          "utilization": 0.6,
+          "windowSeconds": 604800
+        },
+        "credits": {
+          "available": 18268,
+          "kind": "balance",
+          "unit": "credits"
+        }
+      }
+    },
+    "codex@ab12cd34": {
+      "displayName": "Codex",
+      "stale": false,
+      "resources": {
+        "weekly": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 10,
+          "unit": "percent",
+          "resetsAt": "2026-11-23T18:00:00.000Z",
+          "windowSeconds": 604800
+        }
+      }
+    },
+    "copilot": {
+      "displayName": "Copilot",
+      "plan": "Individual",
+      "stale": true,
+      "resources": {
+        "premiumCredits": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 38,
+          "resetsAt": "2026-12-01T00:00:00.000Z",
+          "unit": "percent",
+          "used": 62,
+          "utilization": 0.62,
+          "windowSeconds": 2592000
+        }
+      }
+    },
+    "zai": {
+      "displayName": "Z.ai",
+      "plan": "Max",
+      "stale": false,
+      "resources": {
+        "weekly": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 0,
+          "resetsAt": "2026-11-22T00:00:00.000Z",
+          "unit": "percent",
+          "used": 100,
+          "utilization": 1,
+          "windowSeconds": 604800
+        },
+        "session": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 100,
+          "resetsAt": "2026-11-20T19:00:00.000Z",
+          "unit": "percent",
+          "used": 0,
+          "utilization": 0,
+          "windowSeconds": 18000
+        }
+      }
+    },
+    "cursor": {
+      "displayName": "Cursor",
+      "stale": false,
+      "resources": {
+        "early": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 4,
+          "unit": "percent",
+          "resetsAt": "2026-11-27T12:57:36.000Z",
+          "windowSeconds": 604800
+        },
+        "nearly": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 99.6,
+          "unit": "percent",
+          "resetsAt": "2026-11-23T18:00:00.000Z",
+          "windowSeconds": 604800
+        },
+        "overdue": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 40,
+          "unit": "percent",
+          "resetsAt": "2026-11-20T17:00:00.000Z",
+          "windowSeconds": 604800
+        },
+        "extra": {
+          "kind": "consumption",
+          "unit": "usd",
+          "used": 12.5
+        },
+        "zeroLimit": {
+          "kind": "consumption",
+          "limit": 0,
+          "unit": "usd",
+          "used": 3
+        },
+        "noWindow": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 50,
+          "unit": "percent",
+          "resetsAt": "2026-11-23T18:00:00.000Z"
+        },
+        "euro": {
+          "kind": "consumption",
+          "limit": 50,
+          "used": 49.96,
+          "unit": "eur",
+          "resetsAt": "2026-11-23T18:00:00.000Z",
+          "windowSeconds": 604800
+        },
+        "onPace": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 50,
+          "unit": "percent",
+          "resetsAt": "2026-11-24T06:00:00.000Z",
+          "windowSeconds": 604800
+        },
+        "fresh": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 0,
+          "unit": "percent",
+          "resetsAt": "2026-11-27T17:50:00.000Z",
+          "windowSeconds": 604800
+        },
+        "five": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 5,
+          "unit": "percent",
+          "resetsAt": "2026-11-23T18:00:00.000Z",
+          "windowSeconds": 604800
+        },
+        "margin": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 45,
+          "unit": "percent",
+          "resetsAt": "2026-11-24T06:00:00.000Z",
+          "windowSeconds": 604800
+        },
+        "room": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 44,
+          "unit": "percent",
+          "resetsAt": "2026-11-24T06:00:00.000Z",
+          "windowSeconds": 604800
+        },
+        "ten": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 8,
+          "unit": "percent",
+          "resetsAt": "2026-11-27T01:12:00.000Z",
+          "windowSeconds": 604800
+        },
+        "burst": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 15,
+          "unit": "percent",
+          "resetsAt": "2026-11-27T12:57:36.000Z",
+          "windowSeconds": 604800
+        }
+      }
+    }
+  }
+}
