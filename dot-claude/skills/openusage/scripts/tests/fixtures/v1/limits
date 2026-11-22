@@ -5,7 +5,7 @@
     "claude": {
       "displayName": "Claude",
       "plan": "Ultra",
-      "stale": false,
+      "stale": true,
       "resources": {
         "weekly": {
           "kind": "consumption",
@@ -32,7 +32,8 @@
           "kind": "balance",
           "unit": "resets"
         }
-      }
+      },
+      "fetchedAt": "2026-11-20T17:54:00.000Z"
     },
     "codex": {
       "displayName": "Codex",
@@ -84,8 +85,14 @@
           "used": 62,
           "utilization": 0.62,
           "windowSeconds": 2592000
+        },
+        "overage": {
+          "kind": "consumption",
+          "used": 2,
+          "unit": "usd"
         }
-      }
+      },
+      "fetchedAt": "2026-11-20T17:49:00.000Z"
     },
     "zai": {
       "displayName": "Z.ai",
@@ -223,6 +230,49 @@
           "unit": "percent",
           "resetsAt": "2026-11-27T12:57:36.000Z",
           "windowSeconds": 604800
+        },
+        "noReset": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 30,
+          "unit": "percent",
+          "windowSeconds": 604800
+        },
+        "nearCap": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 97,
+          "unit": "percent",
+          "resetsAt": "2026-11-23T18:00:00.000Z"
+        },
+        "low": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 3,
+          "unit": "percent",
+          "resetsAt": "2026-11-23T18:00:00.000Z",
+          "windowSeconds": 604800
+        },
+        "idle": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 0,
+          "unit": "percent",
+          "windowSeconds": 18000
+        },
+        "float": {
+          "kind": "consumption",
+          "limit": 100,
+          "used": 9,
+          "unit": "percent",
+          "resetsAt": "2026-11-26T18:28:48.000Z",
+          "windowSeconds": 604800
+        },
+        "spend": {
+          "kind": "consumption",
+          "limit": 50,
+          "used": 1,
+          "unit": "usd"
         }
       }
     }

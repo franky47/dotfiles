@@ -19,6 +19,7 @@ claude/fable: 38% used, pace 53% (15 pts under), resets in 3d 6h at 2026-11-24T0
 
 The pace line is the share of the window that has passed.
 Under the line means spare quota to spend before the reset.
+A limit with no window or reset time uses its cap as the line.
 
 A target is a provider (`claude`), a model, an account (`codex@ab12cd34`) or one limit (`claude/weekly`).
 Fable has its own limit (`claude/fable`); other Claude models use the shared Claude limit;
@@ -27,14 +28,14 @@ Fable has its own limit (`claude/fable`); other Claude models use the shared Cla
 ## Run until caught up or reset
 
 Pick the one limit to pace against, for example `claude/fable` for Fable work.
-After each unit of work, run `usage.sh check <limit>`:
+Before each unit of work, run `usage.sh check <limit>`:
 
 - exit 0: still under the pace line, continue.
 - exit 1: caught up with the pace line, spent, stale or reset. Stop and report the line.
   Under 5% used counts as a reset, so a limit already under 5% stops at once.
 - exit 2: error (app not running, bad target). Stop and report.
 
-The app refreshes about every 5 minutes, so check after each unit of work, not in a tight loop.
+The app refreshes about every 5 minutes, so check once per unit of work, not in a tight loop.
 
 ## Gate a scripted run
 
@@ -45,5 +46,5 @@ or when a limit is spent, stale or reset due. It exits 2 on errors.
 Use it in cron jobs or hooks to start an agent only when there is quota to spend:
 
 ```sh
-~/.claude/skills/openusage/scripts/usage.sh gate fable >/dev/null && claude -p "..."
+~/.claude/skills/openusage/scripts/usage.sh gate fable >/dev/null && claude --model fable -p "..."
 ```

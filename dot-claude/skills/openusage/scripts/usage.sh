@@ -50,13 +50,14 @@ require_target() {
   known=$(jq -r '.providers | keys_unsorted | map(sub("@.*"; ""), select(contains("@"))) | unique[] | ascii_downcase' <<<"$json")
   grep -qxF -- "$provider" <<<"$known" ||
     die "unknown provider or model: $provider (known: ${known//$'\n'/, })"
-  case $scope in
-    all | shared) ;;
-    *) jq -e --arg p "$provider" --arg s "$scope" '
-         any(.providers | to_entries[] | select(.key | ascii_downcase | . == $p or sub("@.*"; "") == $p)
-             | .value.resources | keys[]; ascii_downcase == $s)' <<<"$json" >/dev/null ||
-      die "no $target limit on this plan" ;;
+  case $target:$scope in
+    */* | *:fable) ;;
+    *) return ;;
   esac
+  jq -e --arg p "$provider" --arg s "$scope" --arg t "$target" '
+    any(.providers | to_entries[] | select(.key | ascii_downcase | . == $p or (($t | contains("/") | not) and sub("@.*"; "") == $p))
+        | .value.resources | to_entries[] | select(.value.kind == "consumption") | .key; ascii_downcase == $s)' <<<"$json" >/dev/null ||
+    die "no $target limit on this plan"
 }
 
 limits() {
@@ -74,41 +75,41 @@ limits() {
       | if $m >= 1440 then "\($m / 1440 | floor)d \($m % 1440 / 60 | floor)h"
         elif $m >= 60 then "\($m / 60 | floor)h \($m % 60)m"
         else "\($m)m" end;
-    def matches($id): $provider == "" or ($id | ascii_downcase | . == $provider or sub("@.*"; "") == $provider);
+    def matches($id): $provider == "" or ($id | ascii_downcase | . == $provider or (($target | contains("/") | not) and sub("@.*"; "") == $provider));
     def in_scope($key):
       ($key | ascii_downcase) as $k
       | $scope == "all" or (if $scope == "shared" then $k != "fable" else $k == $scope end);
     def capped($r; $left):
-      ($r.used / $r.limit * 100 | round) as $used
+      ($r.used / $r.limit * 100) as $used
       | (if $r.unit == "percent" then 1 elif $r.unit | test("^[a-z]{3}$") then 0.01 else 0.1 end) as $step
       | ($r.windowSeconds // 0) as $window
-      | "\($used)% used" as $head
-      | "resets in \($left | duration) at \($r.resetsAt | iso)" as $resets
-      | if $left == null then {line: $head}
-        elif $left <= 0 then {line: "\($head), reset due", blocked: true}
-        elif (($r.limit - $r.used) / $step | round) <= 0 then {line: "\($head), spent, \($resets)", blocked: true}
-        elif $window == 0 then {line: "\($head), \($resets)"}
+      | "\($used | round)% used" as $head
+      | (if $left == null then "" else ", resets in \($left | duration) at \($r.resetsAt | iso)" end) as $resets
+      | if $left != null and $left <= 0 then {line: "\($head), reset due", blocked: true}
+        elif (($r.limit - $r.used) / $step | round) <= 0 then {line: "\($head), spent\($resets)", blocked: true}
+        elif $left == null or $window == 0 then {line: "\($head)\($resets)", gap: (100 - $used), pace: 100, fresh: ($used < 5 and ($left != null or $window > 0))}
         else ([$window - $left, 0] | max / $window * 100) as $pace
-          | ($pace - $r.used / $r.limit * 100) as $gap
+          | (($pace - $used) * 1e6 | round / 1e6) as $gap
           | ($gap | fabs | round | if . == 0 then "<1" else . end) as $pts
-          | { line: "\($head), pace \($pace | round)% (\(if $gap > 0 then "\($pts) pts under" elif $gap < 0 then "\($pts) pts over" else "on pace" end)), \($resets)",
-              gap: $gap, pace: $pace, used: ($r.used / $r.limit) }
+          | { line: "\($head), pace \($pace | round)% (\(if $gap > 0 then "\($pts) pts under" elif $gap < 0 then "\($pts) pts over" else "on pace" end))\($resets)",
+              gap: $gap, pace: $pace, fresh: ($used < 5) }
         end;
     def limit($r):
       ($r.resetsAt // null | if . then ts - $now else null end) as $left
       | if ($r.limit // 0) > 0 then capped($r; $left) else {line: "\($r.used) \($r.unit) used"} end;
     def go:
       if .blocked or .stale then false
-      elif $mode == "check" then .gap > 0 and .used >= 0.05
+      elif $mode == "check" then .gap > 0 and (.fresh | not)
       else .pace < 10 or .gap > 5 end;
     [ .providers | to_entries[] | select(matches(.key))
-        | .key as $p | .value.stale as $stale
+        | .key as $p
+        | (.value.stale and (.value.fetchedAt == null or $now - (.value.fetchedAt | ts) > 600)) as $stale
         | .value.resources | to_entries[] | select(.value.kind == "consumption" and in_scope(.key))
         | .key as $k | limit(.value) + {stale: $stale}
         | .line = "\($p)/\($k): \(.line)\(if $stale then " [stale]" else "" end)" ] as $limits
     | ($limits[] | .line),
       if $mode == "show" then empty
-      else [$limits[] | select(.gap or .blocked) | go] as $decisions
+      else [$limits[] | select(.gap or .blocked or .stale) | go] as $decisions
         | if $decisions == [] then "usage.sh: no pace line for \($target)\n" | halt_error(2)
           elif $decisions | all then empty
           else "" | halt_error(1) end
@@ -121,7 +122,7 @@ limits() {
 decide() {
   local mode=$1
   shift
-  [ $# -gt 0 ] || die "$mode needs a provider or model"
+  [ -n "${1:-}" ] || die "$mode needs a provider or model"
   [ $# -eq 1 ] || die "unexpected argument: $2"
   limits "$1" "$mode"
 }
@@ -129,5 +130,8 @@ decide() {
 case ${1:-} in
   -h | --help) usage ;;
   check | gate) decide "$@" ;;
-  *) limits "${1:-}" show ;;
+  *)
+    [ $# -le 1 ] || die "unexpected argument: $2"
+    limits "${1:-}" show
+    ;;
 esac

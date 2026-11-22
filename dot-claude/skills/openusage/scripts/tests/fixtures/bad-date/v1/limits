@@ -1,0 +1,1 @@
+{"providers":{"claude":{"stale":false,"resources":{"weekly":{"kind":"consumption","limit":100,"used":10,"unit":"percent","resetsAt":"2026-11-24 04:00","windowSeconds":604800}}}}}

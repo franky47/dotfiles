@@ -1,0 +1,44 @@
+{
+  "providers": {
+    "claude": {
+      "stale": false,
+      "resources": {
+        "fable": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 62,
+          "resetsAt": "2026-11-24T04:00:00.310Z",
+          "unit": "percent",
+          "used": 38,
+          "utilization": 0.38,
+          "windowSeconds": 604800
+        }
+      }
+    },
+    "claude@9f8e7d6c": {
+      "stale": false,
+      "resources": {
+        "fable": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 98,
+          "resetsAt": "2026-11-24T04:00:00.310Z",
+          "unit": "percent",
+          "used": 2,
+          "utilization": 0.02,
+          "windowSeconds": 604800
+        },
+        "sonnet": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 98,
+          "resetsAt": "2026-11-24T04:00:00.310Z",
+          "unit": "percent",
+          "used": 2,
+          "utilization": 0.02,
+          "windowSeconds": 604800
+        }
+      }
+    }
+  }
+}
