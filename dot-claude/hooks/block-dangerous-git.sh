@@ -1,7 +1,8 @@
 #!/bin/bash
 # PreToolUse hook (matcher: Bash). Hard-blocks destructive git operations that
-# irreversibly discard local work: reset --hard, clean -f, branch -D,
-# checkout ., restore . . `git push` is intentionally NOT blocked.
+# irreversibly discard local work: reset --hard, clean -f, checkout ., restore . .
+# `git push` and `git branch -D` are intentionally NOT blocked:
+# agents may push and delete branches.
 #
 # Mechanism: exit 2 (+ stderr) is the only block that pre-empts permission-rule
 # evaluation, so it holds under defaultMode=bypassPermissions and cannot be
@@ -39,7 +40,7 @@ printf '%s' "$COMMAND" | awk '
 
   # Inspect one shell segment (held in seg[1..nw]); exit 2 if it is a
   # blocked git invocation.
-  function flush(   j, t, b, sub_cmd, k, a, hasDelete, hasForce, hasDot, staged, worktree) {
+  function flush(   j, t, b, sub_cmd, k, a, hasDot, staged, worktree) {
     if (nw == 0) return
 
     j = 1
@@ -75,15 +76,6 @@ printf '%s' "$COMMAND" | awk '
         if (seg[k] == "--force") block("git clean --force")
         if (seg[k] ~ /^-[a-zA-Z]*f/) block("git clean -f")
       }
-    } else if (sub_cmd == "branch") {
-      hasDelete = 0; hasForce = 0
-      for (k = j+1; k <= nw; k++) {
-        a = seg[k]
-        if (a ~ /^-[a-zA-Z]*D/) block("git branch -D")
-        if (a == "--delete" || a ~ /^-[a-zA-Z]*d/) hasDelete = 1
-        if (a == "--force" || a ~ /^-[a-zA-Z]*f/) hasForce = 1
-      }
-      if (hasDelete && hasForce) block("git branch --delete --force")
     } else if (sub_cmd == "checkout") {
       for (k = j+1; k <= nw; k++) if (seg[k] == "." || seg[k] == "./") block("git checkout .")
     } else if (sub_cmd == "restore") {

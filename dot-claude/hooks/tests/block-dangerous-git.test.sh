@@ -91,14 +91,16 @@ assert_blocks 'git -C /repo clean -fd'
 assert_blocks 'cd x && git clean -fd'
 
 # ===========================================================================
-# git branch -D (force-delete) is BLOCKED. Lowercase -d is allowed below.
+# git branch -D (force-delete) is ALLOWED: agents may delete branches.
 # ===========================================================================
-assert_blocks 'git branch -D feature'
-assert_blocks 'git -C /r branch -D old'
-assert_blocks 'git branch --delete --force feature'
-assert_blocks 'git branch -rD origin/feature'
-assert_blocks 'git branch -df feature'
-assert_blocks 'git branch -fd feature'
+assert_blocks 'git branch -D x && git reset --hard'
+assert_allows 'git branch --force feature main'
+assert_allows 'git branch -D feature'
+assert_allows 'git -C /r branch -D old'
+assert_allows 'git branch --delete --force feature'
+assert_allows 'git branch -rD origin/feature'
+assert_allows 'git branch -df feature'
+assert_allows 'git branch -fd feature'
 
 # ===========================================================================
 # git checkout . / restore . (discard worktree) are BLOCKED.
