@@ -108,6 +108,7 @@
       "mcp__shadcn__get_item_examples_from_registries"
     ],
     "deny": [
+      "Artifact",
       "Bash(sudo *)",
       "Bash(dd *)",
       "Bash(mkfs *)",

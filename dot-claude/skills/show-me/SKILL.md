@@ -1,6 +1,6 @@
 ---
 name: show-me
-description: Help the user understand the current topic visually with concise diagrams, code-shape sketches, and focused HTML artifacts.
+description: Help the user understand the current topic visually with concise diagrams, code-shape sketches, and focused HTML pages.
 metadata:
   author: Dex Horthy
   source: https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md
@@ -117,7 +117,7 @@ function expandSkill(command: string): string {
 }
 ```
 
-- For a visual UI, layout, state comparison, or concept too dense for Mermaid, write one focused HTML file — a diagram, an infographic, or a short slide deck, whichever fits the point. Match the product's colors, type, spacing, and components; use real labels and data; support desktop and mobile. Then open it for the user:
+- For a visual UI, layout, state comparison, or concept too dense for Mermaid, write one focused HTML file — a diagram, an infographic, or a short slide deck, whichever fits the point. Match the product's colors, type, spacing, and components; use real labels and data; support desktop and mobile. Then show it to the user: with the `mcp__t3-code__html_preview` tool when it is listed (load it with ToolSearch if deferred), otherwise open it in the browser:
 
 ```
 Bash(open path/to/show-me-{description}.html)
