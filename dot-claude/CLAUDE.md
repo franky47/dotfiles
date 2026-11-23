@@ -20,8 +20,7 @@ Use ASD-STE100 Simplified Technical English.
 
 ## Visuals
 
-- Never use Claude artifacts (the `Artifact` tool).
-- When running in T3 Code, show visuals with the `html_preview` tool instead.
+- When running in T3 Code (the `mcp__t3-code__html_preview` tool is listed; load it with ToolSearch if deferred), show HTML visuals with it.
 
 ## Git
 
