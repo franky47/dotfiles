@@ -1,0 +1,28 @@
+{
+  "errors": [],
+  "generatedAt": "2026-11-20T18:00:00.000Z",
+  "providers": {
+    "claude": {
+      "displayName": "Claude",
+      "plan": "Ultra",
+      "stale": false,
+      "resources": {
+        "weekly": {
+          "kind": "consumption",
+          "limit": 100,
+          "remaining": 67,
+          "resetsAt": "2026-11-24T04:00:00.309Z",
+          "unit": "percent",
+          "used": 33,
+          "utilization": 0.33,
+          "windowSeconds": 604800
+        },
+        "rateLimitResets": {
+          "available": 3,
+          "kind": "balance",
+          "unit": "resets"
+        }
+      }
+    }
+  }
+}
