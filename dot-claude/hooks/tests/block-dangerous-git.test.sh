@@ -91,9 +91,10 @@ assert_blocks 'git -C /repo clean -fd'
 assert_blocks 'cd x && git clean -fd'
 
 # ===========================================================================
-# git branch -D (force-delete) is ALLOWED: the agent may clean up its own
-# branches.
+# git branch -D (force-delete) is ALLOWED: agents may delete branches.
 # ===========================================================================
+assert_blocks 'git branch -D x && git reset --hard'
+assert_allows 'git branch --force feature main'
 assert_allows 'git branch -D feature'
 assert_allows 'git -C /r branch -D old'
 assert_allows 'git branch --delete --force feature'

@@ -2,7 +2,7 @@
 # PreToolUse hook (matcher: Bash). Hard-blocks destructive git operations that
 # irreversibly discard local work: reset --hard, clean -f, checkout ., restore . .
 # `git push` and `git branch -D` are intentionally NOT blocked:
-# agents may push and clean up their own branches.
+# agents may push and delete branches.
 #
 # Mechanism: exit 2 (+ stderr) is the only block that pre-empts permission-rule
 # evaluation, so it holds under defaultMode=bypassPermissions and cannot be
