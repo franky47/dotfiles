@@ -18,6 +18,11 @@ Use ASD-STE100 Simplified Technical English.
   don't try and maximise the line width.
 - After implementation, run code-review agent on changes. Fix all issues found, then re-run. Loop until clean.
 
+## Visuals
+
+- Never use Claude artifacts (the `Artifact` tool).
+- When running in T3 Code, show visuals with the `html_preview` tool instead.
+
 ## Git
 
 - Never add a Co-Authored-By line for Claude when creating Git commits. Do not add Claude as a co-author.
