@@ -92,6 +92,12 @@ check_prereqs() {
     warn=1
   fi
 
+  if ! command -v jq &>/dev/null; then
+    echo "${YELLOW}WARN:${RESET} jq not found — Claude Code hooks won't run."
+    echo "  brew install jq  # or: sudo apt install jq"
+    warn=1
+  fi
+
   if [[ "${MACHINE_NAME}" == "m4x" || "${MACHINE_NAME}" == "echo" ]]; then
     if ! command -v llama-swap &>/dev/null; then
       echo "${YELLOW}WARN:${RESET} llama-swap not found — model swap daemon unavailable."
