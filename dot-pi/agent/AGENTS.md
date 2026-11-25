@@ -16,7 +16,7 @@ Use ASD-STE100 Simplified Technical English.
 - Comments are brittle and leak abstractions. Write self-documenting code instead.
 - If multi-line comments are needed, split lines semantically,
   don't try and maximise the line width.
-- After implementation, run a code review subagent on changes. Fix all issues found, then re-run. Loop until clean.
+- After implementation, run a code review subagent on changes. Fix all issues found, then re-run. Loop until clean. Skip this if your brief says someone else reviews your work. When you brief an agent whose work you will review, say so in the brief.
 
 ## Pi extensions
 
