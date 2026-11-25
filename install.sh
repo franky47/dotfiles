@@ -93,7 +93,7 @@ check_prereqs() {
   fi
 
   if ! command -v jq &>/dev/null; then
-    echo "${YELLOW}WARN:${RESET} jq not found — Claude Code hooks will fail, and the guard hooks will allow every call."
+    echo "${YELLOW}WARN:${RESET} jq not found — Claude Code hooks will fail, and most guard hooks will allow every call."
     echo "  brew install jq  # or: sudo apt install jq"
     warn=1
   fi
