@@ -226,7 +226,7 @@ echo "<machine>" > /path/to/dotfiles/.machine-name
 
 This file is gitignored (per-clone). The hostname fallback usually works, but can change due to network adapter conflicts — the file provides a stable override.
 
-Current machines: `echo` (macOS), `m4x` (macOS), `pi3` (Linux).
+Current machines: `echo` (Ubuntu), `m4x` (macOS), `pi3` (Linux).
 
 ## Machine-local overrides
 
