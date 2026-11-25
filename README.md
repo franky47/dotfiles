@@ -41,7 +41,7 @@ Original sources attributed, but skills have been adapted for my usage.
 | [`typescript-advanced-types`](dot-claude/skills/typescript-advanced-types/SKILL.md) | Generics, conditional/mapped/template-literal types, utility types                                              | Matt Pocock                                  |
 | [`ubiquitous-language`](dot-claude/skills/ubiquitous-language/SKILL.md)             | Extract a DDD glossary from the conversation                                                                    | Matt Pocock                                  |
 | [`write-a-prd`](dot-claude/skills/write-a-prd/SKILL.md)                             | Create a PRD via interview, codebase exploration, module design                                                 | Matt Pocock                                  |
-| [`write-a-skill`](dot-claude/skills/write-a-skill/SKILL.md)                         | Author new skills with progressive disclosure and bundled resources                                             | Matt Pocock                                  |
+| [`writing-for-agents`](dot-claude/skills/writing-for-agents/SKILL.md)               | Write skills, CLAUDE.md and docs that agents follow the same way each run                                       | Matt Pocock                                  |
 
 ## Hermes plugins
 
