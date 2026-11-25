@@ -37,11 +37,12 @@ Original sources attributed, but skills have been adapted for my usage.
 | [`prd-to-issues`](dot-claude/skills/prd-to-issues/SKILL.md)                         | Split a PRD into independently-grabbable beans issues (tracer bullets)                                          | Matt Pocock                                  |
 | [`prototype`](dot-claude/skills/prototype/SKILL.md)                                 | Prototype ideas for UI & logic                                                                                  | Matt Pocock                                  |
 | [`repro`](dot-claude/skills/repro/SKILL.md)                                         | Build a minimal, self-contained bug reproduction                                                                | Matt Pocock                                  |
+| [`retro`](dot-claude/skills/retro/SKILL.md)                                         | Review a coding session and suggest changes to the agent environment                                            | Matt Pocock                                  |
 | [`tdd`](dot-claude/skills/tdd/)                                                     | Red-green-refactor with behavior-focused integration tests                                                      | Matt Pocock                                  |
 | [`typescript-advanced-types`](dot-claude/skills/typescript-advanced-types/SKILL.md) | Generics, conditional/mapped/template-literal types, utility types                                              | Matt Pocock                                  |
 | [`ubiquitous-language`](dot-claude/skills/ubiquitous-language/SKILL.md)             | Extract a DDD glossary from the conversation                                                                    | Matt Pocock                                  |
 | [`write-a-prd`](dot-claude/skills/write-a-prd/SKILL.md)                             | Create a PRD via interview, codebase exploration, module design                                                 | Matt Pocock                                  |
-| [`write-a-skill`](dot-claude/skills/write-a-skill/SKILL.md)                         | Author new skills with progressive disclosure and bundled resources                                             | Matt Pocock                                  |
+| [`writing-for-agents`](dot-claude/skills/writing-for-agents/SKILL.md)               | Write skills, CLAUDE.md and docs that agents follow the same way each run                                       | Matt Pocock                                  |
 
 ## Hermes plugins
 
