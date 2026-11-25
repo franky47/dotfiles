@@ -99,6 +99,7 @@ dot-claude/                     # Stow-managed → ~/.claude/
   settings.json                 # Permissions, hooks, plugins, preferences
   statusline-command.sh
   hooks/
+    block-background-agent.sh   # Blocks background Agent calls in T3 (use delegate_task)
     block-dangerous-git.sh
   agents/
     deep-research.md

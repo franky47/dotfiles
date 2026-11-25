@@ -163,6 +163,15 @@
             "command": "~/.claude/hooks/block-env-files.sh"
           }
         ]
+      },
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-background-agent.sh"
+          }
+        ]
       }
     ],
     "WorktreeCreate": [
