@@ -107,6 +107,10 @@ RUN echo "=== llama-swap (non-m4x) ===" \
     && ! grep -q "llama-swap not found" /tmp/install.out && echo "OK: no llama-swap prereq warn on non-m4x" \
     && ! grep -q "llama-server not found" /tmp/install.out && echo "OK: no llama-server prereq warn on non-m4x"
 
+# Assertions: jq prereq (every Claude hook needs it; this image has none)
+RUN echo "=== jq prereq ===" \
+    && grep -q "WARN.*jq not found" /tmp/install.out && echo "OK: jq prereq warn when missing"
+
 # Assertions: zsh sources
 RUN echo "=== Zsh ===" \
     && zsh -c 'source ~/.zshrc' 2>&1 || true \
