@@ -62,13 +62,14 @@ assert_no_decision Agent '{"prompt":"x","subagent_type":"fork","isolation":"remo
 assert_no_decision Agent '{"prompt":"x","isolation":"remote"}' '{"agent_id":"a1"}'
 assert_no_decision Agent '{"prompt":"x","subagent_type":"fork","isolation":"remote"}' '{"agent_id":"a1"}'
 
-# --- in T3, forks report to the session that started them -------------------
+# --- in T3, forks from the main session are allowed; from a subagent, denied -
 SUBAGENT='{"agent_id":"a1","agent_type":"general-purpose"}'
 assert_no_decision Agent '{"prompt":"x","subagent_type":"fork"}'
 assert_no_decision Agent '{"prompt":"x","subagent_type":"fork","run_in_background":true}'
 assert_no_decision Task '{"prompt":"x","subagent_type":"fork"}'
 assert_no_decision Agent '{"prompt":"x","subagent_type":"fork"}' '{"agent_id":null}'
 assert_no_decision Agent '{"prompt":"x","subagent_type":"fork"}' '{"agent_id":""}'
+assert_no_decision Agent '{"prompt":"x","subagent_type":"fork"}' '{"agent_type":"reviewer"}'
 assert_denies Agent '{"prompt":"x","subagent_type":"fork"}' "$SUBAGENT"
 assert_denies Agent '{"prompt":"x","subagent_type":"fork","run_in_background":false}' "$SUBAGENT"
 assert_denies Agent '{"prompt":"x"}' "$SUBAGENT"
@@ -106,18 +107,21 @@ for env_args in "T3CODE_THREAD_ID=" "-u T3CODE_THREAD_ID"; do
   [ -z "$out" ] || { printf 'FAIL: expected no decision outside T3 (env %s)\nactual: %s\n' "$env_args" "$out" >&2; exit 1; }
 done
 
-# --- in T3 without jq, the hook reports a non-blocking error ----------------
+# --- without jq: blocks in T3, stays silent outside ------------------------
 NO_JQ_BIN=$(mktemp -d)
 trap 'rm -rf "$NO_JQ_BIN"' EXIT
 ln -s "$(command -v cat)" "$NO_JQ_BIN/cat"
-code=0
-err=$(printf '%s' "$background" | env PATH="$NO_JQ_BIN" T3CODE_THREAD_ID="$IN_T3" /bin/bash "$HOOK" 2>&1 >/dev/null) || code=$?
-if [ "$code" != 1 ] || [[ "$err" != *jq* ]]; then
-  printf 'FAIL: expected exit 1 with a jq error when jq is missing\nexit: %s\nstderr: %s\n' "$code" "$err" >&2
-  exit 1
-fi
+for t3 in "$IN_T3" ''; do
+  code=0
+  err=$(printf '%s' "$background" | env PATH="$NO_JQ_BIN" T3CODE_THREAD_ID="$t3" /bin/bash "$HOOK" 2>&1 >/dev/null) || code=$?
+  if [ -n "$t3" ]; then want_code=2; else want_code=0; fi
+  if [ "$code" != "$want_code" ] || { [ -n "$t3" ] && [[ "$err" != *jq* ]]; } || { [ -z "$t3" ] && [ -n "$err" ]; }; then
+    printf 'FAIL: without jq (T3CODE_THREAD_ID=%s) expected exit %s\nexit: %s\nstderr: %s\n' "$t3" "$want_code" "$code" "$err" >&2
+    exit 1
+  fi
+done
 
-# --- unparseable input fails open -------------------------------------------
+# --- empty or unparseable input fails open ---------------------------------
 for raw in '' 'not json' '{}'; do
   out=$(run_raw "$raw" T3CODE_THREAD_ID="$IN_T3")
   [ -z "$out" ] || { printf 'FAIL: expected no decision for raw input: %s\nactual: %s\n' "$raw" "$out" >&2; exit 1; }
